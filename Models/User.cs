@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MedSync.DataLayer.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace MedSync.Models;
@@ -7,7 +8,7 @@ public partial class User
 {
     public Guid UserId { get; set; }
 
-    public int Role { get; set; }
+    public UserType Role { get; set; }
 
     public string? FirstName { get; set; }
 
