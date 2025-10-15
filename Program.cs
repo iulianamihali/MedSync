@@ -1,6 +1,7 @@
 ﻿using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using MedSync.Services;
+using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetSection("Jwt");
 var key = builder.Configuration["Jwt:Key"];
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IGlobalAdminService, GlobalAdminService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
