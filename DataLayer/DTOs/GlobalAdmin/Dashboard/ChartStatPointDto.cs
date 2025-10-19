@@ -2,7 +2,7 @@
 {
     public class ChartStatPointDto
     {
-        public DateTime Date;
-        public int Value;
+        public DateTime Date { get; set; }
+        public int Value { get; set; }
     }
 }

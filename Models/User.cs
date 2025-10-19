@@ -6,7 +6,7 @@ namespace MedSync.Models;
 
 public partial class User
 {
-    public Guid UserId { get; set; }
+    public Guid Id { get; set; }
 
     public UserType Role { get; set; }
 
@@ -47,4 +47,5 @@ public partial class User
     public virtual ICollection<UserSchedule> UserScheduleCreatedByUsers { get; set; } = new List<UserSchedule>();
 
     public virtual ICollection<UserSchedule> UserScheduleUsers { get; set; } = new List<UserSchedule>();
+    public virtual ICollection<SupportIssues> SupportIssues { get; set; } = new List<SupportIssues>();
 }

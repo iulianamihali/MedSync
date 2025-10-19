@@ -5,7 +5,7 @@ namespace MedSync.Models;
 
 public partial class Address
 {
-    public Guid AddressId { get; set; }
+    public Guid Id { get; set; }
 
     public string Country { get; set; } = null!;
 

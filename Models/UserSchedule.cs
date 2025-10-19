@@ -5,7 +5,7 @@ namespace MedSync.Models;
 
 public partial class UserSchedule
 {
-    public Guid ScheduleId { get; set; }
+    public Guid Id { get; set; }
 
     public int DayOfWeek { get; set; }
 

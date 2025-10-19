@@ -5,7 +5,7 @@ namespace MedSync.Models;
 
 public partial class MedicalRecord
 {
-    public Guid RecordId { get; set; }
+    public Guid Id { get; set; }
 
     public Guid PatientId { get; set; }
 

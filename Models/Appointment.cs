@@ -5,7 +5,7 @@ namespace MedSync.Models;
 
 public partial class Appointment
 {
-    public Guid AppointmentId { get; set; }
+    public Guid Id { get; set; }
 
     public Guid InstitutionId { get; set; }
 

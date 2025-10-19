@@ -5,7 +5,7 @@ namespace MedSync.Models;
 
 public partial class Institution
 {
-    public Guid InstitutionId { get; set; }
+    public Guid Id { get; set; }
 
     public int Type { get; set; }
 

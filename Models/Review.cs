@@ -5,7 +5,7 @@ namespace MedSync.Models;
 
 public partial class Review
 {
-    public Guid ReviewId { get; set; }
+    public Guid Id { get; set; }
 
     public int Rating { get; set; }
 

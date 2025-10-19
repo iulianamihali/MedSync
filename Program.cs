@@ -74,7 +74,7 @@ using (var scope = app.Services.CreateScope())
         var userId = Guid.NewGuid();
         var user = new User
         {
-            UserId = userId,
+            Id = userId,
             Email = adminEmail!,
             Role = UserType.GlobalAdmin,
             IsActive = true

@@ -5,6 +5,7 @@
         public string Title { get; set; }
         public int Value { get; set; }
         public string Trend { get; set; }
+        public int TrendValue { get; set; }
         public List<ChartStatPointDto> ChartData { get; set; }
     }
     public class StatCardsResponseDto

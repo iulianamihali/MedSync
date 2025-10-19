@@ -14,16 +14,19 @@ namespace MedSync.Services
             _context = context;
         }
        
-        public async Task<StatCardsResponseDto> GetDashboardStatsCardsAsync(StatCardsRequestDto request)
+        public async Task<StatCardsResponseDto> GetDashboardStatsCardsAsync(DashboardFilterRequestDto request)
         {
+          
             var currentPatientsCount = await _context.Patients
-                .Where(p => p.User.CreatedAt >= request.From && p.User.CreatedAt <= request.To)
+                .Include(p => p.User)
+                .Where(p => p.User.CreatedAt.Date >= request.From.Date && p.User.CreatedAt.Date <= request.To.Date)
                 .CountAsync();
             var currentDoctorsCount = await _context.Doctors
-                .Where(d => d.User.CreatedAt >= request.From && d.User.CreatedAt <= request.To)
+                .Include(d => d.User)
+                .Where(d => d.User.CreatedAt.Date >= request.From.Date && d.User.CreatedAt.Date <= request.To.Date)
                 .CountAsync();
             var currentInstituionsCount = await _context.Institutions
-                .Where(i => i.CreatedAt >= request.From && i.CreatedAt <= request.To)
+                .Where(i => i.CreatedAt.Date >= request.From.Date && i.CreatedAt.Date <= request.To.Date)
                 .CountAsync();
 
             var duration = (request.To - request.From).Days + 1;
@@ -31,23 +34,27 @@ namespace MedSync.Services
             var previousTo = request.From.AddDays(-1);
 
             var previousPatientsCount = await _context.Patients
-                .Where(p => p.User.CreatedAt >= previousFrom && p.User.CreatedAt <= previousTo)
+                .Include(p => p.User)
+                .Where(p => p.User.CreatedAt.Date >= previousFrom.Date && p.User.CreatedAt.Date <= previousTo.Date)
                 .CountAsync();
             var previousDoctorsCount = await _context.Doctors
-                .Where(d => d.User.CreatedAt >= previousFrom && d.User.CreatedAt <= previousTo)
+                .Include(d => d.User)
+                .Where(d => d.User.CreatedAt.Date >= previousFrom.Date && d.User.CreatedAt.Date <= previousTo.Date)
                 .CountAsync();
-            var previousInstituionsCount = await _context.Institutions
-                .Where(i => i.CreatedAt >= previousFrom && i.CreatedAt <= previousTo)
+            var previousInstitutionsCount = await _context.Institutions
+                .Where(i => i.CreatedAt.Date >= previousFrom.Date && i.CreatedAt.Date <= previousTo.Date)
                 .CountAsync();
 
             var patientsInRange = await _context.Patients
-                .Where(p => p.User.CreatedAt >= request.From && p.User.CreatedAt <= request.To)
+                .Include(p => p.User)
+                .Where(p => p.User.CreatedAt.Date >= request.From.Date && p.User.CreatedAt.Date <= request.To.Date)
                 .ToListAsync();
             var doctorsInRange = await _context.Doctors
-                .Where(d => d.User.CreatedAt >= request.From && d.User.CreatedAt <= request.To)
+                .Include(d => d.User)
+                .Where(d => d.User.CreatedAt.Date >= request.From.Date && d.User.CreatedAt.Date <= request.To.Date)
                 .ToListAsync();
             var institutionsInRange = await _context.Institutions
-                .Where(i => i.CreatedAt >= request.From && i.CreatedAt <= request.To)
+                .Where(i => i.CreatedAt.Date >= request.From.Date && i.CreatedAt.Date <= request.To.Date)
                 .ToListAsync();
 
             TimeGroupingType timeGrouping = duration <= 31
@@ -69,6 +76,7 @@ namespace MedSync.Services
                         : currentPatientsCount < previousPatientsCount
                             ? "down"
                             : "neutral",
+                    TrendValue = currentPatientsCount == 0 ? 0 : (int)Math.Round(((double)(currentPatientsCount - previousPatientsCount) / (previousPatientsCount == 0 ? currentPatientsCount : previousPatientsCount)) * 100, 2),
                     ChartData = GroupPatientsByPeriod(patientsInRange, timeGrouping)
 
                 },
@@ -81,21 +89,76 @@ namespace MedSync.Services
                         : currentDoctorsCount < previousDoctorsCount
                             ? "down"
                             : "neutral",
+                    TrendValue = currentDoctorsCount == 0 ? 0 : (int)Math.Round(((double)(currentDoctorsCount - previousDoctorsCount) / (previousDoctorsCount == 0 ? currentDoctorsCount : previousDoctorsCount)) * 100, 2),    
                     ChartData = GroupDoctorsByPeriod(doctorsInRange, timeGrouping)
                 },
                 Institutions = new StatCardDto
                 {
                     Title = "Institutions",
                     Value = currentInstituionsCount,
-                    Trend = currentInstituionsCount > previousInstituionsCount
+                    Trend = currentInstituionsCount > previousInstitutionsCount
                         ? "up"
-                        : currentInstituionsCount < previousInstituionsCount
+                        : currentInstituionsCount < previousInstitutionsCount
                             ? "down"
                             : "neutral",
+                    TrendValue = currentInstituionsCount == 0 ? 0 : (int)Math.Round(((double)(currentInstituionsCount - previousInstitutionsCount) / (previousInstitutionsCount == 0 ? currentInstituionsCount : previousInstitutionsCount)) * 100, 2),
                     ChartData = GroupInstitutionsByPeriod(institutionsInRange, timeGrouping)
                 }
             };
             return response;
+        }
+
+        public async Task<List<SupportBarchartPointsDto>> GetDashboardSupportStatsBarChart(DashboardFilterRequestDto requestDto)
+        {
+            var result = await _context.SupportIssues
+                .Where(s => s.CreatedAt.Date >= requestDto.From.Date && s.CreatedAt.Date <= requestDto.To.Date)
+                .ToListAsync();
+            var groupedResultBasedOnType = result.GroupBy(s => s.Type)
+                .Select(g => new SupportBarchartPointsDto
+                {
+                    Type = g.Key,
+                    Value = g.Count()
+                });
+            return groupedResultBasedOnType.ToList();
+        }
+
+        public async Task<List<PieChartTopInstDto>> GetDashboardTopInstitutionsPieChart(DashboardFilterRequestDto requestDto)
+        {
+            var rows = await _context.Appointments
+                .Include(a => a.Institution)
+                .Where(a => a.CreatedAt.Date >= requestDto.From.Date && a.CreatedAt.Date <= requestDto.To.Date)
+                .ToListAsync();
+            var total = rows.Count;
+            var groupedResultBasedOnInstitution = rows.GroupBy(a => new { Id = a.InstitutionId, Name = a.Institution.Name });
+            List<PieChartTopInstDto> pieChartData = new List<PieChartTopInstDto>();
+            foreach (var groupList in groupedResultBasedOnInstitution)
+            {
+                var totalForGroup = groupList.Count();
+                pieChartData.Add(new PieChartTopInstDto
+                {
+                    Name = groupList.Key.Name,
+                    Total = totalForGroup,
+                    Percentage = Math.Round(((double)totalForGroup / total) * 100.0, 2)
+                }) ;
+            }
+            pieChartData = pieChartData
+                .OrderByDescending(a => a.Total)
+                .ToList();
+            var top3 = pieChartData.Take(3).ToList();
+            var otherTotal = pieChartData.Skip(3).Sum(a => a.Total);
+            var otherPercentage = Math.Round(((double)otherTotal / total) * 100.0, 2);
+
+            if (otherTotal > 0)
+            {
+                top3.Add(new PieChartTopInstDto
+                {
+                    Name = "Other",
+                    Total = otherTotal,
+                    Percentage = otherPercentage
+                });
+            }
+            return top3;
+     
         }
 
         private DateTime GetPeriodStartDate(DateTime date, TimeGroupingType groupingType)
@@ -121,7 +184,7 @@ namespace MedSync.Services
             var result = new Dictionary<DateTime, int>();
             foreach (var p in patients)
             {
-                var key = GetPeriodStartDate(p.User.CreatedAt, groupingType);
+                var key = GetPeriodStartDate(p.User.CreatedAt.Date, groupingType);
                 if (result.ContainsKey(key))
                     result[key]++;
                 else
@@ -138,7 +201,7 @@ namespace MedSync.Services
             var result = new Dictionary<DateTime, int>();
             foreach (var d in doctors)
             {
-                var key = GetPeriodStartDate(d.User.CreatedAt, groupingType);
+                var key = GetPeriodStartDate(d.User.CreatedAt.Date, groupingType);
                 if (result.ContainsKey(key))
                     result[key]++;
                 else
@@ -156,7 +219,7 @@ namespace MedSync.Services
             var result = new Dictionary<DateTime, int>();
             foreach (var i in institutions)
             {
-                var key = GetPeriodStartDate(i.CreatedAt, groupingType);
+                var key = GetPeriodStartDate(i.CreatedAt.Date, groupingType);
                 if (result.ContainsKey(key))
                     result[key]++;
                 else

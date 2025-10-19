@@ -16,9 +16,22 @@ namespace MedSync.Controllers
         }
 
         [HttpGet("dashboardStatsCards")]
-        public async Task<IActionResult> GetDashboardStatsCards([FromQuery] StatCardsRequestDto request)
+        public async Task<IActionResult> GetDashboardStatsCards([FromQuery] DashboardFilterRequestDto request)
         {
             var response = await _globalAdminService.GetDashboardStatsCardsAsync(request);
+            return Ok(response);
+        }
+        [HttpGet("dashboardSupportStatsBarChart")]
+        public async Task<IActionResult> GetDashboardSupportStatsBarChart([FromQuery] DashboardFilterRequestDto request)
+        {
+            var response = await _globalAdminService.GetDashboardSupportStatsBarChart(request);
+            return Ok(response);
+        }
+
+        [HttpGet("dashboardTopInstitutionsPieChart")]
+        public async Task<IActionResult> GetDashboardTopInstitutionsPieChart([FromQuery] DashboardFilterRequestDto request)
+        {
+            var response = await _globalAdminService.GetDashboardTopInstitutionsPieChart(request);
             return Ok(response);
         }
 

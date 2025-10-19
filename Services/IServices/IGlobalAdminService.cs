@@ -4,6 +4,8 @@ namespace MedSync.Services.IServices
 {
     public interface IGlobalAdminService
     {
-        Task<StatCardsResponseDto> GetDashboardStatsCardsAsync(StatCardsRequestDto requestDto);
+        Task<StatCardsResponseDto> GetDashboardStatsCardsAsync(DashboardFilterRequestDto requestDto);
+        Task<List<SupportBarchartPointsDto>> GetDashboardSupportStatsBarChart(DashboardFilterRequestDto requestDto);
+        Task<List<PieChartTopInstDto>> GetDashboardTopInstitutionsPieChart(DashboardFilterRequestDto requestDto);
     }
 }

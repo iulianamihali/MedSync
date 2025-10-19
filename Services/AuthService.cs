@@ -36,7 +36,7 @@ namespace MedSync.Services
             return new LoginResponseDto
             {
                 Token = token,
-                UserId = user.UserId,
+                UserId = user.Id,
                 Role = user.Role,
                 Email = user.Email,
                 UserName = $"{user.FirstName} {user.LastName}"
@@ -47,7 +47,7 @@ namespace MedSync.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("name", $"{user.FirstName} {user.LastName}".Trim()),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
@@ -78,7 +78,7 @@ namespace MedSync.Services
         {
             var newUser = new User
             {
-                UserId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Role = request.Role,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
@@ -96,7 +96,7 @@ namespace MedSync.Services
             {
                 var patient = new Patient
                 {
-                    UserId = newUser.UserId,
+                    UserId = newUser.Id,
                     Cnp = request.PatientData.Cnp,
                     InsuranceCardNumber = request.PatientData.InsuranceNumber,
                     EmergencyContactName = request.PatientData.EmergencyContactName,
@@ -107,7 +107,7 @@ namespace MedSync.Services
             else if (request.Role == UserType.Doctor) {
                 var doctor = new Doctor
                 {
-                    UserId = newUser.UserId,
+                    UserId = newUser.Id,
                     Specialization = request.DoctorData.Specialization,
                     YearsOfExperience = request.DoctorData.YearsOfExperience,
                     MedicalLicenseNumber = request.DoctorData.LicenseNumber,
@@ -121,7 +121,7 @@ namespace MedSync.Services
             return new LoginResponseDto
             {
                 Token = token,
-                UserId = newUser.UserId,
+                UserId = newUser.Id,
                 Role = newUser.Role,
                 Email = newUser.Email,
                 UserName = $"{newUser.FirstName} {newUser.LastName}"

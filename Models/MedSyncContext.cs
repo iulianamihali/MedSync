@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MedSync.DataLayer.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace MedSync.Models;
@@ -38,12 +39,13 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserSchedule> UserSchedules { get; set; }
+    public virtual DbSet<SupportIssues> SupportIssues { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.Property(e => e.AddressId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.City).HasMaxLength(100);
             entity.Property(e => e.Country).HasMaxLength(100);
             entity.Property(e => e.Number).HasMaxLength(20);
@@ -55,7 +57,7 @@ public partial class MedSyncContext : DbContext
         {
             entity.HasIndex(e => new { e.DoctorId, e.StartDateTime }, "IX_Appointments_Doctor_StartDateTime").IsUnique();
 
-            entity.Property(e => e.AppointmentId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
 
             entity.HasOne(d => d.Doctor).WithMany(p => p.Appointments)
@@ -111,7 +113,7 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<Institution>(entity =>
         {
-            entity.Property(e => e.InstitutionId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
@@ -141,9 +143,9 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<MedicalRecord>(entity =>
         {
-            entity.HasKey(e => e.RecordId);
+            entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.RecordId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Title).HasMaxLength(255);
 
@@ -202,7 +204,7 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<Review>(entity =>
         {
-            entity.Property(e => e.ReviewId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Comment).HasMaxLength(1000);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
 
@@ -226,7 +228,7 @@ public partial class MedSyncContext : DbContext
         {
             entity.HasIndex(e => e.Email, "UQ__Users__A9D105346202A944").IsUnique();
 
-            entity.Property(e => e.UserId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.FirstName).HasMaxLength(100);
@@ -246,9 +248,9 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<UserSchedule>(entity =>
         {
-            entity.HasKey(e => e.ScheduleId);
+            entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.ScheduleId).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.UserScheduleCreatedByUsers)
                 .HasForeignKey(d => d.CreatedByUserId)
@@ -264,6 +266,24 @@ public partial class MedSyncContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserSchedules_UserId");
+        });
+        
+        modelBuilder.Entity<SupportIssues>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+          
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.Type).HasConversion(x => (short)x, x => (SupportIssuesEnumType)x).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.Active).IsRequired();
+            entity.Property(e => e.Status).HasConversion(x => (short)x, x => (StatusSupportEnumType)x).IsRequired();
+
+            entity.HasOne(d => d.User).WithMany(p => p.SupportIssues)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SupportIssues_UserId");
         });
 
         OnModelCreatingPartial(modelBuilder);
