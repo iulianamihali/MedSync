@@ -34,11 +34,12 @@ GO
 -- 3. Institutions
 CREATE TABLE Institutions (
     Id uniqueidentifier NOT NULL,
-    Type int NOT NULL,
+    Code nvarchar(25) not null UNIQUE,
     Name nvarchar(255) NOT NULL,
     PhoneNumber nvarchar(20),
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
     AddressId uniqueidentifier NOT NULL,
+    Active bit NOT NULL DEFAULT 0,
     CONSTRAINT PK_Institutions PRIMARY KEY (Id),
     CONSTRAINT FK_Institutions_AddressId FOREIGN KEY (AddressId) REFERENCES Addresses(Id)
 );

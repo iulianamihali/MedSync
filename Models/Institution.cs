@@ -7,7 +7,7 @@ public partial class Institution
 {
     public Guid Id { get; set; }
 
-    public int Type { get; set; }
+    public string Code { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -16,7 +16,7 @@ public partial class Institution
     public DateTime CreatedAt { get; set; }
 
     public Guid AddressId { get; set; }
-
+    public bool Active { get; set; }
     public virtual Address Address { get; set; } = null!;
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
