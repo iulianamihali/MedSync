@@ -192,3 +192,4 @@ CREATE TABLE SupportIssues (
 	CONSTRAINT PK_SupportIssues PRIMARY KEY (Id),
 	CONSTRAINT FK_SupportIssues_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
 );
+

@@ -13,6 +13,7 @@ var jwt = builder.Configuration.GetSection("Jwt");
 var key = builder.Configuration["Jwt:Key"];
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IGlobalAdminService, GlobalAdminService>();
+builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
