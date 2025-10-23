@@ -40,6 +40,7 @@ public partial class MedSyncContext : DbContext
 
     public virtual DbSet<UserSchedule> UserSchedules { get; set; }
     public virtual DbSet<SupportIssues> SupportIssues { get; set; }
+    public virtual DbSet<InstitutionRequests> InstitutionRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -118,6 +119,7 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+            entity.Property(e => e.TaxIdentificationNumber).HasMaxLength(25);
 
             entity.HasOne(d => d.Address).WithMany(p => p.Institutions)
                 .HasForeignKey(d => d.AddressId)
@@ -287,6 +289,26 @@ public partial class MedSyncContext : DbContext
                 .HasConstraintName("FK_SupportIssues_UserId");
         });
 
+        modelBuilder.Entity<InstitutionRequests>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.InstitutionId).IsRequired();
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime2(0)");
+            entity.Property(e => e.Status).HasConversion(x => (short)x, x => (InstitutionRequestsStatusEnumType)x).IsRequired();
+
+            entity.HasOne(d => d.User).WithMany(p => p.InstitutionRequests)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_InstitutionRequests_UserId");
+            entity.HasOne(d => d.Institution).WithMany(p => p.InstitutionRequests)
+               .HasForeignKey(d => d.InstitutionId)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_InstitutionRequests_InstitutionId");
+        });
         OnModelCreatingPartial(modelBuilder);
     }
 

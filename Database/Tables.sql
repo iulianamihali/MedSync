@@ -40,6 +40,7 @@ CREATE TABLE Institutions (
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
     AddressId uniqueidentifier NOT NULL,
     Active bit NOT NULL DEFAULT 0,
+    TaxIdentificationNumber nvarchar(25) NOT NULL UNIQUE,
     CONSTRAINT PK_Institutions PRIMARY KEY (Id),
     CONSTRAINT FK_Institutions_AddressId FOREIGN KEY (AddressId) REFERENCES Addresses(Id)
 );
@@ -191,5 +192,18 @@ CREATE TABLE SupportIssues (
 	Status smallint NOT NULL,
 	CONSTRAINT PK_SupportIssues PRIMARY KEY (Id),
 	CONSTRAINT FK_SupportIssues_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+);
+
+Create table InstitutionRequests (
+	Id uniqueidentifier NOT NULL,
+	UserId uniqueidentifier NOT NULL,
+	InstitutionId uniqueidentifier NOT NULL,
+	CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
+	UpdatedAt datetime2 NULL,
+	Status smallint NOT NULL,
+    CONSTRAINT PK_InstitutionRequests PRIMARY KEY (Id),
+	CONSTRAINT FK_InstitutionRequests_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+	CONSTRAINT FK_InstitutionRequests_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
+
 );
 

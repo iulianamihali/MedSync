@@ -3,6 +3,7 @@
     public class InstitutionRequestDto
     {
         public string InstitutionName { get; set; }
+        public string TaxIdentificationNumber { get; set; }
         public string Country { get; set; }
         public string City { get; set; }
         public string StreetAddress { get; set; }

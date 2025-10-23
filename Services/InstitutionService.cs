@@ -31,6 +31,7 @@ namespace MedSync.Services
             {
                 Id = Guid.NewGuid(),
                 Name = requestDto.InstitutionName,
+                TaxIdentificationNumber = requestDto.TaxIdentificationNumber,
                 PhoneNumber = requestDto.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
                 AddressId = newAddress.Id,
@@ -52,9 +53,21 @@ namespace MedSync.Services
                 PasswordHash = requestDto.Password,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = false,
-                AddressId = null,
+                AddressId = newAddress.Id,
             };
             _context.Users.Add(newUser);
+
+            var newInstitutionRequest = new InstitutionRequests
+            {
+                Id = Guid.NewGuid(),
+                UserId = newUser.Id,
+                InstitutionId = newInstitution.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = null,
+                Status = InstitutionRequestsStatusEnumType.Pending,
+
+            };
+            _context.InstitutionRequests.Add(newInstitutionRequest);
             var result = await _context.SaveChangesAsync();
             return result > 0;
         }
