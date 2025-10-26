@@ -2,11 +2,13 @@
 using MedSync.Services;
 using MedSync.Services.IServices;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
-
+using MedSync.Attributes;
+using MedSync.DataLayer.Enums;
 namespace MedSync.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [AuthorizeUserType(UserType.GlobalAdmin)]
     public class GlobalAdminController : ControllerBase
     {
         private readonly IGlobalAdminService _globalAdminService;

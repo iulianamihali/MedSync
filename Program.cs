@@ -14,6 +14,7 @@ var key = builder.Configuration["Jwt:Key"];
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IGlobalAdminService, GlobalAdminService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
+builder.Services.AddScoped<MailerSendService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

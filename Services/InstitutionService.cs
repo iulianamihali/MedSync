@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
 using NanoidDotNet;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 namespace MedSync.Services
 {
@@ -14,10 +15,12 @@ namespace MedSync.Services
     {
         private readonly MedSyncContext _context;
         private readonly PasswordHasher<User> _passwordHasher = new();
+        private readonly MailerSendService _mailerSendService;
 
-        public InstitutionService(MedSyncContext context)
+        public InstitutionService(MedSyncContext context, MailerSendService mailerSendService)
         {
             _context = context;
+            _mailerSendService = mailerSendService;
         }
         public async Task<bool> RegisterInstitutionAsync(InstitutionRequestDto requestDto)
         {
@@ -114,6 +117,7 @@ namespace MedSync.Services
         public async Task<bool> UpdateStatusInstitutionRequestAsync(UpdateInstitutionRequestDto request)
         {
             var result = await _context.InstitutionRequests
+                  .Include(u => u.Institution)
                   .Where(u => u.Id == request.Id)
                   .FirstOrDefaultAsync();
             if (result != null)
@@ -137,6 +141,7 @@ namespace MedSync.Services
                         _context.Users.Update(user);
                     }
 
+
                 }
                 else
                 {
@@ -146,7 +151,38 @@ namespace MedSync.Services
 
                 }
 
-                return (await _context.SaveChangesAsync()) > 0;
+                var success = (await _context.SaveChangesAsync()) > 0;
+
+                if (success) {
+                    var json = File.ReadAllText("EmailTemplates.json");
+                    using var doc = JsonDocument.Parse(json);
+                    if (request.Value)
+                    {
+                        var template = doc.RootElement.GetProperty("InstitutionApproved");
+                        var subject = template.GetProperty("subject").GetString();
+                        var html = template.GetProperty("html").GetString()
+                            .Replace("{{InstitutionName}}", result.Institution.Name)
+                            .Replace("{{AccessCode}}", result.Institution.Code);
+                        await _mailerSendService.SendEmailAsync(
+                            toEmail: "miuliana959@gmail.com",
+                            subject: subject,
+                            message: html
+                            );
+                        
+                    }
+                    else {
+                        var template = doc.RootElement.GetProperty("InstitutionRejected");
+                        var subject = template.GetProperty("subject").GetString();
+                        var html = template.GetProperty("html").GetString()
+                            .Replace("{{InstitutionName}}", result.Institution.Name);
+                        await _mailerSendService.SendEmailAsync(
+                           toEmail: "miuliana959@gmail.com",
+                           subject: template.GetProperty("subject").GetString(),
+                           message: html
+                           );
+                    }
+                    return success;
+                }
 
             }
             return false;
