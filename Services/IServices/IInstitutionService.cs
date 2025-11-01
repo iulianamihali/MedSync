@@ -8,5 +8,6 @@ namespace MedSync.Services.IServices
         Task<int> CountInstitutionRequestsAsync();
         Task<List<InstitutionReqPopUpResponseDto>> GetInstitutionRequestDetailsAsync();
         Task<bool> UpdateStatusInstitutionRequestAsync(UpdateInstitutionRequestDto request);
+        Task<List<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync();
     }
 }

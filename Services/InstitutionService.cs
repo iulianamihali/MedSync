@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.Enums;
 using MedSync.Models;
@@ -187,6 +188,28 @@ namespace MedSync.Services
             }
             return false;
 
+        }
+        public async Task<List<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync()
+        {
+            var result = await _context.InstitutionRequests
+                .Include(i => i.User)
+                    .ThenInclude(i => i.Address)
+                .Include(i => i.Institution)
+                .Select(i => new InstitutionsDataTableResponseDto
+                {
+                    Id = i.Institution.Id,
+                    NameInstitution = i.Institution.Name,
+                    NameAdmin = $"{i.User.FirstName} {i.User.LastName}",
+                    Address = $"{i.Institution.Address.Country}, {i.Institution.Address.City}, {i.Institution.Address.Street}, {i.Institution.Address.Number}",
+                    Email = i.User.Email,
+                    PhoneNumber = i.User.PhoneNumber,
+                    CreatedAt = i.Institution.CreatedAt,
+                    status = i.Institution.Active
+
+                })
+                .OrderByDescending(i => i.CreatedAt)
+                .ToListAsync();
+            return result;
         }
 
         private string GenerateInstitutionCode (string institutionName)
