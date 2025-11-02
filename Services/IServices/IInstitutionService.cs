@@ -1,4 +1,5 @@
-﻿using MedSync.DataLayer.DTOs.Institution;
+﻿using MedSync.DataLayer.DTOs;
+using MedSync.DataLayer.DTOs.Institution;
 
 namespace MedSync.Services.IServices
 {
@@ -8,6 +9,6 @@ namespace MedSync.Services.IServices
         Task<int> CountInstitutionRequestsAsync();
         Task<List<InstitutionReqPopUpResponseDto>> GetInstitutionRequestDetailsAsync();
         Task<bool> UpdateStatusInstitutionRequestAsync(UpdateInstitutionRequestDto request);
-        Task<List<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync();
+        Task<PaginationDto<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync(int page);
     }
 }

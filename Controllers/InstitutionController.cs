@@ -46,11 +46,11 @@ namespace MedSync.Controllers
             var response = await _institutionService.UpdateStatusInstitutionRequestAsync(request);
             return Ok(response);
         }
-        [HttpGet("getDataTableInstitutions")]
+        [HttpGet("getDataTableInstitutions/{page}")]
         [AuthorizeUserType(UserType.GlobalAdmin)]
-        public async Task<IActionResult> GetDataTableInstitutions()
+        public async Task<IActionResult> GetDataTableInstitutions(int page)
         {
-            var response = await _institutionService.GetInstitutionsDataTableAsync();
+            var response = await _institutionService.GetInstitutionsDataTableAsync(page);
             return Ok(response);
         }
 

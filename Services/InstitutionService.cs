@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Core;
+using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.Enums;
 using MedSync.Models;
@@ -189,9 +190,9 @@ namespace MedSync.Services
             return false;
 
         }
-        public async Task<List<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync()
+        public async Task<PaginationDto<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync(int page)
         {
-            var result = await _context.InstitutionRequests
+            var result = _context.InstitutionRequests
                 .Include(i => i.User)
                     .ThenInclude(i => i.Address)
                 .Include(i => i.Institution)
@@ -207,9 +208,18 @@ namespace MedSync.Services
                     status = i.Institution.Active
 
                 })
+                .AsQueryable();
+            var rows = await result
+                .Skip(page * 3)
+                .Take(3)
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
-            return result;
+            var total = await result.CountAsync();
+            return new PaginationDto<InstitutionsDataTableResponseDto>
+            {
+                Rows = rows,
+                TotalCount = total,
+            };
         }
 
         private string GenerateInstitutionCode (string institutionName)
