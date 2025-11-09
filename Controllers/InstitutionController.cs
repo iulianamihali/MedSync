@@ -53,6 +53,14 @@ namespace MedSync.Controllers
             var response = await _institutionService.GetInstitutionsDataTableAsync(page);
             return Ok(response);
         }
+        [HttpPut("updateInstitutionsInfo")]
+        [AuthorizeUserType(UserType.GlobalAdmin)]
+        public async Task<IActionResult> UpdateInstitutionsInfo([FromBody] UpdateInstitutionsInfoDto info)
+        {
+            var response = await _institutionService.UpdateInstitutionsInfoAsync(info);
+            return Ok(response);
+        }
+            
 
     }
 }

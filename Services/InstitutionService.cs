@@ -11,6 +11,7 @@ using NanoidDotNet;
 using NanoidDotNet;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 namespace MedSync.Services
 {
     public class InstitutionService : IInstitutionService
@@ -199,13 +200,18 @@ namespace MedSync.Services
                 .Select(i => new InstitutionsDataTableResponseDto
                 {
                     Id = i.Institution.Id,
-                    NameInstitution = i.Institution.Name,
-                    NameAdmin = $"{i.User.FirstName} {i.User.LastName}",
+                    InstitutionName = i.Institution.Name,
+                    AdminName = $"{i.User.FirstName} {i.User.LastName}",
                     Address = $"{i.Institution.Address.Country}, {i.Institution.Address.City}, {i.Institution.Address.Street}, {i.Institution.Address.Number}",
+                    Country = i.Institution.Address.Country,
+                    City = i.Institution.Address.City,
+                    StreetAddress = i.Institution.Address.Street,
+                    StreetNumber = i.Institution.Address.Number,
+                    PostalCode = i.Institution.Address.PostalCode,
                     Email = i.User.Email,
                     PhoneNumber = i.User.PhoneNumber,
                     CreatedAt = i.Institution.CreatedAt,
-                    status = i.Institution.Active
+                    Status = i.Institution.Active
 
                 })
                 .AsQueryable();
@@ -220,6 +226,26 @@ namespace MedSync.Services
                 Rows = rows,
                 TotalCount = total,
             };
+        }
+
+        public async Task<bool> UpdateInstitutionsInfoAsync(UpdateInstitutionsInfoDto request)
+        {
+            var result = await _context.Institutions
+                    .Include(i => i.Address)
+                    .Where(i => i.Id == request.Id)
+                .FirstOrDefaultAsync();
+            if(result != null)
+            {
+                result.Name = request.InstitutionName;
+                result.Address.Country = request.Country;
+                result.Address.City = request.City;
+                result.Address.Street = request.StreetAddress;
+                result.Address.Number = request.StreetNumber;
+                result.Address.PostalCode = request.PostalCode;
+                result.Active = request.Status;
+                _context.Institutions.Update(result);
+            }
+            return (await _context.SaveChangesAsync()) > 0;
         }
 
         private string GenerateInstitutionCode (string institutionName)
