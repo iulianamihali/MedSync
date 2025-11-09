@@ -1,5 +1,6 @@
 ﻿using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Institution;
+using MedSync.DataLayer.DTOs.User;
 
 namespace MedSync.Services.IServices
 {
@@ -10,6 +11,6 @@ namespace MedSync.Services.IServices
         Task<List<InstitutionReqPopUpResponseDto>> GetInstitutionRequestDetailsAsync();
         Task<bool> UpdateStatusInstitutionRequestAsync(UpdateInstitutionRequestDto request);
         Task<PaginationDto<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync(int page);
-        Task<bool> UpdateInstitutionsInfoAsync(UpdateInstitutionsInfoDto info); 
+        Task<bool> UpdateInstitutionsInfoAsync(UpdateInstitutionsInfoDto info);
     }
 }

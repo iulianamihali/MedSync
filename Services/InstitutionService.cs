@@ -79,6 +79,15 @@ namespace MedSync.Services
 
             };
             _context.InstitutionRequests.Add(newInstitutionRequest);
+
+            var newInstitutionUser = new InstitutionUser
+            {
+                InstitutionId = newInstitution.Id,
+                UserId = newUser.Id,
+                CreatedAt = DateTime.Now,
+            };
+            _context.InstitutionUsers.Add(newInstitutionUser);
+
             var result = await _context.SaveChangesAsync();
             return result > 0;
         }
@@ -216,8 +225,8 @@ namespace MedSync.Services
                 })
                 .AsQueryable();
             var rows = await result
-                .Skip(page * 3)
-                .Take(3)
+                .Skip(page * 9)
+                .Take(9)
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
             var total = await result.CountAsync();
