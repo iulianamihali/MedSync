@@ -47,5 +47,27 @@ namespace MedSync.Services
             };
 
         }
+
+        public async Task<UserSettingsDataResponseDto> GetUserSettingsDataAsync(Guid id)
+        {
+            var result = await _context.Users
+                .Where(i => i.Id == id)
+                .Include(i => i.Address)
+                .Select(i => new UserSettingsDataResponseDto
+                {
+                    Id = i.Id,
+                    FirstName = i.FirstName,
+                    LastName = i.LastName,
+                    PhoneNumber = i.PhoneNumber,
+                    Email = i.Email,
+                    Country = i.Address.Country,
+                    City = i.Address.City,
+                    StreetAddress = i.Address.Street,
+                    StreetNumber = i.Address.Number,
+                    PostalCode = i.Address.PostalCode
+                })
+                .FirstOrDefaultAsync();
+            return result;
+        }
     }
 }

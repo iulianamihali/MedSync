@@ -21,6 +21,13 @@ namespace MedSync.Controllers
             var result = await _userService.GetDataTableUsersAsync(page, userType);
             return Ok(result);
         }
+        [HttpGet("getUserSettingsData/{id}")]
+        [AuthorizeUserType(UserType.GlobalAdmin, UserType.LocalAdmin, UserType.Patient, UserType.Doctor)]
+        public async Task<IActionResult> GetUserSettingsDataAsync(Guid id)
+        {
+            var result = await _userService.GetUserSettingsDataAsync(id);
+            return Ok(result);
+        }
 
     }
 }
