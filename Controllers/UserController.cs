@@ -1,4 +1,5 @@
 ﻿using MedSync.Attributes;
+using MedSync.DataLayer.DTOs.User;
 using MedSync.DataLayer.Enums;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,19 @@ namespace MedSync.Controllers
             var result = await _userService.GetUserSettingsDataAsync(id);
             return Ok(result);
         }
-
+        [HttpPut("editInfoUsers")]
+        [AuthorizeUserType(UserType.GlobalAdmin, UserType.LocalAdmin, UserType.Patient, UserType.Doctor)]
+        public async Task<IActionResult> EditInfoUsersAsync(UserSettingsDataResponseDto request)
+        {
+            var response = await _userService.EditInfoUsersAsync(request);
+            return Ok(response);
+        }
+        [HttpPut("updateUserStatus")]
+        [AuthorizeUserType(UserType.GlobalAdmin, UserType.LocalAdmin)]
+        public async Task<IActionResult> UpdateUserStatusAsync(UpdateUserStatusRequestDto request)
+        {
+            var response = await _userService.UpdateUserStatusAsync(request);
+            return Ok(response);
+        }
     }
 }

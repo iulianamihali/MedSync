@@ -24,7 +24,7 @@ namespace MedSync.Services
                 .Select(i => new UsersDataTableResponseDto
                 {
                     Id = i.Id,
-                    UserName = $"{i.FirstName},{i.LastName}",
+                    UserName = $"{i.FirstName} {i.LastName}",
                     Role = i.Role,
                     InstitutionName = string.Join(", ", i.InstitutionUsers
                         .Select(x => x.Institution.Name)),
@@ -68,6 +68,41 @@ namespace MedSync.Services
                 })
                 .FirstOrDefaultAsync();
             return result;
+        }
+
+        public async Task<bool> EditInfoUsersAsync(UserSettingsDataResponseDto request)
+        {
+            var result = await _context.Users
+                .Where(i => i.Id == request.Id)
+                .Include(i => i.Address)
+                .FirstOrDefaultAsync();
+            result.FirstName = request.FirstName;
+            result.LastName = request.LastName;
+            result.PhoneNumber = request.PhoneNumber;
+            result.Email = request.Email;
+            if(result.Role == UserType.Patient || result.Role == UserType.Doctor)
+            {
+                result.Address.Country = request.Country;
+                result.Address.City = request.City;
+                result.Address.Street = request.StreetAddress;
+                result.Address.Number = request.StreetNumber;
+                result.Address.PostalCode = request.PostalCode;
+            }
+            _context.Users.Update(result);
+            return (await _context.SaveChangesAsync()) > 0;
+        }
+
+        public async Task<bool> UpdateUserStatusAsync(UpdateUserStatusRequestDto request)
+        {
+            var result = await _context.Users
+                .Where(i => i.Id == request.Id)
+                .FirstOrDefaultAsync();
+            if (result != null)
+            {
+                result.IsActive = request.Value;
+                _context.Users.Update(result);
+            }
+            return (await _context.SaveChangesAsync()) > 0;
         }
     }
 }
