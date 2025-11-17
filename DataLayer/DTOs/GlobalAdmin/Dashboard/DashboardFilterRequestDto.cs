@@ -4,5 +4,6 @@
     {
         public DateTime From { get; set; }
         public DateTime To { get; set; }
+        public Guid?  InstitutionId { get; set; }
     }
 }

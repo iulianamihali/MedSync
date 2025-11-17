@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MedSync.DataLayer.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace MedSync.Models;
@@ -21,7 +22,7 @@ public partial class Appointment
 
     public DateTime EndDateTime { get; set; }
 
-    public int Status { get; set; }
+    public AppointmentStatusEnumType Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

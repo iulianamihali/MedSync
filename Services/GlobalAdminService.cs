@@ -25,7 +25,7 @@ namespace MedSync.Services
                 .Include(d => d.User)
                 .Where(d => d.User.CreatedAt.Date >= request.From.Date && d.User.CreatedAt.Date <= request.To.Date)
                 .CountAsync();
-            var currentInstituionsCount = await _context.Institutions
+            var currentInstitutionsCount = await _context.Institutions
                 .Where(i => i.CreatedAt.Date >= request.From.Date && i.CreatedAt.Date <= request.To.Date)
                 .CountAsync();
 
@@ -95,13 +95,13 @@ namespace MedSync.Services
                 Institutions = new StatCardDto
                 {
                     Title = "Institutions",
-                    Value = currentInstituionsCount,
-                    Trend = currentInstituionsCount > previousInstitutionsCount
+                    Value = currentInstitutionsCount,
+                    Trend = currentInstitutionsCount > previousInstitutionsCount
                         ? "up"
-                        : currentInstituionsCount < previousInstitutionsCount
+                        : currentInstitutionsCount < previousInstitutionsCount
                             ? "down"
                             : "neutral",
-                    TrendValue = currentInstituionsCount == 0 ? 0 : (int)Math.Round(((double)(currentInstituionsCount - previousInstitutionsCount) / (previousInstitutionsCount == 0 ? currentInstituionsCount : previousInstitutionsCount)) * 100, 2),
+                    TrendValue = currentInstitutionsCount == 0 ? 0 : (int)Math.Round(((double)(currentInstitutionsCount - previousInstitutionsCount) / (previousInstitutionsCount == 0 ? currentInstitutionsCount : previousInstitutionsCount)) * 100, 2),
                     ChartData = GroupInstitutionsByPeriod(institutionsInRange, timeGrouping)
                 }
             };

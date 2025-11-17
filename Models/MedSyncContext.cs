@@ -60,6 +60,7 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Status).HasConversion(x => (int)x, x => (AppointmentStatusEnumType)x).IsRequired();
 
             entity.HasOne(d => d.Doctor).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.DoctorId)
@@ -75,6 +76,7 @@ public partial class MedSyncContext : DbContext
                 .HasForeignKey(d => d.PatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_PatientId");
+
         });
 
         modelBuilder.Entity<AssociatedUser>(entity =>

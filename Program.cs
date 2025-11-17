@@ -16,6 +16,7 @@ builder.Services.AddScoped<IGlobalAdminService, GlobalAdminService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 builder.Services.AddScoped<MailerSendService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILocalAdminService, LocalAdminService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

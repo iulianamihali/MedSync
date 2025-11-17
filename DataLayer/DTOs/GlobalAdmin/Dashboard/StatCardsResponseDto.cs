@@ -1,4 +1,5 @@
-﻿namespace MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard
+﻿using System.Text.Json.Serialization;
+namespace MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard
 {
     public class StatCardDto
     {
@@ -10,8 +11,13 @@
     }
     public class StatCardsResponseDto
     {
-       public StatCardDto Patients { get; set; } = new StatCardDto();
-       public StatCardDto Doctors { get; set; } = new StatCardDto();
-       public StatCardDto Institutions { get; set; } = new StatCardDto();
+       public StatCardDto Patients { get; set; }
+       public StatCardDto Doctors { get; set; }
+
+       [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+       public StatCardDto Institutions { get; set; }
+       [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+       public StatCardDto Appointments { get; set; }
+
     }
 }
