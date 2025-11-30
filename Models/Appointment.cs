@@ -13,7 +13,7 @@ public partial class Appointment
     public Guid PatientId { get; set; }
 
     public Guid DoctorId { get; set; }
-
+    public string? ReferralCode { get; set; }
     public int Type { get; set; }
 
     public int? Price { get; set; }

@@ -14,7 +14,7 @@ namespace MedSync.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<LoginResponseDto> Login([FromBody] LoginRequestDto request)
+        public ActionResult<string> Login([FromBody] LoginRequestDto request)
         {
             var result = _authService.ValidateLogin(request);
             if (result == null)
@@ -24,9 +24,11 @@ namespace MedSync.Controllers
         }
 
         [HttpPost("signup")]
-        public ActionResult<LoginResponseDto> Signup([FromBody] SignupRequestDto request)
+        public ActionResult<string> Signup([FromBody] SignupRequestDto request)
         {
             var result = _authService.RegisterUser(request);
+            if (result == null)
+                return BadRequest();
             return Ok(result);
         }
     }

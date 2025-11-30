@@ -13,6 +13,7 @@ namespace MedSync.DataLayer.DTOs.Auth
         public UserType Role { get; set; }
         public PatientDataDto? PatientData { get; set; }
         public DoctorDataDto? DoctorData { get; set; }
+        public string? InstitutionCode { get; set; }
     }
 
     public class PatientDataDto

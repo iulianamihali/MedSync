@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MedSync.DataLayer.Enums;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 namespace MedSync.Services
 {
     public class AuthService
@@ -20,30 +20,30 @@ namespace MedSync.Services
             _configuration = configuration;
         }
 
-        public LoginResponseDto ValidateLogin(LoginRequestDto request)
+        public string ValidateLogin(LoginRequestDto request)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
             if (user == null)
             {
                 return null;
             }
+           
             var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
             if (verificationResult == PasswordVerificationResult.Failed)
             {
                 return null;
             }
-            var token = GenerateJwtToken(user);
-            return new LoginResponseDto
-            {
-                Token = token,
-                UserId = user.Id,
-                Role = user.Role,
-                Email = user.Email,
-                UserName = $"{user.FirstName} {user.LastName}"
-            };
+            var insId = _context.InstitutionUsers
+                .Include(i => i.Institution)
+                .Where(i => i.UserId == user.Id)
+                .Select(i => i.InstitutionId)
+                .FirstOrDefault();
+
+            var token = GenerateJwtToken(user, insId);
+            return token;
         }
 
-        private String GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user, Guid? institutionId)
         {
             var claims = new List<Claim>
             {
@@ -51,6 +51,7 @@ namespace MedSync.Services
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("name", $"{user.FirstName} {user.LastName}".Trim()),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim("ins", $"{institutionId}")
 
             };
 
@@ -69,13 +70,21 @@ namespace MedSync.Services
                 signingCredentials: credentials
             );
 
+
             return new JwtSecurityTokenHandler().WriteToken(token);
 
 
         }
 
-        public LoginResponseDto RegisterUser(SignupRequestDto request)
+        public string? RegisterUser(SignupRequestDto request)
         {
+            Guid? institutionId = null;
+            if(request.Role == UserType.Doctor)
+            {
+                institutionId = _context.Institutions.FirstOrDefault(x => x.Code == request.InstitutionCode)?.Id;
+                if (institutionId == null)
+                    return null;
+            }
             var newUser = new User
             {
                 Id = Guid.NewGuid(),
@@ -114,20 +123,18 @@ namespace MedSync.Services
                     UniversityName = request.DoctorData.UniversityName,
                 };
                 _context.Doctors.Add(doctor);
+                _context.InstitutionUsers.Add(new InstitutionUser
+                {
+                    InstitutionId = institutionId.Value,
+                    UserId = doctor.UserId,
+                    CreatedAt = DateTime.UtcNow,
+                });
+
             }
             _context.SaveChanges();
 
-            var token = GenerateJwtToken(newUser);
-            return new LoginResponseDto
-            {
-                Token = token,
-                UserId = newUser.Id,
-                Role = newUser.Role,
-                Email = newUser.Email,
-                UserName = $"{newUser.FirstName} {newUser.LastName}"
-            };
-
-            
+            var token = GenerateJwtToken(newUser, institutionId);
+            return token;
         }
     }
 

@@ -61,7 +61,8 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Status).HasConversion(x => (int)x, x => (AppointmentStatusEnumType)x).IsRequired();
-
+            entity.Property(e => e.ReferralCode)
+                .HasMaxLength(50);
             entity.HasOne(d => d.Doctor).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.DoctorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

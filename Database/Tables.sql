@@ -132,6 +132,7 @@ CREATE TABLE Appointments (
     InstitutionId uniqueidentifier NOT NULL,
     PatientId uniqueidentifier NOT NULL,
     DoctorId uniqueidentifier NOT NULL,
+    ReferralCode nvarchar(50),
     Type int NOT NULL,
     Price int,
     StartDateTime datetime2 NOT NULL,
