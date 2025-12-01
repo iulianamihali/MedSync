@@ -129,6 +129,16 @@ namespace MedSync.Services
                     UserId = doctor.UserId,
                     CreatedAt = DateTime.UtcNow,
                 });
+                var newDoctorRequest = new DoctorRequests
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = newUser.Id,
+                    InstitutionId = institutionId.Value,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = null,
+                    Status = DoctorRequestsStatusEnumType.Pending,
+                };
+                _context.DoctorRequests.Add(newDoctorRequest);
 
             }
             _context.SaveChanges();

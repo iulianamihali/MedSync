@@ -49,4 +49,6 @@ public partial class User
     public virtual ICollection<UserSchedule> UserScheduleUsers { get; set; } = new List<UserSchedule>();
     public virtual ICollection<SupportIssues> SupportIssues { get; set; } = new List<SupportIssues>();
     public virtual ICollection<InstitutionRequests> InstitutionRequests { get; set; } = new List<InstitutionRequests>();
+    public virtual ICollection<DoctorRequests> DoctorRequests { get; set; } = new List<DoctorRequests>();
+
 }

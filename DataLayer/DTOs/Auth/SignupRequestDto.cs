@@ -14,6 +14,7 @@ namespace MedSync.DataLayer.DTOs.Auth
         public PatientDataDto? PatientData { get; set; }
         public DoctorDataDto? DoctorData { get; set; }
         public string? InstitutionCode { get; set; }
+
     }
 
     public class PatientDataDto
@@ -26,6 +27,7 @@ namespace MedSync.DataLayer.DTOs.Auth
 
     public class DoctorDataDto
     {
+        public string? InstitutionCode { get; set; }
         public string Specialization { get; set; }
         public int YearsOfExperience { get; set; }
         public string LicenseNumber { get; set; }

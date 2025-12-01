@@ -41,6 +41,7 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<UserSchedule> UserSchedules { get; set; }
     public virtual DbSet<SupportIssues> SupportIssues { get; set; }
     public virtual DbSet<InstitutionRequests> InstitutionRequests { get; set; }
+    public virtual DbSet<DoctorRequests> DoctorRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -311,6 +312,26 @@ public partial class MedSyncContext : DbContext
                .HasForeignKey(d => d.InstitutionId)
                .OnDelete(DeleteBehavior.ClientSetNull)
                .HasConstraintName("FK_InstitutionRequests_InstitutionId");
+        });
+        modelBuilder.Entity<DoctorRequests>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.InstitutionId).IsRequired();
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime2(0)");
+            entity.Property(e => e.Status).HasConversion(x => (short)x, x => (DoctorRequestsStatusEnumType)x).IsRequired();
+
+            entity.HasOne(d => d.User).WithMany(p => p.DoctorRequests)
+               .HasForeignKey(d => d.UserId)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_DoctorRequests_UserId");
+            entity.HasOne(d => d.Institution).WithMany(p => p.DoctorRequests)
+               .HasForeignKey(d => d.InstitutionId)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_DoctorRequests_InstitutionId");
         });
         OnModelCreatingPartial(modelBuilder);
     }

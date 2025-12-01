@@ -208,3 +208,16 @@ Create table InstitutionRequests (
 
 );
 
+Create table DoctorRequests (
+    Id uniqueidentifier NOT NULL,
+    UserId uniqueidentifier NOT NULL,
+    InstitutionId uniqueidentifier NOT NULL,
+    CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
+	UpdatedAt datetime2 NULL,
+	Status smallint NOT NULL,
+    CONSTRAINT PK_DoctorRequests PRIMARY KEY (Id),
+    CONSTRAINT FK_DoctorRequests_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+    CONSTRAINT FK_DoctorRequests_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
+
+);
+

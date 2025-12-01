@@ -1,20 +1,24 @@
 ﻿using Azure.Core;
 using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
+using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.LocalAdmin.Dashboard;
 using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using MedSync.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace MedSync.Services
 {
     public class LocalAdminService : ILocalAdminService
     {
         private readonly MedSyncContext _context;
-        public LocalAdminService(MedSyncContext context)
+        private readonly MailerSendService _mailerSendService;
+        public LocalAdminService(MedSyncContext context, MailerSendService mailerSendService)
         {
             _context = context;
+            _mailerSendService = mailerSendService;
         }
         public async Task<CountsStatCardsResponseDto> GetDashboardStatCardsAsync(DashboardFilterRequestDto request)
         {
@@ -59,7 +63,7 @@ namespace MedSync.Services
                     .ThenInclude(u => u.User)
                 .Include(u => u.Doctor)
                     .ThenInclude(u => u.User)
-                .Where(u => u.InstitutionId == institutionId 
+                .Where(u => u.InstitutionId == institutionId
                 //&& (u.StartDateTime.Date >= DateTime.UtcNow.Date && u.StartDateTime.Date <= DateTime.UtcNow)
                 && (u.Status == AppointmentStatusEnumType.Confirmed || u.Status == AppointmentStatusEnumType.InProgress || u.Status == AppointmentStatusEnumType.Rescheduled)
                 )
@@ -93,5 +97,99 @@ namespace MedSync.Services
             return (await _context.SaveChangesAsync()) > 0;
         }
 
+        public async Task<List<DoctorReqPopUpResponseDto>> GetDoctorRequestDetailsAsync(Guid institutionId)
+        {
+            var result = await _context.DoctorRequests
+                .AsNoTracking()
+                .Include(i => i.Institution)
+                .Include(i => i.User)
+                .Where(i => i.InstitutionId == institutionId &&
+                i.Status == DoctorRequestsStatusEnumType.Pending
+                )
+                .Select(i => new DoctorReqPopUpResponseDto
+                {
+                    Id = i.Id,
+                    Name = $"{i.User.FirstName} {i.User.LastName}",
+                    Email = i.User.Email,
+                    DateOfBirth = i.User.DateOfBirth.ToString(),
+                    PhoneNumber = i.User.PhoneNumber,
+                    UniversityName = i.User.Doctor.UniversityName,
+                    Specialization = i.User.Doctor.Specialization,
+                    MedicalLicenseNumber = i.User.Doctor.MedicalLicenseNumber,
+                    YearsOfExperience = i.User.Doctor.YearsOfExperience.ToString(),
+                    CreatedAt = i.CreatedAt
+
+                })
+                .OrderBy(i => i.CreatedAt)
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<bool> UpdateStatusDoctorRequestAsync(UpdateDoctorRequestDto request)
+        {
+            var result = await _context.DoctorRequests
+                  .Include(u => u.User)
+                  .Where(u => u.Id == request.Id)
+                  .FirstOrDefaultAsync();
+            if (result != null)
+            {
+                if (request.Value)
+                {
+                    result.Status = DoctorRequestsStatusEnumType.Approved;
+                    result.UpdatedAt = DateTime.UtcNow;
+                    _context.DoctorRequests.Update(result);
+                    var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == result.UserId);
+                    if (user != null)
+                    {
+                        user.IsActive = true;
+                        _context.Users.Update(user);
+                    }
+                }
+                else
+                {
+                    result.Status = DoctorRequestsStatusEnumType.Rejected;
+                    result.UpdatedAt = DateTime.UtcNow;
+                    _context.DoctorRequests.Update(result);
+                }
+
+                var success = (await _context.SaveChangesAsync()) > 0;
+               
+                if (success)
+                {
+                    var json = File.ReadAllText("EmailTemplates.json");
+                    using var doc = JsonDocument.Parse(json);
+                    if (request.Value)
+                    {
+                        var template = doc.RootElement.GetProperty("DoctorApproved");
+                        var subject = template.GetProperty("subject").GetString();
+                        var html = template.GetProperty("html").GetString()
+                            .Replace("{{DoctorName}}", result.User.FirstName + "" + result.User.LastName);
+                        await _mailerSendService.SendEmailAsync(
+                            toEmail: "miuliana959@gmail.com",
+                            subject: subject,
+                            message: html
+                            );
+
+                    }
+                    else
+                    {
+                        var template = doc.RootElement.GetProperty("DoctorRejected");
+                        var subject = template.GetProperty("subject").GetString();
+                        var html = template.GetProperty("html").GetString()
+                            .Replace("{{DoctorName}}", result.User.FirstName + "" + result.User.LastName);
+                        await _mailerSendService.SendEmailAsync(
+                           toEmail: "miuliana959@gmail.com",
+                           subject: template.GetProperty("subject").GetString(),
+                           message: html
+                           );
+                    }
+                    return success;
+                }
+
+            }
+            return false;
+
+        }
+           
     }
 }

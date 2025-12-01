@@ -1,8 +1,10 @@
 ﻿using MedSync.Attributes;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
+using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.LocalAdmin;
 using MedSync.DataLayer.DTOs.LocalAdmin.Dashboard;
 using MedSync.DataLayer.Enums;
+using MedSync.Services;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +37,18 @@ namespace MedSync.Controllers
         {
             var result = await _localAdminService.EditStatusAppointmentAsync(request);
             return Ok(result);
+        }
+        [HttpGet("getDoctorRequestDetails")]
+        public async Task<IActionResult> GetDoctorRequestDetails(Guid institutionId)
+        {
+            var result = await _localAdminService.GetDoctorRequestDetailsAsync(institutionId);
+            return Ok(result);
+        }
+        [HttpPut("updateDoctorRequest")]
+        public async Task<IActionResult> UpdateDoctorRequest([FromBody] UpdateDoctorRequestDto request)
+        {
+            var response = await _localAdminService.UpdateStatusDoctorRequestAsync(request);
+            return Ok(response);
         }
     }
 }
