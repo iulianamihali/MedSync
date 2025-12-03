@@ -81,7 +81,7 @@ namespace MedSync.Services
             Guid? institutionId = null;
             if(request.Role == UserType.Doctor)
             {
-                institutionId = _context.Institutions.FirstOrDefault(x => x.Code == request.InstitutionCode)?.Id;
+                institutionId = _context.Institutions.FirstOrDefault(x => x.Code == request.DoctorData.InstitutionCode)?.Id;
                 if (institutionId == null)
                     return null;
             }
