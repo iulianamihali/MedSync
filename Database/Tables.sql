@@ -221,3 +221,29 @@ Create table DoctorRequests (
 
 );
 
+Create Table Specialties(
+	Id uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+	CONSTRAINT PK_Specialties PRIMARY KEY (Id)
+);
+
+Create Table Services(
+	Id uniqueidentifier NOT NULL,
+	[Name] nvarchar(100) NOT NULL,
+	CONSTRAINT PK_Services PRIMARY KEY (Id)
+);
+
+Create Table InstitutionServices(
+	Id uniqueidentifier NOT NULL,
+    [Description] nvarchar(max),
+	Price decimal(10,2) NOT NULL,
+	Duration int NOT NULL,
+	InstitutionId uniqueidentifier NOT NULL,
+	SpecialtyId uniqueidentifier NOT NULL,
+	ServiceId uniqueidentifier NOT NULL,
+	CONSTRAINT PK_InstitutionServices PRIMARY KEY (Id),
+	CONSTRAINT FK_InstitutionServices_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
+	CONSTRAINT FK_InstitutionServices_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
+	CONSTRAINT FK_InstitutionServices_ServiceId FOREIGN KEY (ServiceId) REFERENCES Services(Id)
+);
+

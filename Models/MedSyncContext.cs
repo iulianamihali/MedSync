@@ -42,6 +42,9 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<SupportIssues> SupportIssues { get; set; }
     public virtual DbSet<InstitutionRequests> InstitutionRequests { get; set; }
     public virtual DbSet<DoctorRequests> DoctorRequests { get; set; }
+    public virtual DbSet<Specialty> Specialties { get; set; }
+    public virtual DbSet<Service> Services { get; set; }
+    public virtual DbSet<InstitutionService> InstitutionServices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -332,6 +335,52 @@ public partial class MedSyncContext : DbContext
                .HasForeignKey(d => d.InstitutionId)
                .OnDelete(DeleteBehavior.ClientSetNull)
                .HasConstraintName("FK_DoctorRequests_InstitutionId");
+        });
+        modelBuilder.Entity<Specialty>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Name)
+                  .HasMaxLength(100)
+                  .IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100);
+
+        });
+        modelBuilder.Entity<Service>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Name)
+                  .HasMaxLength(100)
+                  .IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100);
+
+        });
+        modelBuilder.Entity<InstitutionService>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Price).HasPrecision(10, 2);
+            entity.Property(e => e.Duration).IsRequired();
+            entity.Property(e => e.InstitutionId).IsRequired();
+          
+
+            entity.HasOne(d => d.Institution).WithMany(p => p.InstitutionServices)
+               .HasForeignKey(d => d.InstitutionId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("FK_InstitutionServices_InstitutionId");
+            entity.HasOne(d => d.Specialty).WithMany(p => p.InstitutionServices)
+               .HasForeignKey(d => d.SpecialtyId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("FK_InstitutionServices_SpecialtyId");
+            entity.HasOne(d => d.Service).WithMany(p => p.InstitutionServices)
+               .HasForeignKey(d => d.ServiceId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("FK_InstitutionServices_ServiceId");
         });
         OnModelCreatingPartial(modelBuilder);
     }
