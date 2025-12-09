@@ -1,0 +1,35 @@
+﻿IF NOT EXISTS (SELECT 1 FROM Specialties)
+BEGIN
+    INSERT INTO Specialties (Id, [Name]) VALUES 
+
+    ('D7398122-3839-4E60-B149-D8D8090C7735', N'Stomatology'),           
+
+    ('B2613945-8025-45C0-85A3-98C359149022', N'Cardiology'),
+    
+    ('9F579738-96A9-4979-A69D-566C71D683A3', N'Dermatology'),
+    
+    ('4C6E5A02-4D78-4D2A-9493-2715C87E8F04', N'Pediatrics'),
+    
+    ('A1E2F773-8C9B-4A1E-9D5F-112233445566', N'Gynecology'), 
+    
+    ('18002C93-4702-4E57-9F11-6C641217032F', N'Ophthalmology'),
+    
+	('E4B9D1A2-5678-4F12-90AB-CDEF12345678', N'Otolaryngology (ENT)'), 
+	
+    ('F5A2C3E4-9876-4543-2109-876543210FED', N'Orthopedics'),
+    
+    ('7B8C9D0E-1F2A-3B4C-5D6E-7F8A9B0C1D2E', N'Neurology'),
+    
+    ('3A2B1C0D-4E5F-6A7B-8C9D-0E1F2A3B4C5D', N'Psychiatry'),
+    
+    ('11223344-5566-7788-99AA-BBCCDDEEFF00', N'Family Medicine'),     
+    
+    ('CCDD3344-5566-7788-99AA-BBCCDDEEFF11', N'Internal Medicine'),
+
+    ('55443322-1100-AABB-CCDD-EEFF99887766', N'Gastroenterology'),
+    
+    ('98765432-AAAA-BBBB-CCCC-DDDDEEEEFFFF', N'Urology'),
+    
+    ('12345678-90AB-CDEF-1234-567890ABCDEF', N'Medical Analysis'); 
+END
+GO
