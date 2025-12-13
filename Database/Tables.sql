@@ -72,12 +72,12 @@ GO
 -- 6. Doctors
 CREATE TABLE Doctors (
     UserId uniqueidentifier NOT NULL,
-    Specialization nvarchar(100) NOT NULL,
     YearsOfExperience int NOT NULL,
     MedicalLicenseNumber nvarchar(50) NOT NULL UNIQUE,
     UniversityName nvarchar(255),
     CONSTRAINT PK_Doctors PRIMARY KEY (UserId),
-    CONSTRAINT FK_Doctors_UserId FOREIGN KEY (UserId) REFERENCES Users(Id)
+    CONSTRAINT FK_Doctors_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+    CONSTRAINT FK_Doctors_SpecialtyId FOREIGN KEY(SpecialtyId) REFERENCES Specialties(Id)
 );
 GO
 
@@ -144,7 +144,9 @@ CREATE TABLE Appointments (
     CONSTRAINT PK_Appointments PRIMARY KEY (Id),
     CONSTRAINT FK_Appointments_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
     CONSTRAINT FK_Appointments_PatientId FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
-    CONSTRAINT FK_Appointments_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId)
+    CONSTRAINT FK_Appointments_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
+    CONSTRAINT FK_Appointments_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionService(Id)
+
 );
 GO
 
@@ -247,3 +249,10 @@ Create Table InstitutionServices(
 	CONSTRAINT FK_InstitutionServices_ServiceId FOREIGN KEY (ServiceId) REFERENCES Services(Id)
 );
 
+CREATE TABLE DoctorSpecialties (
+	DoctorId uniqueidentifier NOT NULL,
+	SpecialtyId uniqueidentifier NOT NULL,
+	CONSTRAINT PK_DoctorSpecialties PRIMARY KEY (DoctorId, SpecialtyId),
+	CONSTRAINT FK_DoctorSpecialties_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
+	CONSTRAINT FK_DoctorSpecialties_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
+);

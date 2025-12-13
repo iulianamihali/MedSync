@@ -4,7 +4,8 @@
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<InstitutionService> InstitutionServices { get; set; }
-       
+        public virtual ICollection<InstitutionService> InstitutionServices { get; set; } = new List<InstitutionService>();
+        public virtual ICollection<DoctorSpecialty> DoctorSpecialties { get; set; } = new List<DoctorSpecialty>();
+
     }
 }

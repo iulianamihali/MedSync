@@ -12,7 +12,7 @@
         public virtual Institution Institution { get; set; }
         public virtual Specialty Specialty { get; set; }
         public virtual Service Service { get; set; }
-       
+        public virtual ICollection<Appointment> Appointments { get; set; }
 
     }
 }

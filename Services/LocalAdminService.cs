@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using MedSync.DataLayer.DTOs;
+using MedSync.DataLayer.DTOs.Appointments;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.LocalAdmin.Dashboard;
@@ -56,19 +57,24 @@ namespace MedSync.Services
 
         }
 
-        public async Task<List<AppointmentDto>> GetDetailsRecentAppointmentsAsync(Guid institutionId)
+        public async Task<List<RecentAppointmentsDto>> GetDetailsRecentAppointmentsAsync(Guid institutionId)
         {
             var response = await _context.Appointments
                 .Include(u => u.Patient)
                     .ThenInclude(u => u.User)
                 .Include(u => u.Doctor)
                     .ThenInclude(u => u.User)
-                .Where(u => u.InstitutionId == institutionId
+                .Include(u => u.InstitutionService)
+                    .ThenInclude(u => u.Specialty)
+                .Include(u => u.InstitutionService)
+                    .ThenInclude(u => u.Service)
+                      
+                .Where(u => u.InstitutionService.InstitutionId == institutionId
                 //&& (u.StartDateTime.Date >= DateTime.UtcNow.Date && u.StartDateTime.Date <= DateTime.UtcNow)
                 && (u.Status == AppointmentStatusEnumType.Confirmed || u.Status == AppointmentStatusEnumType.InProgress || u.Status == AppointmentStatusEnumType.Rescheduled)
                 )
                 .Select(
-                    u => new AppointmentDto
+                    u => new RecentAppointmentsDto
                     {
                         AppointmentId = u.Id,
                         PatientId = u.PatientId,
@@ -76,8 +82,10 @@ namespace MedSync.Services
                         PatientName = $"{u.Patient.User.FirstName} {u.Patient.User.LastName}",
                         DoctorName = $"Dr. {u.Doctor.User.FirstName} {u.Doctor.User.LastName}",
                         DateTimeUtc = u.StartDateTime,
-                        Price = u.Price,
-                        Type = "Consult",
+                        Price = u.InstitutionService.Price,
+                        Specialty = u.InstitutionService.Specialty.Name,
+                        Type = u.InstitutionService.Service.Name,
+                        Duration = u.InstitutionService.Duration,
                         Status = u.Status
                     }
                 ).OrderByDescending(u => u.DateTimeUtc)
@@ -103,6 +111,9 @@ namespace MedSync.Services
                 .AsNoTracking()
                 .Include(i => i.Institution)
                 .Include(i => i.User)
+                    .ThenInclude(i => i.Doctor)
+                        .ThenInclude(i => i.DoctorSpecialties)
+                            .ThenInclude(i => i.Specialty)
                 .Where(i => i.InstitutionId == institutionId &&
                 i.Status == DoctorRequestsStatusEnumType.Pending
                 )
@@ -114,7 +125,7 @@ namespace MedSync.Services
                     DateOfBirth = i.User.DateOfBirth.ToString(),
                     PhoneNumber = i.User.PhoneNumber,
                     UniversityName = i.User.Doctor.UniversityName,
-                    Specialization = i.User.Doctor.Specialization,
+                    Specialization = string.Join(", ", i.User.Doctor.DoctorSpecialties.Select(x => x.Specialty.Name).ToList()),
                     MedicalLicenseNumber = i.User.Doctor.MedicalLicenseNumber,
                     YearsOfExperience = i.User.Doctor.YearsOfExperience.ToString(),
                     CreatedAt = i.CreatedAt

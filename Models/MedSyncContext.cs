@@ -45,6 +45,7 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<Specialty> Specialties { get; set; }
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<InstitutionService> InstitutionServices { get; set; }
+    public virtual DbSet<DoctorSpecialty> DoctorSpecialties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,16 +72,14 @@ public partial class MedSyncContext : DbContext
                 .HasForeignKey(d => d.DoctorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_DoctorId");
-
-            entity.HasOne(d => d.Institution).WithMany(p => p.Appointments)
-                .HasForeignKey(d => d.InstitutionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Appointments_InstitutionId");
-
             entity.HasOne(d => d.Patient).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.PatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_PatientId");
+            entity.HasOne(d => d.InstitutionService).WithMany(p => p.Appointments)
+               .HasForeignKey(d => d.InstitutionServiceId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("FK_Appointments_InstitutionServiceId");
 
         });
 
@@ -381,7 +380,24 @@ public partial class MedSyncContext : DbContext
                .HasForeignKey(d => d.ServiceId)
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("FK_InstitutionServices_ServiceId");
+         
         });
+
+        modelBuilder.Entity<DoctorSpecialty>(entity =>
+        {
+            entity.HasKey(e => new { e.DoctorId, e.SpecialtyId });
+
+            entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorSpecialties)
+               .HasForeignKey(d => d.DoctorId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("FK_DoctorSpecialties_DoctorId");
+            entity.HasOne(d => d.Specialty).WithMany(p => p.DoctorSpecialties)
+               .HasForeignKey(d => d.SpecialtyId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("FK_DoctorSpecialties_SpecialtyId");
+
+        });
+
         OnModelCreatingPartial(modelBuilder);
     }
 
