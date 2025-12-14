@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.Enums;
+using MedSync.Models;
 namespace MedSync.DataLayer.DTOs.Auth
 {
     public class SignupRequestDto
@@ -27,7 +28,7 @@ namespace MedSync.DataLayer.DTOs.Auth
     public class DoctorDataDto
     {
         public string? InstitutionCode { get; set; }
-        public string Specialization { get; set; }
+        public List<Guid> Specialties { get; set; }
         public int YearsOfExperience { get; set; }
         public string LicenseNumber { get; set; }
         public string? UniversityName { get; set; }

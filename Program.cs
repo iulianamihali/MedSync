@@ -17,6 +17,8 @@ builder.Services.AddScoped<IInstitutionService, MedSync.Services.InstitutionServ
 builder.Services.AddScoped<MailerSendService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILocalAdminService, LocalAdminService>();
+builder.Services.AddScoped<IGlobalDataService, GlobalDataService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();

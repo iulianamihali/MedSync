@@ -76,8 +76,7 @@ CREATE TABLE Doctors (
     MedicalLicenseNumber nvarchar(50) NOT NULL UNIQUE,
     UniversityName nvarchar(255),
     CONSTRAINT PK_Doctors PRIMARY KEY (UserId),
-    CONSTRAINT FK_Doctors_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-    CONSTRAINT FK_Doctors_SpecialtyId FOREIGN KEY(SpecialtyId) REFERENCES Specialties(Id)
+    CONSTRAINT FK_Doctors_UserId FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
 GO
 

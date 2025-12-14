@@ -114,14 +114,22 @@ namespace MedSync.Services
                 _context.Patients.Add(patient);
             }
             else if (request.Role == UserType.Doctor) {
+
                 var doctor = new Doctor
                 {
                     UserId = newUser.Id,
-                    Specialization = request.DoctorData.Specialization,
                     YearsOfExperience = request.DoctorData.YearsOfExperience,
                     MedicalLicenseNumber = request.DoctorData.LicenseNumber,
                     UniversityName = request.DoctorData.UniversityName,
                 };
+                foreach(var specialtyId in request.DoctorData.Specialties)
+                {
+                    _context.DoctorSpecialties.Add(new DoctorSpecialty
+                    {
+                        DoctorId = newUser.Id,
+                        SpecialtyId = specialtyId
+                    });
+                }    
                 _context.Doctors.Add(doctor);
                 _context.InstitutionUsers.Add(new InstitutionUser
                 {

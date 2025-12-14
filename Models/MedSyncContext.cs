@@ -109,7 +109,6 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.UserId).ValueGeneratedNever();
             entity.Property(e => e.MedicalLicenseNumber).HasMaxLength(50);
-            entity.Property(e => e.Specialization).HasMaxLength(100);
             entity.Property(e => e.UniversityName).HasMaxLength(255);
 
             entity.HasOne(d => d.User).WithOne(p => p.Doctor)
