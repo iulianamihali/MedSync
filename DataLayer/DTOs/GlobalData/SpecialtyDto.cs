@@ -4,6 +4,7 @@ namespace MedSync.DataLayer.DTOs.GlobalData
 {
     public class SpecialtyDto
     {
+
         public SpecialtyDto(Specialty specialty) {
             Id = specialty.Id;
             Name = specialty.Name;

@@ -14,6 +14,7 @@ namespace MedSync.Services
         }
         public async Task<List<SpecialtyDto>> GetSpecialties()
         {
+
             var specialties = await _context.Specialties
                 .Select(x => new SpecialtyDto(x))
                .ToListAsync();

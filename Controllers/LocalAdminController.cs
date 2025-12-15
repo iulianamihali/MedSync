@@ -1,4 +1,5 @@
 ﻿using MedSync.Attributes;
+using MedSync.DataLayer.DTOs.Appointments;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.LocalAdmin;
@@ -16,9 +17,12 @@ namespace MedSync.Controllers
     public class LocalAdminController : ControllerBase
     {
         private readonly ILocalAdminService _localAdminService;
-        public LocalAdminController(ILocalAdminService localAdminService)
+        private readonly IAppointmentsService _appointmentsService;
+
+        public LocalAdminController(ILocalAdminService localAdminService, IAppointmentsService appointmentsService)
         {
             _localAdminService = localAdminService;
+            _appointmentsService = appointmentsService;
         }
         [HttpGet("dashboardStatsCards")]
         public async Task<IActionResult> GetDashboardStatCards([FromQuery] DashboardFilterRequestDto request)
@@ -49,6 +53,12 @@ namespace MedSync.Controllers
         {
             var response = await _localAdminService.UpdateStatusDoctorRequestAsync(request);
             return Ok(response);
+        }
+        [HttpGet("getCalendarAppointments")]
+        public async Task<IActionResult> GetCalendarAppointments(CalendarAppointmentsRequestDto request)
+        {
+            var result = await _appointmentsService.GetCalendarAppointmentsAsync(request);
+            return Ok(result);
         }
     }
 }
