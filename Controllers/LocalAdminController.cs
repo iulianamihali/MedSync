@@ -54,8 +54,8 @@ namespace MedSync.Controllers
             var response = await _localAdminService.UpdateStatusDoctorRequestAsync(request);
             return Ok(response);
         }
-        [HttpGet("getCalendarAppointments")]
-        public async Task<IActionResult> GetCalendarAppointments(CalendarAppointmentsRequestDto request)
+        [HttpPost("getCalendarAppointments")]
+        public async Task<IActionResult> GetCalendarAppointments([FromBody] CalendarAppointmentsRequestDto request)
         {
             var result = await _appointmentsService.GetCalendarAppointmentsAsync(request);
             return Ok(result);

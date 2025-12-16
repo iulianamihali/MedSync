@@ -17,9 +17,6 @@ public partial class Appointment
 
     public string? ReferralCode { get; set; }
     public int Type { get; set; }
-
-    public int? Price { get; set; }
-
     public DateTime StartDateTime { get; set; }
 
     public DateTime EndDateTime { get; set; }

@@ -33,7 +33,7 @@ namespace MedSync.Services
                      PatientName = $"{x.Patient.User.FirstName} {x.Patient.User.LastName}",
                      StartDateTimeUtc = x.StartDateTime,
                      EndDateTimeUtc = x.EndDateTime,
-                     Price = x.Price,
+                     Price = x.InstitutionService.Price,
                      Duration = x.InstitutionService.Duration,
                  })
                  .ToListAsync();
