@@ -33,12 +33,27 @@ namespace MedSync.Services
                      PatientName = $"{x.Patient.User.FirstName} {x.Patient.User.LastName}",
                      StartDateTimeUtc = x.StartDateTime,
                      EndDateTimeUtc = x.EndDateTime,
-                     Price = x.InstitutionService.Price,
+                     StandardPrice = x.InstitutionService.Price,
+                     TotalPrice = x.TotalPrice,
                      Duration = x.InstitutionService.Duration,
                  })
                  .ToListAsync();
             return appointments;
 
+        }
+
+        public async Task<bool> EditInfoAppointment(EditInfoAppointmentRequest request)
+        {
+            var result = await _context.Appointments
+                .Where(i => i.Id == request.Id)
+                .FirstOrDefaultAsync();
+            if(result != null)
+            {
+                result.TotalPrice = request.TotalPrice;
+                result.Status = request.Status;
+                _context.Appointments.Update(result);
+            }
+            return (await _context.SaveChangesAsync()) > 0;
         }
 
     }

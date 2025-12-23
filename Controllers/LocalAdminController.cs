@@ -60,5 +60,11 @@ namespace MedSync.Controllers
             var result = await _appointmentsService.GetCalendarAppointmentsAsync(request);
             return Ok(result);
         }
+        [HttpPost("editInfoAppointment")]
+        public async Task<IActionResult> EditInfoAppointment([FromBody] EditInfoAppointmentRequest request)
+        {
+            var result = await _appointmentsService.EditInfoAppointment(request);
+            return Ok(result);
+        }
     }
 }

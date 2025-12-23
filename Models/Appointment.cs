@@ -16,11 +16,10 @@ public partial class Appointment
     public Guid InstitutionId { get; set; }
 
     public string? ReferralCode { get; set; }
-    public int Type { get; set; }
     public DateTime StartDateTime { get; set; }
 
     public DateTime EndDateTime { get; set; }
-
+    public decimal TotalPrice { get; set; }
     public AppointmentStatusEnumType Status { get; set; }
 
     public DateTime CreatedAt { get; set; }

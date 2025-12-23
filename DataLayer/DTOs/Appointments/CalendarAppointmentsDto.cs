@@ -12,7 +12,8 @@ namespace MedSync.DataLayer.DTOs.Appointments
         public string PatientName { get; set; }
         public DateTime StartDateTimeUtc { get; set; }
         public DateTime EndDateTimeUtc { get; set; }
-        public decimal? Price { get; set; }
+        public decimal? StandardPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
         public int Duration { get; set; }
     }
 }

@@ -133,7 +133,7 @@ CREATE TABLE Appointments (
     DoctorId uniqueidentifier NOT NULL,
     ReferralCode nvarchar(50),
     Type int NOT NULL,
-    Price int,
+    TotalPrice DECIMAL(10,2) NOT NULL DEFAULT 0,
     StartDateTime datetime2 NOT NULL,
     EndDateTime datetime2 NOT NULL,
     Status int NOT NULL,
