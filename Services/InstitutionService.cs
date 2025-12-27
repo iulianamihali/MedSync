@@ -256,6 +256,139 @@ namespace MedSync.Services
             }
             return (await _context.SaveChangesAsync()) > 0;
         }
+        public async Task<List<SpecialtyWithServicesDto>> GetSpecialtiesWithServices(Guid institutionId)
+        {
+            var result = await _context.InstitutionServices
+                .Where(s => s.InstitutionId == institutionId)
+                .GroupBy(s => new { s.Specialty.Id, s.Specialty.Name })
+                .Select(g => new SpecialtyWithServicesDto
+                {
+                    SpecialtyId = g.Key.Id,
+                    SpecialtyName = g.Key.Name,
+                    Services = g.Select(x => new ServiceDto
+                    {
+                        Id = x.Service.Id,
+                        Name = x.Service.Name
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return result;
+        }
+        public async Task<List<DoctorDto>> GetDoctorsWithSlots(GetDoctorsWithSlotsRequestDto request)
+        {
+            var result = new List<DoctorDto>();
+
+            var service = await _context.InstitutionServices
+                .FirstOrDefaultAsync(s =>
+                    s.InstitutionId == request.InstitutionId &&
+                    s.ServiceId == request.ServiceId);
+
+            if (service == null)
+                throw new Exception("Service NOT found for this institution");
+
+            var slotDuration = TimeSpan.FromMinutes(service.Duration);
+
+            var doctors = await _context.InstitutionUsers
+                .Include(i => i.User)
+                    .ThenInclude(u => u.Doctor)
+                        .ThenInclude(d => d.DoctorSpecialties)
+                .Where(i =>
+                    i.InstitutionId == request.InstitutionId &&
+                    i.User.Role == UserType.Doctor &&
+                    i.User.Doctor.DoctorSpecialties.Any(ds => ds.SpecialtyId == request.SpecialtyId))
+                .ToListAsync();
+
+            foreach (var doctor in doctors)
+            {
+                var localDate = request.From.ToLocalTime().Date;
+                var dayOfWeek = (int)localDate.DayOfWeek;
+
+                var scheduleForToday = await _context.UserSchedules
+                    .FirstOrDefaultAsync(s =>
+                        s.InstitutionId == request.InstitutionId &&
+                        s.UserId == doctor.UserId &&
+                        s.DayOfWeek == dayOfWeek);
+
+                if (scheduleForToday == null)
+                    continue;
+
+                var startLocal = localDate.Add(scheduleForToday.StartTime.ToTimeSpan());
+                var endLocal = localDate.Add(scheduleForToday.EndTime.ToTimeSpan());
+                var start = startLocal;
+                var end = endLocal;
+                if (start >= end)
+                    continue;
+
+                var busyIntervals = await _context.Appointments
+                    .Where(a =>
+                        a.DoctorId == doctor.UserId &&
+                        a.InstitutionId == request.InstitutionId &&
+                        a.StartDateTime < end &&
+                        a.EndDateTime > start)
+                    .OrderBy(a => a.StartDateTime)
+                    .Select(a => new
+                    {
+                        Start = a.StartDateTime,
+                        End = a.EndDateTime
+                    })
+                    .ToListAsync();
+
+                var freeIntervals = new List<(DateTime Start, DateTime End)>();
+                var currentStart = start;
+
+                foreach (var busy in busyIntervals)
+                {
+                    if (busy.Start > currentStart)
+                        freeIntervals.Add((currentStart, busy.Start));
+
+                    if (busy.End > currentStart)
+                        currentStart = busy.End;
+                }
+
+                if (currentStart < end)
+                    freeIntervals.Add((currentStart, end));
+
+                var slots = new List<AvailableSlotDto>();
+
+                foreach (var interval in freeIntervals)
+                {
+                    var slotStart = interval.Start;
+
+                    while (slotStart + slotDuration <= interval.End)
+                    {
+                        slots.Add(new AvailableSlotDto
+                        {
+                            Start = slotStart,
+                            End = slotStart.Add(slotDuration)
+                        });
+
+                        slotStart = slotStart.Add(slotDuration);
+                    }
+                }
+
+                slots = slots
+                    .Where(slot =>
+                        !busyIntervals.Any(b =>
+                            slot.Start < b.End &&
+                            slot.End > b.Start))
+                    .ToList();
+
+                if (!slots.Any())
+                    continue;
+
+                result.Add(new DoctorDto
+                {
+                    Id = doctor.UserId,
+                    Name = $"{doctor.User.FirstName} {doctor.User.LastName}",
+                    Slots = slots
+                });
+            }
+
+            return result;
+        }
+
+
 
         private string GenerateInstitutionCode (string institutionName)
         {

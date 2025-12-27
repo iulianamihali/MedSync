@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MedSync.Attributes;
+using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.Institution;
+using MedSync.DataLayer.Enums;
 using MedSync.Services;
 using MedSync.Services.IServices;
-using MedSync.DataLayer.DTOs.Institution;
 using Microsoft.AspNetCore.Authorization;
-using MedSync.Attributes;
-using MedSync.DataLayer.Enums;
+using Microsoft.AspNetCore.Mvc;
 namespace MedSync.Controllers
 {
     [ApiController]
@@ -60,7 +61,19 @@ namespace MedSync.Controllers
             var response = await _institutionService.UpdateInstitutionsInfoAsync(info);
             return Ok(response);
         }
-            
+        [HttpGet("getSpecialtiesWithServices/{institutionId}")]
+        public async Task<IActionResult> GetSpecialtiesWithServicesAsync(Guid institutionId)
+        {
+            var response = await _institutionService.GetSpecialtiesWithServices(institutionId);
+            return Ok(response);
+        }
+        [HttpPost("getDoctors")]
+        public async Task<IActionResult> GetDoctorsWithSlotsAsync([FromBody] GetDoctorsWithSlotsRequestDto request)
+        {
+            var response = await _institutionService.GetDoctorsWithSlots(request);
+            return Ok(response);
+        }
+
 
     }
 }

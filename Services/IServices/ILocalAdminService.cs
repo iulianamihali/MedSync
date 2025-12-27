@@ -13,6 +13,5 @@ namespace MedSync.Services.IServices
         Task<bool> EditStatusAppointmentAsync(EditStatusAppointmentRequestDto request);
         Task<List<DoctorReqPopUpResponseDto>> GetDoctorRequestDetailsAsync(Guid institutionId);
         Task<bool> UpdateStatusDoctorRequestAsync(UpdateDoctorRequestDto request);
-
     }
 }

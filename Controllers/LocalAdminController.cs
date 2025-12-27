@@ -66,5 +66,6 @@ namespace MedSync.Controllers
             var result = await _appointmentsService.EditInfoAppointment(request);
             return Ok(result);
         }
+      
     }
 }
