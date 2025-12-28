@@ -10,7 +10,8 @@ public partial class Appointment
 
     public Guid InstitutionServiceId { get; set; }
 
-    public Guid PatientId { get; set; }
+    public Guid? PatientId { get; set; }
+    public Guid? UnregisteredPatientId { get; set; }
 
     public Guid DoctorId { get; set; }
     public Guid InstitutionId { get; set; }
@@ -30,8 +31,9 @@ public partial class Appointment
 
     public virtual Doctor Doctor { get; set; } = null!;
 
-    public virtual Patient Patient { get; set; } = null!;
+    public virtual Patient? Patient { get; set; } = null!;
     public virtual Institution Institution { get; set; } = null!;
 
     public virtual InstitutionService InstitutionService { get; set; }
+    public virtual UnregisteredPatient? UnregisteredPatient { get; set; }
 }

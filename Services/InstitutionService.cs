@@ -380,7 +380,7 @@ namespace MedSync.Services
                 result.Add(new DoctorDto
                 {
                     Id = doctor.UserId,
-                    Name = $"{doctor.User.FirstName} {doctor.User.LastName}",
+                    Name = $"Dr. {doctor.User.FirstName} {doctor.User.LastName}",
                     Slots = slots
                 });
             }

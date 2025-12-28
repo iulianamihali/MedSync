@@ -46,6 +46,7 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<InstitutionService> InstitutionServices { get; set; }
     public virtual DbSet<DoctorSpecialty> DoctorSpecialties { get; set; }
+    public virtual DbSet<UnregisteredPatient> UnregisteredPatients { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,6 +81,11 @@ public partial class MedSyncContext : DbContext
                .HasForeignKey(d => d.InstitutionServiceId)
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("FK_Appointments_InstitutionServiceId");
+            entity.HasOne(d => d.UnregisteredPatient)
+                .WithMany()
+                .HasForeignKey(d => d.UnregisteredPatientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Appointments_UnregisteredPatientId");
 
         });
 
@@ -395,6 +401,28 @@ public partial class MedSyncContext : DbContext
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("FK_DoctorSpecialties_SpecialtyId");
 
+        });
+        modelBuilder.Entity<UnregisteredPatient>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.FirstName)
+             .IsRequired()
+             .HasMaxLength(100);
+
+            entity.Property(e => e.LastName)
+                  .IsRequired()
+                  .HasMaxLength(100);
+
+            entity.Property(e => e.PhoneNumber)
+                  .IsRequired()
+                  .HasMaxLength(20);
+
+            entity.Property(e => e.Email)
+                  .HasMaxLength(255);
+
+            entity.Property(e => e.CreatedAt)
+                  .HasDefaultValueSql("GETDATE()");
         });
 
         OnModelCreatingPartial(modelBuilder);

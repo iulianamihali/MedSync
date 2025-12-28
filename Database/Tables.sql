@@ -129,7 +129,8 @@ GO
 CREATE TABLE Appointments (
     Id uniqueidentifier NOT NULL,
     InstitutionId uniqueidentifier NOT NULL,
-    PatientId uniqueidentifier NOT NULL,
+    PatientId uniqueidentifier NULL,
+    UnregisteredPatientId uniqueidentifier NULL,
     DoctorId uniqueidentifier NOT NULL,
     ReferralCode nvarchar(50),
     Type int NOT NULL,
@@ -143,6 +144,7 @@ CREATE TABLE Appointments (
     CONSTRAINT PK_Appointments PRIMARY KEY (Id),
     CONSTRAINT FK_Appointments_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
     CONSTRAINT FK_Appointments_PatientId FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+    CONSTRAINT FK_Appointments_UnregisteredPatientId FOREIGN KEY (UnregisteredPatientId) REFERENCES UnregisteredPatients(Id),
     CONSTRAINT FK_Appointments_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
     CONSTRAINT FK_Appointments_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionService(Id)
 
@@ -255,3 +257,15 @@ CREATE TABLE DoctorSpecialties (
 	CONSTRAINT FK_DoctorSpecialties_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
 	CONSTRAINT FK_DoctorSpecialties_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
 );
+
+CREATE TABLE UnregisteredPatients (
+	Id uniqueidentifier NOT NULL,
+	FirstName nvarchar(100) NOT NULL,
+	LastName nvarchar(100) NOT NULL,
+	Email nvarchar(255) NULL,
+	PhoneNumber nvarchar(20) NOT NULL,
+	CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
+
+	CONSTRAINT PK_UnregisteredPatients PRIMARY KEY (Id)
+);
+
