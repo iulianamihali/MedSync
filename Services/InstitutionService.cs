@@ -388,7 +388,35 @@ namespace MedSync.Services
             return result;
         }
 
+        public async Task<PatientSearchResultDto?> SearchPatientsByPhone(SearchPatientsByPhoneRequestDto request)
+        {
+            var result = await _context.Users
+                .Where(u => u.PhoneNumber == request.PhoneNumber && u.Role == UserType.Patient)
+                .FirstOrDefaultAsync();
+            if (result != null)
+            {
+                return new PatientSearchResultDto
+                {
+                    Id = result.Id,
+                    Name = $"{result.FirstName} {result.LastName}",
+                    IsRegistered = true,
+                };
+            }
 
+            var result2 = await _context.UnregisteredPatients
+                .Where(u => u.PhoneNumber == request.PhoneNumber)
+                .FirstOrDefaultAsync();
+            if (result2 != null) {
+                return new PatientSearchResultDto
+                {
+                    Id = result2.Id,
+                    Name = $"{result2.FirstName} {result2.LastName}",
+                    IsRegistered = false,
+                };
+            }
+            return null;
+
+        }
 
         private string GenerateInstitutionCode (string institutionName)
         {

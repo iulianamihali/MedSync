@@ -6,7 +6,7 @@ namespace MedSync.DataLayer.DTOs.Appointments
     public class RecentAppointmentsDto
     {
         public Guid AppointmentId { get; set; }
-        public Guid PatientId { get; set; }
+        public Guid? PatientId { get; set; }
         public Guid DoctorId { get; set; }
         public Guid InstitutionServiceId { get; set; }
         public string PatientName { get; set; }

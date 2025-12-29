@@ -73,6 +73,12 @@ namespace MedSync.Controllers
             var response = await _institutionService.GetDoctorsWithSlots(request);
             return Ok(response);
         }
+        [HttpPost("searchPatientsByPhone")]
+        public async Task<IActionResult> SearchPatientsByPhoneAsync([FromBody] SearchPatientsByPhoneRequestDto request)
+        {
+            var response = await _institutionService.SearchPatientsByPhone(request);
+            return Ok(response);
+        }
 
 
     }
