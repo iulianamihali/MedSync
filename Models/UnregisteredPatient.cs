@@ -8,6 +8,6 @@
         public string? Email { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime CreatedAt { get; set; }
-        public ICollection<Appointment> appointments { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

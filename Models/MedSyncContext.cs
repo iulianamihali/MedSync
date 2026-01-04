@@ -82,7 +82,7 @@ public partial class MedSyncContext : DbContext
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("FK_Appointments_InstitutionServiceId");
             entity.HasOne(d => d.UnregisteredPatient)
-                .WithMany()
+                .WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.UnregisteredPatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_UnregisteredPatientId");
