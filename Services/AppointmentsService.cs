@@ -81,7 +81,8 @@ namespace MedSync.Services
                     StartDateTime = request.startTime,
                     EndDateTime = request.startTime.AddMinutes(institutionService.Duration),
                     TotalPrice = institutionService.Price,
-                    Status = AppointmentStatusEnumType.Confirmed
+                    Status = AppointmentStatusEnumType.Confirmed,
+                    ReferralCode = request.ReferralCode,
                 };
                 _context.Appointments.Add(newApp);
                 return (await _context.SaveChangesAsync()) > 0;
@@ -98,7 +99,8 @@ namespace MedSync.Services
                     StartDateTime = request.startTime,
                     EndDateTime = request.startTime.AddMinutes(institutionService.Duration),
                     TotalPrice = institutionService.Price,
-                    Status = AppointmentStatusEnumType.Confirmed
+                    Status = AppointmentStatusEnumType.Confirmed,
+                    ReferralCode = request.ReferralCode,
                 };
                 _context.Appointments.Add(newApp);
                 return (await _context.SaveChangesAsync()) > 0;
@@ -125,7 +127,8 @@ namespace MedSync.Services
                     StartDateTime = request.startTime,
                     EndDateTime = request.startTime.AddMinutes(institutionService.Duration),
                     TotalPrice = institutionService.Price,
-                    Status = AppointmentStatusEnumType.Confirmed
+                    Status = AppointmentStatusEnumType.Confirmed,
+                    ReferralCode = request.ReferralCode,
                 };
                 _context.Appointments.Add(newApp);
                 return (await _context.SaveChangesAsync()) > 0;

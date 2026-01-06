@@ -17,6 +17,7 @@ namespace MedSync.DataLayer.DTOs.Appointments
         public Guid ServiceId { get; set; }
         public Guid DoctorId { get; set; }
         public DateTime startTime { get; set; }
+        public string ReferralCode { get; set; }
 
     }
 }
