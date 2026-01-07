@@ -1,4 +1,5 @@
 ﻿using MedSync.Attributes;
+using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Appointments;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.Enums;
@@ -79,7 +80,19 @@ namespace MedSync.Controllers
             var response = await _institutionService.SearchPatientsByPhone(request);
             return Ok(response);
         }
+        [HttpGet("getDataTablePatients/{page}/{institutionId}")]
+        public async Task<IActionResult> GetDataTablePatients(int page, Guid institutionId)
+        {
+            var response = await _institutionService.GetDataTablePatients(page, institutionId);
+            return Ok(response);
+        }
 
+        [HttpGet("getDataTableDoctors/{page}/{institutionId}")]
+        public async Task<IActionResult> GetDataTableDoctorsAsync(int page, Guid institutionId)
+        {
+            var response = await _institutionService.GetDataTableDoctors(page, institutionId);
+            return Ok(response);
+        }
 
     }
 }

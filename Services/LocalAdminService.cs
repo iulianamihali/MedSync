@@ -62,6 +62,7 @@ namespace MedSync.Services
             var response = await _context.Appointments
                 .Include(u => u.Patient)
                     .ThenInclude(u => u.User)
+                .Include(u => u.UnregisteredPatient)
                 .Include(u => u.Doctor)
                     .ThenInclude(u => u.User)
                 .Include(u => u.InstitutionService)
@@ -70,16 +71,18 @@ namespace MedSync.Services
                     .ThenInclude(u => u.Service)
                       
                 .Where(u => u.InstitutionService.InstitutionId == institutionId
-                //&& (u.StartDateTime.Date >= DateTime.UtcNow.Date && u.StartDateTime.Date <= DateTime.UtcNow)
+                && (u.StartDateTime.Date >= DateTime.UtcNow.Date && u.StartDateTime.Date <= DateTime.UtcNow)
                 && (u.Status == AppointmentStatusEnumType.Confirmed || u.Status == AppointmentStatusEnumType.InProgress || u.Status == AppointmentStatusEnumType.Rescheduled)
                 )
                 .Select(
                     u => new RecentAppointmentsDto
                     {
                         AppointmentId = u.Id,
-                        PatientId = u.PatientId,
+                        PatientId = u.PatientId ?? u.UnregisteredPatientId,
                         DoctorId = u.DoctorId,
-                        PatientName = $"{u.Patient.User.FirstName} {u.Patient.User.LastName}",
+                        PatientName = u.Patient != null 
+                        ? $"{u.Patient.User.FirstName} {u.Patient.User.LastName}"
+                        : $"{u.UnregisteredPatient.FirstName} {u.UnregisteredPatient.LastName}",
                         DoctorName = $"Dr. {u.Doctor.User.FirstName} {u.Doctor.User.LastName}",
                         DateTimeUtc = u.StartDateTime,
                         Price = u.InstitutionService.Price,

@@ -2,10 +2,12 @@
 using Azure.Core;
 using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Institution;
+using MedSync.DataLayer.DTOs.User;
 using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
 using NanoidDotNet;
@@ -300,80 +302,56 @@ namespace MedSync.Services
                     i.User.Doctor.DoctorSpecialties.Any(ds => ds.SpecialtyId == request.SpecialtyId))
                 .ToListAsync();
 
+            var localDate = request.From.ToLocalTime().Date;
+            var dayOfWeek = (int)localDate.DayOfWeek;
+            var now = DateTime.Now;
+
             foreach (var doctor in doctors)
             {
-                var localDate = request.From.ToLocalTime().Date;
-                var dayOfWeek = (int)localDate.DayOfWeek;
-
-                var scheduleForToday = await _context.UserSchedules
+                var schedule = await _context.UserSchedules
                     .FirstOrDefaultAsync(s =>
                         s.InstitutionId == request.InstitutionId &&
                         s.UserId == doctor.UserId &&
                         s.DayOfWeek == dayOfWeek);
 
-                if (scheduleForToday == null)
+                if (schedule == null)
                     continue;
 
-                var startLocal = localDate.Add(scheduleForToday.StartTime.ToTimeSpan());
-                var endLocal = localDate.Add(scheduleForToday.EndTime.ToTimeSpan());
-                var start = startLocal;
-                var end = endLocal;
-                if (start >= end)
-                    continue;
+                var workStart = localDate.Add(schedule.StartTime.ToTimeSpan());
+                var workEnd = localDate.Add(schedule.EndTime.ToTimeSpan());
 
-                var busyIntervals = await _context.Appointments
-                    .Where(a =>
-                        a.DoctorId == doctor.UserId &&
-                        a.InstitutionId == request.InstitutionId &&
-                        a.StartDateTime < end &&
-                        a.EndDateTime > start)
-                    .OrderBy(a => a.StartDateTime)
-                    .Select(a => new
-                    {
-                        Start = a.StartDateTime,
-                        End = a.EndDateTime
-                    })
-                    .ToListAsync();
+                var start = workStart;
 
-                var freeIntervals = new List<(DateTime Start, DateTime End)>();
-                var currentStart = start;
-
-                foreach (var busy in busyIntervals)
+                if (localDate == now.Date)
                 {
-                    if (busy.Start > currentStart)
-                        freeIntervals.Add((currentStart, busy.Start));
-
-                    if (busy.End > currentStart)
-                        currentStart = busy.End;
-                }
-
-                if (currentStart < end)
-                    freeIntervals.Add((currentStart, end));
-
-                var slots = new List<AvailableSlotDto>();
-
-                foreach (var interval in freeIntervals)
-                {
-                    var slotStart = interval.Start;
-
-                    while (slotStart + slotDuration <= interval.End)
+                    while (start + slotDuration <= workEnd && start <= now)
                     {
-                        slots.Add(new AvailableSlotDto
-                        {
-                            Start = slotStart,
-                            End = slotStart.Add(slotDuration)
-                        });
-
-                        slotStart = slotStart.Add(slotDuration);
+                        start = start.Add(slotDuration);
                     }
                 }
 
-                slots = slots
-                    .Where(slot =>
-                        !busyIntervals.Any(b =>
-                            slot.Start < b.End &&
-                            slot.End > b.Start))
-                    .ToList();
+                var slots = new List<AvailableSlotDto>();
+
+                for (var t = start; t + slotDuration <= workEnd; t = t.Add(slotDuration))
+                {
+                    var slotEnd = t.Add(slotDuration);
+
+                    var isBusy = await _context.Appointments.AnyAsync(a =>
+                        a.DoctorId == doctor.UserId &&
+                        a.InstitutionId == request.InstitutionId &&
+                        a.StartDateTime < slotEnd &&
+                        a.EndDateTime > t
+                    );
+
+                    if (!isBusy)
+                    {
+                        slots.Add(new AvailableSlotDto
+                        {
+                            Start = t,
+                            End = slotEnd
+                        });
+                    }
+                }
 
                 if (!slots.Any())
                     continue;
@@ -388,6 +366,7 @@ namespace MedSync.Services
 
             return result;
         }
+
 
         public async Task<PatientSearchResultDto?> SearchPatientsByPhone(SearchPatientsByPhoneRequestDto request)
         {
@@ -416,6 +395,73 @@ namespace MedSync.Services
                 };
             }
             return null;
+
+        }
+
+        public async Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId)
+        {
+            var result = _context.Appointments
+                .Where(a => a.InstitutionId == institutionId && a.Status == AppointmentStatusEnumType.Completed)
+                .GroupBy(a => a.PatientId)
+                .Select(g => new PatientsDataTableResponseDto
+                {
+                    Id = g.Key.Value,
+                    PatientName = g.First().Patient.User.FirstName + " " + g.First().Patient.User.LastName,
+                    Address = g.First().Patient.User.Address.Country + ", " +
+                              g.First().Patient.User.Address.City + ", " +
+                              g.First().Patient.User.Address.Street + ", " +
+                              g.First().Patient.User.Address.Number,
+                    PhoneNumber = g.First().Patient.User.PhoneNumber,
+                    DateOfBirth = g.First().Patient.User.DateOfBirth,
+                    Visits = g.Count(),
+                    LastVisit = g.Max(a => a.StartDateTime)
+
+                })
+                .AsQueryable();
+
+            var rows = await result
+                .OrderByDescending(i => i.LastVisit)
+                .Skip(page * 9)
+                .Take(9)
+                .ToListAsync();
+            var total = await result.CountAsync();
+            return new PaginationDto<PatientsDataTableResponseDto>
+            {
+                Rows = rows,
+                TotalCount = total,
+            };
+
+        }
+
+        public async Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(int page, Guid institutionId)
+        {
+            var result = _context.InstitutionUsers
+                .Where(d => d.InstitutionId == institutionId && d.User.Role == UserType.Doctor)
+                .Select(d => new DoctorsDataTableResponseDto
+                {
+                    Id = d.UserId,
+                    DoctorName = $"{d.User.FirstName} {d.User.LastName}",
+                    PhoneNumber = d.User.PhoneNumber,
+                    CreatedAt = d.User.CreatedAt,
+                    Specialization = d.User.Doctor.DoctorSpecialties
+                        .Select(ds => ds.Specialty.Name)
+                        .FirstOrDefault(),
+                    YearsOfExperience = d.User.Doctor.YearsOfExperience,
+                    Status = d.User.IsActive,
+
+                });
+
+            var rows = await result
+                .OrderByDescending(d => d.CreatedAt)
+                .Skip(page * 9)
+                .Take(9)
+                .ToListAsync();
+            var total = await result.CountAsync();
+            return new PaginationDto<DoctorsDataTableResponseDto>
+            {
+                Rows = rows,
+                TotalCount = total,
+            };
 
         }
 
