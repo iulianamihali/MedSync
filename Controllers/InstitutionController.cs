@@ -20,6 +20,13 @@ namespace MedSync.Controllers
         {
             _institutionService = institutionService;
         }
+        [HttpGet("getInstitutionName/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
+        public async Task<IActionResult> GetInstitutionName(Guid institutionId)
+        {
+            var response = await _institutionService.GetInstitutionName(institutionId);
+            return Ok(response);
+        }
         [AllowAnonymous]
         [HttpPost("registerInstitution")]
         public async Task<IActionResult> RegisterInstitution([FromBody] InstitutionRequestDto request)

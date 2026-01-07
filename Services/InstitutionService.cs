@@ -27,6 +27,16 @@ namespace MedSync.Services
             _context = context;
             _mailerSendService = mailerSendService;
         }
+
+        public async Task<string> GetInstitutionName(Guid institutionId)
+        {
+            var result = await _context.Institutions
+                .Where(i => i.Id == institutionId)
+                .Select(i => i.Name)
+                .FirstOrDefaultAsync();
+            return result;
+        }
+
         public async Task<bool> RegisterInstitutionAsync(InstitutionRequestDto requestDto)
         {
             var newAddress = new Address
@@ -464,6 +474,8 @@ namespace MedSync.Services
             };
 
         }
+
+
 
         private string GenerateInstitutionCode (string institutionName)
         {

@@ -6,6 +6,7 @@ namespace MedSync.Services.IServices
 {
     public interface IInstitutionService
     {
+        Task<string> GetInstitutionName(Guid institutionId);
         Task<bool> RegisterInstitutionAsync(InstitutionRequestDto requestDto);
         Task<int> CountInstitutionRequestsAsync();
         Task<List<InstitutionReqPopUpResponseDto>> GetInstitutionRequestDetailsAsync();

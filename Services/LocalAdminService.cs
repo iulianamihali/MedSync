@@ -23,9 +23,12 @@ namespace MedSync.Services
         }
         public async Task<CountsStatCardsResponseDto> GetDashboardStatCardsAsync(DashboardFilterRequestDto request)
         {
+            var fromLocal = request.From.ToLocalTime().Date;
+            var toLocal = request.To.ToLocalTime().Date;
+
             var appointmentsCount = await _context.Appointments
                 .Where(a => a.InstitutionId == request.InstitutionId &&
-                (a.StartDateTime >= request.From.Date && a.StartDateTime < request.To.Date.AddDays(1)))
+                (a.StartDateTime >= fromLocal && a.StartDateTime < toLocal.AddDays(1)))
                 .CountAsync();
             var totalDoctors = await _context.InstitutionUsers
                 .Include(u => u.User)
@@ -37,13 +40,13 @@ namespace MedSync.Services
                 .CountAsync();
             var canceledAppointments = await _context.Appointments
                 .Where(a => a.InstitutionId == request.InstitutionId &&
-                (a.StartDateTime >= request.From.Date &&
-                a.StartDateTime < request.To.Date.AddDays(1)) &&
+                (a.StartDateTime >= fromLocal &&
+                a.StartDateTime < toLocal.AddDays(1)) &&
                 a.Status == AppointmentStatusEnumType.Canceled)
                 .CountAsync();
             var appointmentsWithReferral = await _context.Appointments
                 .Where(a => a.InstitutionId == request.InstitutionId &&
-                (a.StartDateTime >= request.From.Date && a.StartDateTime < request.To.Date.AddDays(1)) &&
+                (a.StartDateTime >= fromLocal && a.StartDateTime < toLocal.AddDays(1)) &&
                 a.ReferralCode != null)
                 .CountAsync();
             var response = new CountsStatCardsResponseDto
