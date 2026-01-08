@@ -18,5 +18,6 @@ namespace MedSync.Services.IServices
         Task<PatientSearchResultDto?> SearchPatientsByPhone(SearchPatientsByPhoneRequestDto request);
         Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId);
         Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(int page, Guid institutionId);
+        Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId);
     }
 }

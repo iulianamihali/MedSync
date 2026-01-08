@@ -475,7 +475,30 @@ namespace MedSync.Services
 
         }
 
-
+        public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId)
+        {
+            var response = await _context.InstitutionServices
+                .Where(i => i.InstitutionId == institutionId)
+                .GroupBy(i => new 
+                { 
+                    i.SpecialtyId, 
+                    i.Specialty.Name 
+                })
+                .Select(g => new SpecialtyServicesResponseDto
+                {
+                    SpecialtyId = g.Key.SpecialtyId,
+                    SpecialtyName = g.Key.Name,
+                    InstitutionServices = g.Select(s => new InstitutionServiceDto
+                    {
+                        Id = s.Id,
+                        Name = s.Service.Name,
+                        Price = s.Price,
+                        Duration = s.Duration
+                    }).ToList()
+                })
+                .ToListAsync();
+            return response;
+        }
 
         private string GenerateInstitutionCode (string institutionName)
         {

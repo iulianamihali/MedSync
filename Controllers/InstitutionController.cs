@@ -100,6 +100,12 @@ namespace MedSync.Controllers
             var response = await _institutionService.GetDataTableDoctors(page, institutionId);
             return Ok(response);
         }
+        [HttpGet("getSpecialtyServices/{institutionId}")]
+        public async Task<IActionResult> GetSpecialtyServicesAsync(Guid institutionId)
+        {
+            var response = await _institutionService.GetSpecialtyServices(institutionId);
+            return Ok(response);
+        }
 
     }
 }
