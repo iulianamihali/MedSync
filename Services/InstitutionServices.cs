@@ -530,6 +530,16 @@ namespace MedSync.Services
                 return (await _context.SaveChangesAsync()) > 0;
             
         }
+        public async Task<bool> DeleteService(Guid institutionServiceId)
+        {
+            var response = await _context.InstitutionServices
+                .Where(i => i.Id == institutionServiceId)
+                .FirstOrDefaultAsync ();
+            _context.InstitutionServices.Remove(response);
+            return (await _context.SaveChangesAsync()) > 0;
+
+        }
+
 
         private string GenerateInstitutionCode (string institutionName)
         {

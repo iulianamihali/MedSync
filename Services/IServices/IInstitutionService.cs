@@ -21,5 +21,6 @@ namespace MedSync.Services.IServices
         Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId);
         Task<bool> AddService(AddServiceRequestDto request);
         Task<bool> EditDataService(EditDataServiceRequestDto request);
+        Task<bool> DeleteService(Guid institutionServiceId);
     }
 }

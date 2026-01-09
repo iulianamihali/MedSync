@@ -126,6 +126,13 @@ namespace MedSync.Controllers
             var response = await _institutionService.EditDataService(request);
             return Ok(response);
         }
+        [HttpDelete("deleteService/{institutionServiceId}")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
+        public async Task<IActionResult> DeleteServiceAsync(Guid institutionServiceId)
+        {
+            var response = await _institutionService.DeleteService(institutionServiceId);
+            return Ok(response);
+        }
 
     }
 }
