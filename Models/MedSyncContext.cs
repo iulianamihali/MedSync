@@ -364,6 +364,7 @@ public partial class MedSyncContext : DbContext
         });
         modelBuilder.Entity<InstitutionService>(entity =>
         {
+            entity.ToTable("InstitutionServices");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
 

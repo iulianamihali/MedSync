@@ -13,7 +13,7 @@ var jwt = builder.Configuration.GetSection("Jwt");
 var key = builder.Configuration["Jwt:Key"];
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IGlobalAdminService, GlobalAdminService>();
-builder.Services.AddScoped<IInstitutionService, MedSync.Services.InstitutionService>();
+builder.Services.AddScoped<IInstitutionService, MedSync.Services.InstitutionServices>();
 builder.Services.AddScoped<MailerSendService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILocalAdminService, LocalAdminService>();

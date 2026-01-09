@@ -6,5 +6,6 @@ namespace MedSync.Services.IServices
     public interface IGlobalDataService
     {
         Task<List<SpecialtyDto>> GetSpecialties();
+        Task<List<ServiceSelectDto>> GetServices();
     }
 }

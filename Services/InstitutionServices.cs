@@ -16,13 +16,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 namespace MedSync.Services
 {
-    public class InstitutionService : IInstitutionService
+    public class InstitutionServices : IInstitutionService
     {
         private readonly MedSyncContext _context;
         private readonly PasswordHasher<User> _passwordHasher = new();
         private readonly MailerSendService _mailerSendService;
 
-        public InstitutionService(MedSyncContext context, MailerSendService mailerSendService)
+        public InstitutionServices(MedSyncContext context, MailerSendService mailerSendService)
         {
             _context = context;
             _mailerSendService = mailerSendService;
@@ -498,6 +498,37 @@ namespace MedSync.Services
                 })
                 .ToListAsync();
             return response;
+        }
+
+        public async Task<bool> AddService(AddServiceRequestDto request)
+        {
+            foreach(Guid serviceId in request.Services)
+            {
+                var obj = new InstitutionService
+                {
+                    Id = Guid.NewGuid(),
+                    InstitutionId = request.InstitutionId,
+                    SpecialtyId = request.SpecialtyId,
+                    ServiceId = serviceId,
+                };
+                 _context.InstitutionServices.Add(obj);
+            }
+
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+
+        }
+        public async Task<bool> EditDataService(EditDataServiceRequestDto request)
+        {
+            var response = await _context.InstitutionServices
+                .Where(i => i.Id == request.InstitutionServiceId)
+                .FirstOrDefaultAsync();
+
+                response.Price = request.Price;
+                response.Duration = request.Duration;
+                _context.InstitutionServices.Update(response);
+                return (await _context.SaveChangesAsync()) > 0;
+            
         }
 
         private string GenerateInstitutionCode (string institutionName)

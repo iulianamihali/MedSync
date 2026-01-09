@@ -70,24 +70,28 @@ namespace MedSync.Controllers
             return Ok(response);
         }
         [HttpGet("getSpecialtiesWithServices/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
         public async Task<IActionResult> GetSpecialtiesWithServicesAsync(Guid institutionId)
         {
             var response = await _institutionService.GetSpecialtiesWithServices(institutionId);
             return Ok(response);
         }
         [HttpPost("getDoctors")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
         public async Task<IActionResult> GetDoctorsWithSlotsAsync([FromBody] GetDoctorsWithSlotsRequestDto request)
         {
             var response = await _institutionService.GetDoctorsWithSlots(request);
             return Ok(response);
         }
         [HttpPost("searchPatientsByPhone")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
         public async Task<IActionResult> SearchPatientsByPhoneAsync([FromBody] SearchPatientsByPhoneRequestDto request)
         {
             var response = await _institutionService.SearchPatientsByPhone(request);
             return Ok(response);
         }
         [HttpGet("getDataTablePatients/{page}/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
         public async Task<IActionResult> GetDataTablePatients(int page, Guid institutionId)
         {
             var response = await _institutionService.GetDataTablePatients(page, institutionId);
@@ -95,15 +99,31 @@ namespace MedSync.Controllers
         }
 
         [HttpGet("getDataTableDoctors/{page}/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
         public async Task<IActionResult> GetDataTableDoctorsAsync(int page, Guid institutionId)
         {
             var response = await _institutionService.GetDataTableDoctors(page, institutionId);
             return Ok(response);
         }
         [HttpGet("getSpecialtyServices/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
         public async Task<IActionResult> GetSpecialtyServicesAsync(Guid institutionId)
         {
             var response = await _institutionService.GetSpecialtyServices(institutionId);
+            return Ok(response);
+        }
+        [HttpPost("addService")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
+        public async Task<IActionResult> AddServiceAsync(AddServiceRequestDto request)
+        {
+            var response = await _institutionService.AddService(request);
+            return Ok(response);
+        }
+        [HttpPut("editDataService")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
+        public async Task<IActionResult> EditDataServiceAsync([FromBody] EditDataServiceRequestDto request)
+        {
+            var response = await _institutionService.EditDataService(request);
             return Ok(response);
         }
 
