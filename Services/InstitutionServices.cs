@@ -491,6 +491,7 @@ namespace MedSync.Services
                     InstitutionServices = g.Select(s => new InstitutionServiceDto
                     {
                         Id = s.Id,
+                        ServiceId = s.ServiceId,
                         Name = s.Service.Name,
                         Price = s.Price,
                         Duration = s.Duration
