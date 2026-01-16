@@ -133,6 +133,13 @@ namespace MedSync.Controllers
             var response = await _institutionService.DeleteService(institutionServiceId);
             return Ok(response);
         }
+        [HttpDelete("deleteSpecialty")]
+        [AuthorizeUserType(UserType.LocalAdmin)]
+        public async Task<IActionResult> DeleteSpecialtyAsync([FromBody] DeleteSpecialtyRequestDto request)
+        {
+            var result = await _institutionService.DeleteSpecialty(request);
+            return Ok(result);
+        }
 
     }
 }

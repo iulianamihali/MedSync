@@ -541,6 +541,14 @@ namespace MedSync.Services
 
         }
 
+        public async Task<bool> DeleteSpecialty(DeleteSpecialtyRequestDto request)
+        {
+            var response = await _context.InstitutionServices
+                .Where(i => i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId)
+                .ExecuteDeleteAsync();
+
+            return response > 0;
+        }
 
         private string GenerateInstitutionCode (string institutionName)
         {
