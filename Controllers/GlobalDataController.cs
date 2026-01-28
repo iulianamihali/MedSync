@@ -1,8 +1,9 @@
-﻿using MedSync.Services;
-using Microsoft.AspNetCore.Mvc;
-using MedSync.DataLayer.DTOs.Auth;
-using Microsoft.AspNetCore.Authorization;
+﻿using MedSync.DataLayer.DTOs.Auth;
+using MedSync.Models;
+using MedSync.Services;
 using MedSync.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 namespace MedSync.Controllers
 {
     [AllowAnonymous]
@@ -26,6 +27,12 @@ namespace MedSync.Controllers
         public async Task<IActionResult> GetServicesAsync()
         {
             var result = await _globalDataService.GetServices();
+            return Ok(result);
+        }
+        [HttpGet("getInstitutionSpecialties/{codeInstitution}")]
+        public async Task<IActionResult> GetInstitutionSpecialties(string codeInstitution)
+        {
+            var result = await _globalDataService.GetInstitutionSpecialties(codeInstitution);
             return Ok(result);
         }
 

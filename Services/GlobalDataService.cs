@@ -34,6 +34,24 @@ namespace MedSync.Services
                 .ToListAsync();
             return services;
         }
+        public async Task<List<SpecialtyDto>> GetInstitutionSpecialties(string codeInstitution)
+        {
+            var institutionId = await _context.Institutions
+                .Where(c => c.Code == codeInstitution)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+            var result = await _context.InstitutionServices
+                .Where(i => i.InstitutionId == institutionId)
+                .Select(x => new SpecialtyDto
+                {
+                    Id = x.Specialty.Id,
+                    Name = x.Specialty.Name,
+
+                })
+                .Distinct()
+                .ToListAsync();
+            return result;
+        }
 
     }
 }

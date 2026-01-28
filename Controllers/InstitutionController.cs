@@ -1,6 +1,7 @@
 ﻿using MedSync.Attributes;
 using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.GlobalData;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.Enums;
 using MedSync.Services;
@@ -140,6 +141,7 @@ namespace MedSync.Controllers
             var result = await _institutionService.DeleteSpecialty(request);
             return Ok(result);
         }
+       
 
     }
 }

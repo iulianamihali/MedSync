@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Core;
 using MedSync.DataLayer.DTOs;
+using MedSync.DataLayer.DTOs.GlobalData;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.User;
 using MedSync.DataLayer.Enums;
@@ -298,9 +299,12 @@ namespace MedSync.Services
                     s.ServiceId == request.ServiceId);
 
             if (service == null)
-                throw new Exception("Service NOT found for this institution");
+                return result;
 
             var slotDuration = TimeSpan.FromMinutes(service.Duration);
+
+            if (slotDuration.TotalMinutes == 0)
+                return result;
 
             var doctors = await _context.InstitutionUsers
                 .Include(i => i.User)
@@ -411,7 +415,7 @@ namespace MedSync.Services
         public async Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId)
         {
             var result = _context.Appointments
-                .Where(a => a.InstitutionId == institutionId && a.Status == AppointmentStatusEnumType.Completed)
+                .Where(a => a.InstitutionId == institutionId && a.Status == AppointmentStatusEnumType.Completed && a.PatientId.HasValue)
                 .GroupBy(a => a.PatientId)
                 .Select(g => new PatientsDataTableResponseDto
                 {

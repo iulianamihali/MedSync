@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.DTOs;
+using MedSync.DataLayer.DTOs.GlobalData;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.User;
 
