@@ -6,6 +6,8 @@ namespace MedSync.Services.IServices
     {
        Task<List<CalendarAppointmentsDto>> GetCalendarAppointmentsAsync(CalendarAppointmentsRequestDto request);
        Task<bool> EditInfoAppointment (EditInfoAppointmentRequest request);
-        Task<bool> AddAppointment(AddAppointmentRequestDto request);
+       Task<bool> AddAppointment(AddAppointmentRequestDto request);
+       Task<List<UpcomingAppointmentsResponseDto>> GetUpcomingAppointmentsForDoctorAsync(Guid institutionId, Guid doctorId);
+       
     }
 }

@@ -133,7 +133,30 @@ namespace MedSync.Services
                 _context.Appointments.Add(newApp);
                 return (await _context.SaveChangesAsync()) > 0;
             }
-            return false;
         }
+
+        public async Task<List<UpcomingAppointmentsResponseDto>> GetUpcomingAppointmentsForDoctorAsync(Guid institutionId, Guid doctorId)
+        {
+            var result = await _context.Appointments
+                .Where(i => i.InstitutionId == institutionId &&
+                i.DoctorId == doctorId &&
+                i.StartDateTime.Date >= DateTime.UtcNow.Date && i.StartDateTime.Date <= DateTime.UtcNow)
+                .Select(x => new UpcomingAppointmentsResponseDto
+                {
+                    AppointmentId = x.Id,
+                    PatientId = x.PatientId ?? x.UnregisteredPatientId,
+                    PatientName = x.Patient != null
+                        ? $"{x.Patient.User.FirstName} {x.Patient.User.LastName}"
+                        : $"{x.UnregisteredPatient.FirstName} {x.UnregisteredPatient.LastName}",
+                    DateTimeUtc = x.StartDateTime,
+                    Type = x.InstitutionService.Service.Name,
+                    Status = x.Status,
+                })
+                .OrderBy(x => x.DateTimeUtc)
+                .ToListAsync();
+            return result;
+
+        }
+
     }
 }

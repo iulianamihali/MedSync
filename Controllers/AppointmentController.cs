@@ -8,7 +8,7 @@ namespace MedSync.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AuthorizeUserType(UserType.LocalAdmin)]
+    [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentsService _appointmentsService;
@@ -21,6 +21,12 @@ namespace MedSync.Controllers
         {
             var response = await _appointmentsService.AddAppointment(request);
             return Ok(response);
+        }
+        [HttpGet("getUpcomingAppointmentsForDoctor/{institutionId}/{doctorId}")]
+        public async Task<IActionResult> GetUpcomingAppointmentsForDoctorAsync(Guid institutionId, Guid doctorId)
+        {
+            var result = await _appointmentsService.GetUpcomingAppointmentsForDoctorAsync(institutionId, doctorId);
+            return Ok(result);
         }
     }
 }

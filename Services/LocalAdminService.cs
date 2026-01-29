@@ -74,7 +74,7 @@ namespace MedSync.Services
                     .ThenInclude(u => u.Service)
                       
                 .Where(u => u.InstitutionService.InstitutionId == institutionId
-                && (u.StartDateTime.Date >= DateTime.UtcNow.Date && u.StartDateTime.Date <= DateTime.UtcNow)
+                && (u.StartDateTime.Date == DateTime.UtcNow.Date)
                 && (u.Status == AppointmentStatusEnumType.Confirmed || u.Status == AppointmentStatusEnumType.InProgress || u.Status == AppointmentStatusEnumType.Rescheduled)
                 )
                 .Select(
@@ -94,7 +94,7 @@ namespace MedSync.Services
                         Duration = u.InstitutionService.Duration,
                         Status = u.Status
                     }
-                ).OrderByDescending(u => u.DateTimeUtc)
+                ).OrderBy(u => u.DateTimeUtc)
                 .ToListAsync();
             return response;
         }
