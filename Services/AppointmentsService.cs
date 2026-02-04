@@ -75,8 +75,8 @@ namespace MedSync.Services
                 {
                     Id = Guid.NewGuid(),
                     InstitutionServiceId = institutionService.Id,
-                    PatientId = request.PatientId,
-                    DoctorId = request.DoctorId,
+                    PatientUserId = request.PatientId,
+                    DoctorUserId = request.DoctorId,
                     InstitutionId = request.InstitutionId,
                     StartDateTime = request.startTime,
                     EndDateTime = request.startTime.AddMinutes(institutionService.Duration),
@@ -94,7 +94,7 @@ namespace MedSync.Services
                     Id = Guid.NewGuid(),
                     InstitutionServiceId = institutionService.Id,
                     UnregisteredPatientId = request.UnregisteredPatientId,
-                    DoctorId = request.DoctorId,
+                    DoctorUserId = request.DoctorId,
                     InstitutionId = request.InstitutionId,
                     StartDateTime = request.startTime,
                     EndDateTime = request.startTime.AddMinutes(institutionService.Duration),
@@ -112,6 +112,7 @@ namespace MedSync.Services
                     Id = Guid.NewGuid(),
                     FirstName = request.FirstName,
                     LastName = request.LastName,
+                    Cnp = request.Cnp,
                     Email = request.Email,
                     PhoneNumber = request.PhoneNumber,
                     CreatedAt = DateTime.UtcNow,
@@ -122,7 +123,7 @@ namespace MedSync.Services
                     Id = Guid.NewGuid(),
                     InstitutionServiceId = institutionService.Id,
                     UnregisteredPatientId = newUnregPatient.Id,
-                    DoctorId = request.DoctorId,
+                    DoctorUserId = request.DoctorId,
                     InstitutionId = request.InstitutionId,
                     StartDateTime = request.startTime,
                     EndDateTime = request.startTime.AddMinutes(institutionService.Duration),
@@ -139,12 +140,12 @@ namespace MedSync.Services
         {
             var result = await _context.Appointments
                 .Where(i => i.InstitutionId == institutionId &&
-                i.DoctorId == doctorId &&
+                i.DoctorUserId == doctorId &&
                 i.StartDateTime.Date >= DateTime.UtcNow.Date && i.StartDateTime.Date <= DateTime.UtcNow)
                 .Select(x => new UpcomingAppointmentsResponseDto
                 {
                     AppointmentId = x.Id,
-                    PatientId = x.PatientId ?? x.UnregisteredPatientId,
+                    PatientId = x.PatientUserId ?? x.UnregisteredPatientId,
                     PatientName = x.Patient != null
                         ? $"{x.Patient.User.FirstName} {x.Patient.User.LastName}"
                         : $"{x.UnregisteredPatient.FirstName} {x.UnregisteredPatient.LastName}",
@@ -157,6 +158,30 @@ namespace MedSync.Services
             return result;
 
         }
+
+        public async Task<List<CalendarAppointmentsByDoctorResponseDto>> GetCalendarAppointmentsByDoctorAsync(CalendarAppointmentsRequestDto request)
+        {
+            var appointments = await _context.Appointments
+                .Where(a => a.InstitutionId == request.InstitutionId &&
+                            a.DoctorUserId == request.DoctorId &&
+                            a.StartDateTime.Date >= request.From.Date &&
+                            a.StartDateTime.Date <= request.To.Date)
+                .Select(x => new CalendarAppointmentsByDoctorResponseDto
+                {
+                    Id = x.Id,
+                    Status = x.Status, 
+                    Service = x.InstitutionService.Service.Name,
+                    PatientName = x.Patient != null
+                        ? $"{x.Patient.User.FirstName} {x.Patient.User.LastName}"
+                        : $"{x.UnregisteredPatient.FirstName} {x.UnregisteredPatient.LastName}",
+                    StartDateTimeUtc = x.StartDateTime,
+                    EndDateTimeUtc = x.EndDateTime,
+                    Duration = x.InstitutionService.Duration,
+                })
+                .ToListAsync();
+            return appointments;
+        }
+
 
     }
 }

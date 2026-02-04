@@ -104,11 +104,11 @@ CREATE TABLE Reviews (
     Comment nvarchar(1000),
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
     UserId uniqueidentifier NOT NULL,
-    DoctorId uniqueidentifier NOT NULL,
+    DoctorUserId uniqueidentifier NOT NULL,
     InstitutionId uniqueidentifier NOT NULL,
     CONSTRAINT PK_Reviews PRIMARY KEY (Id),
     CONSTRAINT FK_Reviews_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-    CONSTRAINT FK_Reviews_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
+    CONSTRAINT FK_Reviews_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
     CONSTRAINT FK_Reviews_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id)
 );
 GO
@@ -129,9 +129,10 @@ GO
 CREATE TABLE Appointments (
     Id uniqueidentifier NOT NULL,
     InstitutionId uniqueidentifier NOT NULL,
-    PatientId uniqueidentifier NULL,
+    InstitutionServiceId uniqueidentifier NOT NULL,
+    PatientUserId uniqueidentifier NULL,
     UnregisteredPatientId uniqueidentifier NULL,
-    DoctorId uniqueidentifier NOT NULL,
+    DoctorUserId uniqueidentifier NOT NULL,
     ReferralCode nvarchar(50),
     Type int NOT NULL,
     TotalPrice DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -143,16 +144,17 @@ CREATE TABLE Appointments (
     CanceledAt datetime2,
     CONSTRAINT PK_Appointments PRIMARY KEY (Id),
     CONSTRAINT FK_Appointments_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
-    CONSTRAINT FK_Appointments_PatientId FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+    CONSTRAINT FK_Appointments_PatientUserId FOREIGN KEY (PatientUserId) REFERENCES Patients(UserId),
     CONSTRAINT FK_Appointments_UnregisteredPatientId FOREIGN KEY (UnregisteredPatientId) REFERENCES UnregisteredPatients(Id),
-    CONSTRAINT FK_Appointments_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
-    CONSTRAINT FK_Appointments_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionService(Id)
+    CONSTRAINT FK_Appointments_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
+    CONSTRAINT FK_Appointments_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionService(Id),
+
 
 );
 GO
 
 
-CREATE UNIQUE INDEX IX_Appointments_Doctor_StartDateTime ON Appointments (DoctorId, StartDateTime);
+CREATE UNIQUE INDEX IX_Appointments_Doctor_StartDateTime ON Appointments (DoctorUserId, StartDateTime);
 GO
 
 -- 11. PatientAccess
@@ -169,20 +171,20 @@ CREATE TABLE PatientAccess (
 );
 GO
 
+
 -- 12. MedicalRecords
 CREATE TABLE MedicalRecords (
     Id uniqueidentifier NOT NULL,
-    PatientId uniqueidentifier NOT NULL,
-    DoctorId uniqueidentifier NOT NULL,
-    Type int NOT NULL,
-    Title nvarchar(255),
-    Description nvarchar(max),
-    Visibility int NOT NULL,
-    CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
+	AppointmentId uniqueidentifier NOT NULL,
+	Investigation nvarchar(max) NULL,
+	InvestigationResult nvarchar(max) NULL,
+	Symptoms nvarchar(max) NULL,
+	Diagnosis nvarchar(max) NULL,
+	Recommendations nvarchar(max) NULL,
+    CreatedAt datetime2 NOT NULL,
     UpdatedAt datetime2,
     CONSTRAINT PK_MedicalRecords PRIMARY KEY (Id),
-    CONSTRAINT FK_MedicalRecords_PatientId FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
-    CONSTRAINT FK_MedicalRecords_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId)
+	CONSTRAINT FK_MedicalRecords_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id)
 );
 
 
@@ -251,10 +253,10 @@ Create Table InstitutionServices(
 );
 
 CREATE TABLE DoctorSpecialties (
-	DoctorId uniqueidentifier NOT NULL,
+	DoctorUserId uniqueidentifier NOT NULL,
 	SpecialtyId uniqueidentifier NOT NULL,
-	CONSTRAINT PK_DoctorSpecialties PRIMARY KEY (DoctorId, SpecialtyId),
-	CONSTRAINT FK_DoctorSpecialties_DoctorId FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId),
+	CONSTRAINT PK_DoctorSpecialties PRIMARY KEY (DoctorUserId, SpecialtyId),
+	CONSTRAINT FK_DoctorSpecialties_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
 	CONSTRAINT FK_DoctorSpecialties_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
 );
 

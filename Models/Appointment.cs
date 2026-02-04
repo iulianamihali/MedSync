@@ -9,11 +9,10 @@ public partial class Appointment
     public Guid Id { get; set; }
 
     public Guid InstitutionServiceId { get; set; }
-
-    public Guid? PatientId { get; set; }
+    public Guid? PatientUserId { get; set; }
     public Guid? UnregisteredPatientId { get; set; }
 
-    public Guid DoctorId { get; set; }
+    public Guid DoctorUserId { get; set; }
     public Guid InstitutionId { get; set; }
 
     public string? ReferralCode { get; set; }
@@ -36,4 +35,6 @@ public partial class Appointment
 
     public virtual InstitutionService InstitutionService { get; set; }
     public virtual UnregisteredPatient? UnregisteredPatient { get; set; }
+    public virtual MedicalRecord? MedicalRecord { get; set; }
+
 }

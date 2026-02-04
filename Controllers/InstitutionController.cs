@@ -86,9 +86,9 @@ namespace MedSync.Controllers
         }
         [HttpPost("searchPatientsByPhone")]
         [AuthorizeUserType(UserType.LocalAdmin)]
-        public async Task<IActionResult> SearchPatientsByPhoneAsync([FromBody] SearchPatientsByPhoneRequestDto request)
+        public async Task<IActionResult> SearchPatientsByPhoneAsync([FromBody] SearchPatients request)
         {
-            var response = await _institutionService.SearchPatientsByPhone(request);
+            var response = await _institutionService.SearchPatients(request);
             return Ok(response);
         }
         [HttpGet("getDataTablePatients/{page}/{institutionId}")]

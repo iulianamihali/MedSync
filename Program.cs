@@ -20,6 +20,7 @@ builder.Services.AddScoped<ILocalAdminService, LocalAdminService>();
 builder.Services.AddScoped<IGlobalDataService, GlobalDataService>();
 builder.Services.AddScoped<IAppointmentsService, AppointmentsService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<IMedicalRecordsService, MedicalRecordsService>();
 
 // Add services to the container.
 

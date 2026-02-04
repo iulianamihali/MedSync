@@ -81,8 +81,8 @@ namespace MedSync.Services
                     u => new RecentAppointmentsDto
                     {
                         AppointmentId = u.Id,
-                        PatientId = u.PatientId ?? u.UnregisteredPatientId,
-                        DoctorId = u.DoctorId,
+                        PatientId = u.PatientUserId ?? u.UnregisteredPatientId,
+                        DoctorId = u.DoctorUserId,
                         PatientName = u.Patient != null 
                         ? $"{u.Patient.User.FirstName} {u.Patient.User.LastName}"
                         : $"{u.UnregisteredPatient.FirstName} {u.UnregisteredPatient.LastName}",

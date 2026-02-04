@@ -351,7 +351,7 @@ namespace MedSync.Services
                     var slotEnd = t.Add(slotDuration);
 
                     var isBusy = await _context.Appointments.AnyAsync(a =>
-                        a.DoctorId == doctor.UserId &&
+                        a.DoctorUserId == doctor.UserId &&
                         a.InstitutionId == request.InstitutionId &&
                         a.StartDateTime < slotEnd &&
                         a.EndDateTime > t
@@ -382,10 +382,12 @@ namespace MedSync.Services
         }
 
 
-        public async Task<PatientSearchResultDto?> SearchPatientsByPhone(SearchPatientsByPhoneRequestDto request)
+        public async Task<PatientSearchResultDto?> SearchPatients(SearchPatients request)
         {
             var result = await _context.Users
-                .Where(u => u.PhoneNumber == request.PhoneNumber && u.Role == UserType.Patient)
+                .Include(u => u.Patient)
+                .Where(u => u.Role == UserType.Patient && 
+                (u.PhoneNumber == request.PhoneNumber || u.Patient.Cnp == request.Cnp))
                 .FirstOrDefaultAsync();
             if (result != null)
             {
@@ -398,7 +400,7 @@ namespace MedSync.Services
             }
 
             var result2 = await _context.UnregisteredPatients
-                .Where(u => u.PhoneNumber == request.PhoneNumber)
+                .Where(u => u.Cnp == request.Cnp || u.PhoneNumber == request.PhoneNumber)
                 .FirstOrDefaultAsync();
             if (result2 != null) {
                 return new PatientSearchResultDto
@@ -415,8 +417,8 @@ namespace MedSync.Services
         public async Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId)
         {
             var result = _context.Appointments
-                .Where(a => a.InstitutionId == institutionId && a.Status == AppointmentStatusEnumType.Completed && a.PatientId.HasValue)
-                .GroupBy(a => a.PatientId)
+                .Where(a => a.InstitutionId == institutionId && a.Status == AppointmentStatusEnumType.Completed && a.PatientUserId.HasValue)
+                .GroupBy(a => a.PatientUserId)
                 .Select(g => new PatientsDataTableResponseDto
                 {
                     Id = g.Key.Value,

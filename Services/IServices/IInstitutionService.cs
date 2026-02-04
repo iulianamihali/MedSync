@@ -16,7 +16,7 @@ namespace MedSync.Services.IServices
         Task<bool> UpdateInstitutionsInfoAsync(UpdateInstitutionsInfoDto info);
         Task<List<SpecialtyWithServicesDto>> GetSpecialtiesWithServices(Guid institutionId);
         Task<List<DoctorDto>> GetDoctorsWithSlots(GetDoctorsWithSlotsRequestDto request);
-        Task<PatientSearchResultDto?> SearchPatientsByPhone(SearchPatientsByPhoneRequestDto request);
+        Task<PatientSearchResultDto?> SearchPatients(SearchPatients request);
         Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId);
         Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(int page, Guid institutionId);
         Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId);

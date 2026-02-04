@@ -19,8 +19,6 @@ public partial class Patient
 
     public virtual ICollection<AssociatedUser> AssociatedUsers { get; set; } = new List<AssociatedUser>();
 
-    public virtual ICollection<MedicalRecord> MedicalRecords { get; set; } = new List<MedicalRecord>();
-
     public virtual ICollection<PatientAccess> PatientAccesses { get; set; } = new List<PatientAccess>();
 
     public virtual User User { get; set; } = null!;

@@ -28,5 +28,11 @@ namespace MedSync.Controllers
             var result = await _appointmentsService.GetUpcomingAppointmentsForDoctorAsync(institutionId, doctorId);
             return Ok(result);
         }
+        [HttpPost("getCalendarAppointmentsByDoctor")]
+        public async Task<IActionResult> GetCalendarAppointmentsByDoctorAsync([FromBody] CalendarAppointmentsRequestDto request)
+        {
+            var result = await _appointmentsService.GetCalendarAppointmentsByDoctorAsync(request);
+            return Ok(result);
+        }
     }
 }

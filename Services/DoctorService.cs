@@ -19,14 +19,14 @@ namespace MedSync.Services
 
             var totalPatientsWithAppointments = await _context.Appointments
                 .Where(a => a.InstitutionId == request.InstitutionId &&
-                a.DoctorId == request.DoctorId)
-                .Select(a => a.PatientId ?? a.UnregisteredPatientId)
+                a.DoctorUserId == request.DoctorId)
+                .Select(a => a.PatientUserId ?? a.UnregisteredPatientId)
                 .Distinct()
                 .CountAsync();
 
             var totalAppointmentsByPeriod = await _context.Appointments
                 .Where(a => a.InstitutionId == request.InstitutionId &&
-                a.DoctorId == request.DoctorId && 
+                a.DoctorUserId == request.DoctorId && 
                 a.StartDateTime >= fromLocal && a.StartDateTime < toLocal.AddDays(1)
                 )
                 .CountAsync();
