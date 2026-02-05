@@ -51,6 +51,12 @@ namespace MedSync.Services
             var medicalRecord = await _context.MedicalRecords
                 .Where(a => a.AppointmentId == request.AppointmentId)
                 .FirstOrDefaultAsync();
+            var appointment = await _context.Appointments
+                .Where(a => a.Id == request.AppointmentId)
+                .FirstOrDefaultAsync();
+            if (appointment == null)
+                return false;
+
             if(medicalRecord == null)
             {
                 medicalRecord = new MedicalRecord
@@ -63,7 +69,8 @@ namespace MedSync.Services
                     Symptoms = request.Symptoms,
                     Diagnosis = request.Diagnosis,
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
+                  
                 };
                 _context.MedicalRecords.Add(medicalRecord);
             }
@@ -77,7 +84,8 @@ namespace MedSync.Services
                 medicalRecord.UpdatedAt = DateTime.UtcNow;
                 _context.MedicalRecords.Update(medicalRecord);
             }
-   
+            appointment.Status = request.AppointmentStatus;
+            _context.Appointments.Update(appointment);
             var res = await _context.SaveChangesAsync();
             return res > 0;
         }

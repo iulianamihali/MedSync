@@ -1,4 +1,6 @@
-﻿namespace MedSync.DataLayer.DTOs.MedicalRecords
+﻿using MedSync.DataLayer.Enums;
+
+namespace MedSync.DataLayer.DTOs.MedicalRecords
 {
     public class EditMedicalRecordRequestDto
     {
@@ -8,5 +10,6 @@
         public string? Recommendations { get; set; }
         public string? Symptoms { get; set; }
         public string? Diagnosis { get; set; }
+        public AppointmentStatusEnumType AppointmentStatus { get; set; }
     }
 }
