@@ -23,5 +23,11 @@ namespace MedSync.Controllers
             var response = await _doctorService.GetDashboardCardStatsAsync(request);
             return Ok(response);
         }
+        [HttpGet("getDataTableMyPatients/{page}/{institutionId}/{doctorId}")]
+        public async Task<IActionResult> GetDataTableMyPatientsAsync(int page, Guid institutionId, Guid doctorId)
+        {
+            var response = await _doctorService.GetDataTableMyPatientsAsync(page, institutionId, doctorId);
+            return Ok(response);
+        }
     }
 }

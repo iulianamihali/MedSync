@@ -21,7 +21,7 @@ builder.Services.AddScoped<IGlobalDataService, GlobalDataService>();
 builder.Services.AddScoped<IAppointmentsService, AppointmentsService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IMedicalRecordsService, MedicalRecordsService>();
-
+builder.Services.AddScoped<IPatientService, PatientService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
