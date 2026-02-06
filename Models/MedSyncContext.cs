@@ -380,10 +380,10 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<DoctorSpecialty>(entity =>
         {
-            entity.HasKey(e => new { e.DoctorId, e.SpecialtyId });
+            entity.HasKey(e => new { e.DoctorUserId, e.SpecialtyId });
 
             entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorSpecialties)
-               .HasForeignKey(d => d.DoctorId)
+               .HasForeignKey(d => d.DoctorUserId)
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("FK_DoctorSpecialties_DoctorId");
             entity.HasOne(d => d.Specialty).WithMany(p => p.DoctorSpecialties)

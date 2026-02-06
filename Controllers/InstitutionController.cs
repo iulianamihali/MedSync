@@ -71,21 +71,21 @@ namespace MedSync.Controllers
             return Ok(response);
         }
         [HttpGet("getSpecialtiesWithServices/{institutionId}")]
-        [AuthorizeUserType(UserType.LocalAdmin)]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
         public async Task<IActionResult> GetSpecialtiesWithServicesAsync(Guid institutionId)
         {
             var response = await _institutionService.GetSpecialtiesWithServices(institutionId);
             return Ok(response);
         }
         [HttpPost("getDoctors")]
-        [AuthorizeUserType(UserType.LocalAdmin)]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
         public async Task<IActionResult> GetDoctorsWithSlotsAsync([FromBody] GetDoctorsWithSlotsRequestDto request)
         {
             var response = await _institutionService.GetDoctorsWithSlots(request);
             return Ok(response);
         }
         [HttpPost("searchPatientsByPhone")]
-        [AuthorizeUserType(UserType.LocalAdmin)]
+        [AuthorizeUserType(UserType.LocalAdmin,UserType.Doctor)]
         public async Task<IActionResult> SearchPatientsByPhoneAsync([FromBody] SearchPatients request)
         {
             var response = await _institutionService.SearchPatients(request);

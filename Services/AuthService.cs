@@ -126,7 +126,7 @@ namespace MedSync.Services
                 {
                     _context.DoctorSpecialties.Add(new DoctorSpecialty
                     {
-                        DoctorId = newUser.Id,
+                        DoctorUserId = newUser.Id,
                         SpecialtyId = specialtyId
                     });
                 }    
