@@ -12,5 +12,6 @@ namespace MedSync.Services.IServices
         Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServicesByDoctorAsync(Guid doctorId);
         Task<bool> AddServiceAsync(AddServiceRequestDto request);
         Task<bool> DeleteSpecialtyAsync(List<Guid> doctorSpecialtyIds);
+        Task<GetInfoDoctorResponseDto> GetInfoDoctorAsync(Guid doctorId);
     }
 }

@@ -243,10 +243,12 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.AddressId).IsRequired(false);
 
-            entity.HasOne(d => d.Address).WithMany(p => p.Users)
-                .HasForeignKey(d => d.AddressId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_Users_AddressId");
+            entity.HasOne(u => u.Address)
+                  .WithOne(a => a.User)
+                  .HasForeignKey<User>(u => u.AddressId)
+                  .OnDelete(DeleteBehavior.SetNull)
+                  .HasConstraintName("FK_Users_AddressId");
+
         });
 
         modelBuilder.Entity<UserSchedule>(entity =>

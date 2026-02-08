@@ -190,5 +190,26 @@ namespace MedSync.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<GetInfoDoctorResponseDto> GetInfoDoctorAsync(Guid doctorId)
+        {
+            var specialties = await _context.DoctorSpecialties
+                .Where(ds => ds.DoctorUserId == doctorId)
+                .Select(ds => ds.InstitutionService.Specialty.Name)
+                .Distinct()
+                .ToListAsync();
+            var infoDoctor = await _context.Doctors
+                .Where(x => x.UserId == doctorId)
+                .FirstOrDefaultAsync();
+            var response = new GetInfoDoctorResponseDto
+            {
+                Id = doctorId,
+                YearsOfExperience = infoDoctor.YearsOfExperience,
+                MedicalLicenseNumber = infoDoctor.MedicalLicenseNumber,
+                UniversityName = infoDoctor.UniversityName,
+                Specialties = string.Join(", ", specialties),
+            };
+            return response;
+        }
+
     }
 }

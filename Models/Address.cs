@@ -6,7 +6,6 @@ namespace MedSync.Models;
 public partial class Address
 {
     public Guid Id { get; set; }
-
     public string Country { get; set; } = null!;
 
     public string City { get; set; } = null!;
@@ -18,6 +17,7 @@ public partial class Address
     public string PostalCode { get; set; } = null!;
 
     public virtual ICollection<Institution> Institutions { get; set; } = new List<Institution>();
+    public virtual User User { get; set; }
 
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }
+

@@ -49,5 +49,11 @@ namespace MedSync.Controllers
             var response = await _doctorService.DeleteSpecialtyAsync(doctorSpecialtyIds);
             return Ok(response);
         }
+        [HttpGet("getInfoDoctor/{doctorId}")]
+        public async Task<IActionResult> GetInfoDoctorAsync(Guid doctorId)
+        {
+            var response = await _doctorService.GetInfoDoctorAsync(doctorId);
+            return Ok(response);
+        }
     }
 }

@@ -82,11 +82,31 @@ namespace MedSync.Services
             result.Email = request.Email;
             if(result.Role == UserType.Patient || result.Role == UserType.Doctor)
             {
-                result.Address.Country = request.Country;
-                result.Address.City = request.City;
-                result.Address.Street = request.StreetAddress;
-                result.Address.Number = request.StreetNumber;
-                result.Address.PostalCode = request.PostalCode;
+                if (result.Address == null)
+                {
+                   
+                    result.Address = new Address
+                    {
+                        Id = Guid.NewGuid(),
+                        Country = request.Country,
+                        City = request.City,
+                        Street = request.StreetAddress,
+                        Number = request.StreetNumber,
+                        PostalCode = request.PostalCode
+                    };
+
+                    _context.Addresses.Add(result.Address);
+                }
+                else
+                {
+                 
+                    result.Address.Country = request.Country;
+                    result.Address.City = request.City;
+                    result.Address.Street = request.StreetAddress;
+                    result.Address.Number = request.StreetNumber;
+                    result.Address.PostalCode = request.PostalCode;
+                }
+
             }
             _context.Users.Update(result);
             return (await _context.SaveChangesAsync()) > 0;
