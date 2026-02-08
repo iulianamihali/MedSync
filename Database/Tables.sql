@@ -246,10 +246,12 @@ Create Table InstitutionServices(
 	InstitutionId uniqueidentifier NOT NULL,
 	SpecialtyId uniqueidentifier NOT NULL,
 	ServiceId uniqueidentifier NOT NULL,
+    IsActive bit NOT NULL DEFAULT 1,
 	CONSTRAINT PK_InstitutionServices PRIMARY KEY (Id),
 	CONSTRAINT FK_InstitutionServices_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
 	CONSTRAINT FK_InstitutionServices_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
-	CONSTRAINT FK_InstitutionServices_ServiceId FOREIGN KEY (ServiceId) REFERENCES Services(Id)
+	CONSTRAINT FK_InstitutionServices_ServiceId FOREIGN KEY (ServiceId) REFERENCES Services(Id),
+
 );
 
 CREATE TABLE DoctorSpecialties (

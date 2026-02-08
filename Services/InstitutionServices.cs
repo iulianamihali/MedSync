@@ -485,7 +485,7 @@ namespace MedSync.Services
         public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId)
         {
             var response = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == institutionId)
+                .Where(i => i.InstitutionId == institutionId && i.IsActive == true)
                 .GroupBy(i => new 
                 { 
                     i.SpecialtyId, 
@@ -518,6 +518,7 @@ namespace MedSync.Services
                     InstitutionId = request.InstitutionId,
                     SpecialtyId = request.SpecialtyId,
                     ServiceId = serviceId,
+                    IsActive = true,
                 };
                  _context.InstitutionServices.Add(obj);
             }
@@ -543,24 +544,37 @@ namespace MedSync.Services
             var response = await _context.InstitutionServices
                 .Where(i => i.Id == institutionServiceId)
                 .FirstOrDefaultAsync ();
-            _context.InstitutionServices.Remove(response);
+            if(response != null)
+            {
+                response.IsActive = false;
+                _context.InstitutionServices.Update(response);
+              
+            }
             return (await _context.SaveChangesAsync()) > 0;
 
         }
 
         public async Task<bool> DeleteSpecialty(DeleteSpecialtyRequestDto request)
         {
+           
             var response = await _context.InstitutionServices
                 .Where(i => i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId)
-                .ExecuteDeleteAsync();
+                .ToListAsync();
+            if(response.Any())
+            {
+               foreach(var item in response)
+                {
+                    item.IsActive = false;
+                }
+            }
 
-            return response > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<List<SpecialtyDto>> GetSpecialtiesAsync(Guid institutionId)
         {
             var specialties = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == institutionId)
+                .Where(i => i.InstitutionId == institutionId && i.IsActive == true)
                 .Select(i => new SpecialtyDto
                 {
                     Id = i.Specialty.Id,
@@ -574,7 +588,7 @@ namespace MedSync.Services
         public async Task<List<ServiceSelectDto>> GetServicesAsync(Guid institutionId)
         {
             var services = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == institutionId)
+                .Where(i => i.InstitutionId == institutionId && i.IsActive == true)
                 .Select(i => new ServiceSelectDto
                 {
                     Id = i.Service.Id,

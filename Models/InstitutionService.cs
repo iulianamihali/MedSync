@@ -9,6 +9,7 @@
         public Guid InstitutionId { get; set; }
         public Guid SpecialtyId { get; set; }
         public Guid ServiceId { get; set; }
+        public bool IsActive { get; set; }
         public virtual Institution Institution { get; set; }
         public virtual Specialty Specialty { get; set; }
         public virtual Service Service { get; set; }

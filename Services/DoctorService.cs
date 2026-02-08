@@ -116,7 +116,7 @@ namespace MedSync.Services
                     .ThenInclude(ds => ds.Specialty)
                 .Include(ds => ds.InstitutionService)
                     .ThenInclude(ds => ds.Service)
-                .Where(ds => ds.DoctorUserId == doctorId)
+                .Where(ds => ds.DoctorUserId == doctorId && ds.InstitutionService.IsActive == true)
                 .ToListAsync();
 
             var groupBySpecialty = list.GroupBy(ds => new
