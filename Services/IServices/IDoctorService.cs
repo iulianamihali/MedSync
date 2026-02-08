@@ -9,6 +9,8 @@ namespace MedSync.Services.IServices
     {
         Task<CountsStatCardsResponseDto> GetDashboardCardStatsAsync(DashboardFilterRequestDto request);
         Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTableMyPatientsAsync(int page, Guid institutionid, Guid doctorId);
-        
+        Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServicesByDoctorAsync(Guid doctorId);
+        Task<bool> AddServiceAsync(AddServiceRequestDto request);
+        Task<bool> DeleteSpecialtyAsync(List<Guid> doctorSpecialtyIds);
     }
 }

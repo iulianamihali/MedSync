@@ -15,7 +15,7 @@ namespace MedSync.Controllers
 
     public class InstitutionController : ControllerBase
     {
-       
+
         private readonly IInstitutionService _institutionService;
         public InstitutionController(IInstitutionService institutionService)
         {
@@ -85,7 +85,7 @@ namespace MedSync.Controllers
             return Ok(response);
         }
         [HttpPost("searchPatientsByPhone")]
-        [AuthorizeUserType(UserType.LocalAdmin,UserType.Doctor)]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
         public async Task<IActionResult> SearchPatientsByPhoneAsync([FromBody] SearchPatients request)
         {
             var response = await _institutionService.SearchPatients(request);
@@ -141,7 +141,21 @@ namespace MedSync.Controllers
             var result = await _institutionService.DeleteSpecialty(request);
             return Ok(result);
         }
-       
+        [HttpGet("getSpecialties/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
+        public async Task<IActionResult> GetSpecialtiesAsync(Guid institutionId)
+        {
+            var response = await _institutionService.GetSpecialtiesAsync(institutionId);
+            return Ok(response);
+        }
 
+        [HttpGet("getServices/{institutionId}")]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
+        public async Task<IActionResult> GetServicesAsync(Guid institutionId)
+        {
+            var response = await _institutionService.GetServicesAsync(institutionId);
+            return Ok(response);
+
+        }
     }
 }

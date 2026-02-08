@@ -3,6 +3,7 @@
     public class DeleteSpecialtyRequestDto
     {
         public Guid InstitutionId { get; set; }
+        public Guid? DoctorId { get; set; }
         public Guid SpecialtyId { get; set; }
     }
 }

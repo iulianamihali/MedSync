@@ -109,7 +109,86 @@ namespace MedSync.Services
             };
         }
 
+        public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServicesByDoctorAsync(Guid doctorId)
+        {
+            var list = await _context.DoctorSpecialties
+                .Include(ds => ds.InstitutionService)
+                    .ThenInclude(ds => ds.Specialty)
+                .Include(ds => ds.InstitutionService)
+                    .ThenInclude(ds => ds.Service)
+                .Where(ds => ds.DoctorUserId == doctorId)
+                .ToListAsync();
 
+            var groupBySpecialty = list.GroupBy(ds => new
+            {
+                ds.InstitutionService.Specialty.Id,
+                ds.InstitutionService.Specialty.Name
+            });
+
+            List<SpecialtyServicesResponseDto> response = new List<SpecialtyServicesResponseDto>();
+
+            foreach (var item in groupBySpecialty)
+            {
+                List<InstitutionServiceDto> values = new List<InstitutionServiceDto>();
+                foreach(var doctorSpecialty in item)
+                {
+                    values.Add(new InstitutionServiceDto
+                    {
+                        DoctorSpecialtyId = doctorSpecialty.Id,
+                        Id = doctorSpecialty.InstitutionService.Id,
+                        ServiceId = doctorSpecialty.InstitutionService.ServiceId,
+                        Name = doctorSpecialty.InstitutionService.Service.Name,
+                        Price = doctorSpecialty.InstitutionService.Price,
+                        Duration = doctorSpecialty.InstitutionService.Duration,
+                    });
+                }
+
+                response.Add(new SpecialtyServicesResponseDto
+                {
+                    SpecialtyId = item.Key.Id,
+                    SpecialtyName = item.Key.Name,
+                    InstitutionServices = values
+                });
+
+            }
+
+            return response;
+        }
+
+        public async Task<bool> AddServiceAsync(AddServiceRequestDto request)
+        {
+            foreach(var item in request.Services)
+            {
+                var institutionServiceId = await _context.InstitutionServices
+                    .Where(i => i.InstitutionId == request.InstitutionId &&
+                        i.SpecialtyId == request.SpecialtyId &&
+                        i.ServiceId == item)
+                    .Select(i => i.Id)
+                    .FirstOrDefaultAsync();
+                if(institutionServiceId != Guid.Empty)
+                {
+                    var doctorSpecialty = new DoctorSpecialty
+                    {
+                        Id = Guid.NewGuid(),
+                        DoctorUserId = request.DoctorId.Value,
+                        InstitutionServiceId = institutionServiceId,
+                    };
+                    _context.DoctorSpecialties.Add(doctorSpecialty);
+                }
+             
+            }
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteSpecialtyAsync(List<Guid> doctorSpecialtyIds)
+        {
+            var list = await _context.DoctorSpecialties
+                .Where(ds => doctorSpecialtyIds.Contains(ds.Id))
+                .ToListAsync();
+            _context.DoctorSpecialties.RemoveRange(list);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
 
     }
 }

@@ -13,6 +13,6 @@
         public virtual Specialty Specialty { get; set; }
         public virtual Service Service { get; set; }
         public virtual ICollection<Appointment> Appointments { get; set; }
-
+        public virtual ICollection<DoctorSpecialty> DoctorSpecialties { get; set; } = new List<DoctorSpecialty>();
     }
 }

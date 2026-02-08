@@ -253,11 +253,13 @@ Create Table InstitutionServices(
 );
 
 CREATE TABLE DoctorSpecialties (
+	Id uniqueIdentifier NOT NULL,
 	DoctorUserId uniqueidentifier NOT NULL,
-	SpecialtyId uniqueidentifier NOT NULL,
-	CONSTRAINT PK_DoctorSpecialties PRIMARY KEY (DoctorUserId, SpecialtyId),
+	InstitutionServiceId uniqueidentifier NOT NULL,
+	CONSTRAINT PK_DoctorSpecialties PRIMARY KEY (Id),
 	CONSTRAINT FK_DoctorSpecialties_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
-	CONSTRAINT FK_DoctorSpecialties_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
+	CONSTRAINT FK_DoctorSpecialties_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionServices(Id),
+
 );
 
 CREATE TABLE UnregisteredPatients (

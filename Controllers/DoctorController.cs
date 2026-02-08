@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MedSync.DataLayer.Enums;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
 using MedSync.Services.IServices;
+using MedSync.DataLayer.DTOs.Institution;
 
 namespace MedSync.Controllers
 {
@@ -13,7 +14,8 @@ namespace MedSync.Controllers
     public class DoctorController : ControllerBase
     {
         private readonly IDoctorService _doctorService;
-        public DoctorController(IDoctorService doctorService) {
+        public DoctorController(IDoctorService doctorService)
+        {
             _doctorService = doctorService;
         }
 
@@ -27,6 +29,24 @@ namespace MedSync.Controllers
         public async Task<IActionResult> GetDataTableMyPatientsAsync(int page, Guid institutionId, Guid doctorId)
         {
             var response = await _doctorService.GetDataTableMyPatientsAsync(page, institutionId, doctorId);
+            return Ok(response);
+        }
+        [HttpGet("getSpecialtyServicesByDoctor/{doctorId}")]
+        public async Task<IActionResult> GetSpecialtyServicesByDoctor(Guid doctorId)
+        {
+            var response = await _doctorService.GetSpecialtyServicesByDoctorAsync(doctorId);
+            return Ok(response);
+        }
+        [HttpPost("addService")]
+        public async Task<IActionResult> AddServiceAsync([FromBody] AddServiceRequestDto request)
+        {
+            var response = await _doctorService.AddServiceAsync(request);
+            return Ok(response);
+        }
+        [HttpDelete("deleteSpecialty")]
+        public async Task<IActionResult> DeleteSpecialtyAsync([FromBody] List<Guid> doctorSpecialtyIds)
+        {
+            var response = await _doctorService.DeleteSpecialtyAsync(doctorSpecialtyIds);
             return Ok(response);
         }
     }

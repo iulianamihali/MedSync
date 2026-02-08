@@ -312,8 +312,8 @@ namespace MedSync.Services
                         .ThenInclude(d => d.DoctorSpecialties)
                 .Where(i =>
                     i.InstitutionId == request.InstitutionId &&
-                    i.User.Role == UserType.Doctor &&
-                    i.User.Doctor.DoctorSpecialties.Any(ds => ds.SpecialtyId == request.SpecialtyId))
+                    i.User.Role == UserType.Doctor )
+                    //i.User.Doctor.DoctorSpecialties.Any(ds => ds.SpecialtyId == request.SpecialtyId))
                 .ToListAsync();
 
             var localDate = request.From.ToLocalTime().Date;
@@ -460,7 +460,7 @@ namespace MedSync.Services
                     PhoneNumber = d.User.PhoneNumber,
                     CreatedAt = d.User.CreatedAt,
                     Specialization = d.User.Doctor.DoctorSpecialties
-                        .Select(ds => ds.Specialty.Name)
+                        .Select(ds => ds.InstitutionService.Specialty.Name)
                         .FirstOrDefault(),
                     YearsOfExperience = d.User.Doctor.YearsOfExperience,
                     Status = d.User.IsActive,
@@ -480,6 +480,7 @@ namespace MedSync.Services
             };
 
         }
+
 
         public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId)
         {
@@ -556,6 +557,33 @@ namespace MedSync.Services
             return response > 0;
         }
 
+        public async Task<List<SpecialtyDto>> GetSpecialtiesAsync(Guid institutionId)
+        {
+            var specialties = await _context.InstitutionServices
+                .Where(i => i.InstitutionId == institutionId)
+                .Select(i => new SpecialtyDto
+                {
+                    Id = i.Specialty.Id,
+                    Name = i.Specialty.Name,
+                })
+                .Distinct()
+                .ToListAsync();
+            return specialties;
+        }
+
+        public async Task<List<ServiceSelectDto>> GetServicesAsync(Guid institutionId)
+        {
+            var services = await _context.InstitutionServices
+                .Where(i => i.InstitutionId == institutionId)
+                .Select(i => new ServiceSelectDto
+                {
+                    Id = i.Service.Id,
+                    Name = i.Service.Name,
+                })
+                .Distinct()
+                .ToListAsync();
+            return services;
+        }
         private string GenerateInstitutionCode (string institutionName)
         {
             var cleanName = Regex.Replace(institutionName.ToUpper(), @"[^A-Z0-9]", "");

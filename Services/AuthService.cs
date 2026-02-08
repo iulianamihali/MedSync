@@ -122,14 +122,7 @@ namespace MedSync.Services
                     MedicalLicenseNumber = request.DoctorData.LicenseNumber,
                     UniversityName = request.DoctorData.UniversityName,
                 };
-                foreach(var specialtyId in request.DoctorData.Specialties)
-                {
-                    _context.DoctorSpecialties.Add(new DoctorSpecialty
-                    {
-                        DoctorUserId = newUser.Id,
-                        SpecialtyId = specialtyId
-                    });
-                }    
+                
                 _context.Doctors.Add(doctor);
                 _context.InstitutionUsers.Add(new InstitutionUser
                 {

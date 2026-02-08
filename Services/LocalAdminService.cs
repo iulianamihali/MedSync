@@ -119,7 +119,8 @@ namespace MedSync.Services
                 .Include(i => i.User)
                     .ThenInclude(i => i.Doctor)
                         .ThenInclude(i => i.DoctorSpecialties)
-                            .ThenInclude(i => i.Specialty)
+                            .ThenInclude(i => i.InstitutionService)
+                                .ThenInclude(i => i.Specialty)
                 .Where(i => i.InstitutionId == institutionId &&
                 i.Status == DoctorRequestsStatusEnumType.Pending
                 )
@@ -131,7 +132,7 @@ namespace MedSync.Services
                     DateOfBirth = i.User.DateOfBirth.ToString(),
                     PhoneNumber = i.User.PhoneNumber,
                     UniversityName = i.User.Doctor.UniversityName,
-                    Specialization = string.Join(", ", i.User.Doctor.DoctorSpecialties.Select(x => x.Specialty.Name).ToList()),
+                    Specialization = string.Join(", ", i.User.Doctor.DoctorSpecialties.Select(x => x.InstitutionService.Specialty.Name).ToList()),
                     MedicalLicenseNumber = i.User.Doctor.MedicalLicenseNumber,
                     YearsOfExperience = i.User.Doctor.YearsOfExperience.ToString(),
                     CreatedAt = i.CreatedAt
