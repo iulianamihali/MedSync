@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.DTOs.MedicalRecords;
+using MedSync.DataLayer.DTOs.Pdf;
 using MedSync.Models;
 using MedSync.Services.IServices;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace MedSync.Services
         public async Task<GetMedicalRecordByAppointmentResponseDto> GetMedicalRecordByAppointmentAsync(Guid appointmentId)
         {
             var result = await _context.Appointments
+                .Include(a => a.MedicalRecord)
                 .Where(a => a.Id == appointmentId)
                 .Select(a => new GetMedicalRecordByAppointmentResponseDto
                 {
@@ -88,6 +90,64 @@ namespace MedSync.Services
             _context.Appointments.Update(appointment);
             var res = await _context.SaveChangesAsync();
             return res > 0;
+        }
+
+        public async Task<MedicalReportPdfDto> GetMedicalReportPdfDataAsync(Guid medicalRecordId)
+        {
+           
+            var medicalRecordData = await _context.MedicalRecords
+                .Include(m => m.Appointment)
+                    .ThenInclude(m => m.Institution)
+                .Include(m => m.Appointment)
+                    .ThenInclude(a => a.Patient)
+                        .ThenInclude(p => p.User)
+                .Include(m => m.Appointment)
+                    .ThenInclude(a => a.UnregisteredPatient)
+                 .Include(m => m.Appointment)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(p => p.User)
+                .Where(m => m.Id == medicalRecordId)
+            
+                .FirstOrDefaultAsync();
+
+            if(medicalRecordData != null)
+            {
+                var response = new MedicalReportPdfDto
+                {
+                    InstitutionName = medicalRecordData.Appointment.Institution.Name,
+                    ConsultationDate = medicalRecordData.Appointment.StartDateTime,
+                    PatientFullName = medicalRecordData.Appointment.Patient != null
+                        ? $"{medicalRecordData.Appointment.Patient.User.FirstName} {medicalRecordData.Appointment.Patient.User.LastName}"
+                        : $"{medicalRecordData.Appointment.UnregisteredPatient.FirstName} {medicalRecordData.Appointment.UnregisteredPatient.LastName}",
+                    PatientDateOfBirth = medicalRecordData.Appointment.Patient != null
+                        ? medicalRecordData.Appointment.Patient.User.DateOfBirth.Value
+                        : null,
+                    PatientCnp = medicalRecordData.Appointment.Patient != null
+                        ? medicalRecordData.Appointment.Patient.Cnp
+                        : medicalRecordData.Appointment.UnregisteredPatient.Cnp,
+                    Symptoms = medicalRecordData.Symptoms,
+                    Investigation = medicalRecordData.Investigation,
+                    InvestigationResult = medicalRecordData.InvestigationResult,
+                    Diagnosis = medicalRecordData.Diagnosis,
+                    Recommendations = medicalRecordData.Recommendations,
+                    DoctorFullName = $"{medicalRecordData.Appointment.Doctor.User.FirstName} {medicalRecordData.Appointment.Doctor.User.LastName}",
+                    GeneratedAt = DateTime.Now,
+                };
+
+                var logoPath = Path.Combine(
+                      Directory.GetCurrentDirectory(),
+                      "Assets",
+                      "logos",
+                      "logo.png"
+                  );
+
+                if (File.Exists(logoPath))
+                {
+                    response.InstitutionLogo = File.ReadAllBytes(logoPath);
+                }
+                return response;
+            }
+            return null;
         }
 
     }

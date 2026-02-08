@@ -2,11 +2,13 @@
 using MedSync.Models;
 using MedSync.Services;
 using MedSync.Services.IServices;
+using MedSync.Services.pdf;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetSection("Jwt");
@@ -22,6 +24,7 @@ builder.Services.AddScoped<IAppointmentsService, AppointmentsService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IMedicalRecordsService, MedicalRecordsService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<PdfService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -66,6 +69,7 @@ builder.Services.AddCors(options =>
 });
 
 
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 

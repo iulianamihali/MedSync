@@ -65,6 +65,7 @@ namespace MedSync.Services
                 .Where(a => a.InstitutionId == institutionId && a.DoctorUserId == doctorId && (a.PatientUserId == patientId || a.UnregisteredPatientId == patientId))
                 .Select(a => new PatientAppointmentsSummaryResponseDto
                 {
+                    MedicalRecordId = a.MedicalRecord.Id,
                     AppointmentId = a.Id,
                     Date = a.StartDateTime,
                     Status = a.Status,

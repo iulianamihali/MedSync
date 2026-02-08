@@ -2,6 +2,7 @@
 using MedSync.DataLayer.DTOs.MedicalRecords;
 using MedSync.DataLayer.Enums;
 using MedSync.Services.IServices;
+using MedSync.Services.pdf;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MedSync.Controllers
@@ -14,9 +15,11 @@ namespace MedSync.Controllers
     public class MedicalRecordsController : ControllerBase
     {
         private readonly IMedicalRecordsService _medicalRecordsService;
-        public MedicalRecordsController(IMedicalRecordsService medicalRecordsService)
+        private readonly PdfService _pdfService;
+        public MedicalRecordsController(IMedicalRecordsService medicalRecordsService, PdfService pdfService)
         {
             _medicalRecordsService = medicalRecordsService;
+            _pdfService = pdfService;
         }
 
         [HttpGet("getMedicalRecordByAppointment/{appointmentId}")]
@@ -31,7 +34,21 @@ namespace MedSync.Controllers
             var result = await _medicalRecordsService.EditMedicalRecordAsync(request);
             return Ok(result);
         }
+        [HttpGet("getMedicalReportPdfData/{medicalRecordId}")]
+        public async Task<IActionResult> ExportMedicalReportPdf(Guid medicalRecordId)
+        {
+            var dto = await _medicalRecordsService.GetMedicalReportPdfDataAsync(medicalRecordId);
 
+            if (dto == null)
+                return NotFound();
 
+            var pdfBytes = _pdfService.GenerateMedicalReport(dto);
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                "MedicalReport.pdf"
+            );
+        }
     }
 }
