@@ -510,17 +510,31 @@ namespace MedSync.Services
 
         public async Task<bool> AddService(AddServiceRequestDto request)
         {
-            foreach(Guid serviceId in request.Services)
+            var services = await _context.InstitutionServices
+                .Where(i => i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId)
+                .ToListAsync();
+
+            foreach (Guid serviceId in request.Services)
             {
-                var obj = new InstitutionService
+                var existingService = services.FirstOrDefault(s => s.ServiceId == serviceId);
+                if (existingService != null)
                 {
-                    Id = Guid.NewGuid(),
-                    InstitutionId = request.InstitutionId,
-                    SpecialtyId = request.SpecialtyId,
-                    ServiceId = serviceId,
-                    IsActive = true,
-                };
-                 _context.InstitutionServices.Add(obj);
+                   existingService.IsActive = true;
+                    _context.InstitutionServices.Update(existingService);
+                }
+
+                else
+                {
+                    var obj = new InstitutionService
+                    {
+                        Id = Guid.NewGuid(),
+                        InstitutionId = request.InstitutionId,
+                        SpecialtyId = request.SpecialtyId,
+                        ServiceId = serviceId,
+                        IsActive = true,
+                    };
+                    _context.InstitutionServices.Add(obj);
+                }
             }
 
             var result = await _context.SaveChangesAsync();

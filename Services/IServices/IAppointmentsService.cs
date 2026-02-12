@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.Patient;
 
 namespace MedSync.Services.IServices
 {
@@ -9,6 +10,8 @@ namespace MedSync.Services.IServices
        Task<bool> AddAppointment(AddAppointmentRequestDto request);
        Task<List<UpcomingAppointmentsResponseDto>> GetUpcomingAppointmentsForDoctorAsync(Guid institutionId, Guid doctorId);
        Task<List<CalendarAppointmentsByDoctorResponseDto>> GetCalendarAppointmentsByDoctorAsync(CalendarAppointmentsRequestDto request);
+       Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid appointmentId);
+
 
     }
 }

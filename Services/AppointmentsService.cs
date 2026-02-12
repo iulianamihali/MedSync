@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.Patient;
 using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using MedSync.Services.IServices;
@@ -180,6 +181,22 @@ namespace MedSync.Services
                 })
                 .ToListAsync();
             return appointments;
+        }
+
+        public async Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid appointmentId)
+        {
+            var response = await _context.Appointments
+                .Where(a => a.Id == appointmentId)
+                .Select(x => new PatientBasicInfoResponseDto
+                {
+                    Id = x.PatientUserId ?? x.UnregisteredPatientId!.Value,
+                    FullName = x.Patient != null
+                        ? $"{x.Patient.User.FirstName} {x.Patient.User.LastName}"
+                        : $"{x.UnregisteredPatient.FirstName} {x.UnregisteredPatient.LastName}",
+                    DateOfBirth = x.Patient != null ? x.Patient.User.DateOfBirth : null,
+                })
+                .FirstOrDefaultAsync();
+            return response;
         }
 
 

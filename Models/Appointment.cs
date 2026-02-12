@@ -36,5 +36,6 @@ public partial class Appointment
     public virtual InstitutionService InstitutionService { get; set; }
     public virtual UnregisteredPatient? UnregisteredPatient { get; set; }
     public virtual MedicalRecord? MedicalRecord { get; set; }
+    public virtual ICollection<MedicalReferral> MedicalReferrals { get; set; }
 
 }

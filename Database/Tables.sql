@@ -275,3 +275,16 @@ CREATE TABLE UnregisteredPatients (
 	CONSTRAINT PK_UnregisteredPatients PRIMARY KEY (Id)
 );
 
+CREATE TABLE MedicalReferrals (
+	 Id uniqueidentifier NOT NULL,
+	 SpecialtyId uniqueidentifier NOT NULL,
+	 AppointmentId uniqueidentifier NOT NULL,
+	 ReasonReferral nvarchar(max) NOT NULL,
+	 SuspectedDiagnosis nvarchar(max) NOT NULL,
+	 RelevantClinicalInformation nvarchar(max) NOT NULL,
+	 CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
+	 ExpirationDate datetime2 NULL, 
+	 CONSTRAINT PK_MedicalReferrals PRIMARY KEY (Id),
+	 CONSTRAINT FK_MedicalReferrals_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
+	 CONSTRAINT FK_MedicalReferrals_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id),
+)

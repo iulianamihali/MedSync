@@ -34,5 +34,11 @@ namespace MedSync.Controllers
             var result = await _appointmentsService.GetCalendarAppointmentsByDoctorAsync(request);
             return Ok(result);
         }
+        [HttpGet("getPatientBasicInfo/{appointmentId}")]
+        public async Task<IActionResult> GetPatientBasicInfoAsync(Guid appointmentId)
+        {
+            var result = await _appointmentsService.GetPatientBasicInfoAsync(appointmentId);
+            return Ok(result);
+        }
     }
 }

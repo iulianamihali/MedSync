@@ -4,6 +4,7 @@ using MedSync.DataLayer.Enums;
 using MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard;
 using MedSync.Services.IServices;
 using MedSync.DataLayer.DTOs.Institution;
+using MedSync.DataLayer.DTOs.Doctor;
 
 namespace MedSync.Controllers
 {
@@ -55,5 +56,6 @@ namespace MedSync.Controllers
             var response = await _doctorService.GetInfoDoctorAsync(doctorId);
             return Ok(response);
         }
+  
     }
 }

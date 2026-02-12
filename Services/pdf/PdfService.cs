@@ -10,5 +10,11 @@ namespace MedSync.Services.pdf
             var document = new MedicalReportPdf(data);
             return document.GeneratePdf();
         }
+
+        public byte[] GenerateMedicalReferral(MedicalReferralPdfDto data)
+        {
+            var document = new MedicalReferralPdf(data);
+            return document.GeneratePdf();
+        }
     }
 }
