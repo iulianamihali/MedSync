@@ -27,11 +27,23 @@ namespace MedSync.Controllers
         public async Task<IActionResult> CreateMedicalReferralAsync([FromBody] CreateMedicalReferralRequestDto request)
         {
             var referralId = await _medicalReferralService.CreateMedicalReferralAsync(request);
+            return Ok(referralId);
+        }
+
+        [HttpGet("getMedicalReferralPdf/{referralId}")]
+        public async Task<IActionResult> GetMedicalReferralPdfAsync(Guid referralId)
+        {
             var obj = await _medicalReferralService.GetMedicalReferralPdfDataAsync(referralId);
-
-            var pdfBytes =  _pdfService.GenerateMedicalReferral(obj);
-
+            var pdfBytes = _pdfService.GenerateMedicalReferral(obj);
             return File(pdfBytes, "application/pdf", "MedicalReferral.pdf");
         }
+
+        [HttpGet("getAppointmentReferrals/{appointmentId}")]
+        public async Task<IActionResult> GetAppointmentReferralsAsync(Guid appointmentId)
+        {
+            var referrals = await _medicalReferralService.GetAppointmentReferralsAsync(appointmentId);
+            return Ok(referrals);
+        }
     }
+
 }

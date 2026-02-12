@@ -1,5 +1,6 @@
 ﻿using Azure;
 using MedSync.DataLayer.DTOs.Doctor;
+using MedSync.DataLayer.DTOs.MedicalReferrals;
 using MedSync.DataLayer.DTOs.Pdf;
 using MedSync.Models;
 using MedSync.Services.IServices;
@@ -74,6 +75,24 @@ namespace MedSync.Services
             }
             return medicalReferral;
         }
+
+        public async Task<List<GetAppointmentReferralsResponseDto>> GetAppointmentReferralsAsync(Guid appointmentId)
+        {
+            var response = await _context.MedicalReferrals
+                .Where(m => m.AppointmentId == appointmentId)
+                .Select(x => new GetAppointmentReferralsResponseDto
+                {
+                    MedicalReferralId = x.Id,
+                    SpecialtyName = x.Specialty.Name,
+                    IssuedAt = x.CreatedAt,
+                    ExpirationDate = x.ExpirationDate,
+                    SuspectedDiagnosis = x.SuspectedDiagnosis
+                })
+                .OrderByDescending(x => x.IssuedAt)
+                .ToListAsync();
+            return response;
+        }
+
 
     }
 }
