@@ -240,7 +240,8 @@ namespace MedSync.Services
                 Reviews = reviews.Select(r => new DoctorReviewItemDto
                 {
                     ReviewId = r.Id,
-                    PatientName = r.Appointment.Patient != null ? r.Appointment.Patient.User.FirstName + " " + r.Appointment.Patient.User.LastName : "",
+                    PatientFirstName = r.Appointment.Patient != null ? r.Appointment.Patient.User.FirstName : null,
+                    PatientLastName = r.Appointment.Patient != null ? r.Appointment.Patient.User.LastName : null,
                     Rating = r.Rating,
                     Comment = r.Comment,
                     CreatedAt = r.CreatedAt
