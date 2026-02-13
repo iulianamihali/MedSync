@@ -42,8 +42,6 @@ public partial class User
 
     public virtual ICollection<PatientAccess> PatientAccesses { get; set; } = new List<PatientAccess>();
 
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
-
     public virtual ICollection<UserSchedule> UserScheduleCreatedByUsers { get; set; } = new List<UserSchedule>();
 
     public virtual ICollection<UserSchedule> UserScheduleUsers { get; set; } = new List<UserSchedule>();

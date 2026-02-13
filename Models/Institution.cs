@@ -24,8 +24,6 @@ public partial class Institution
 
     public virtual ICollection<InstitutionUser> InstitutionUsers { get; set; } = new List<InstitutionUser>();
 
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
-
     public virtual ICollection<UserSchedule> UserSchedules { get; set; } = new List<UserSchedule>();
     public virtual ICollection<InstitutionRequests> InstitutionRequests { get; set; } = new List<InstitutionRequests>();
     public virtual ICollection<DoctorRequests> DoctorRequests { get; set; } = new List<DoctorRequests>();

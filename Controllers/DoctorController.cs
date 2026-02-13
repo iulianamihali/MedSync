@@ -56,6 +56,12 @@ namespace MedSync.Controllers
             var response = await _doctorService.GetInfoDoctorAsync(doctorId);
             return Ok(response);
         }
-  
+        [HttpGet("getDoctorFeedback/{institutionId}/{doctorId}")]
+        public async Task<IActionResult> GetDoctorFeedbackAsync(Guid institutionId, Guid doctorId)
+        {
+            var response = await _doctorService.GetDoctorFeedbackAsync(institutionId, doctorId);
+            return Ok(response);
+        }
+
     }
 }

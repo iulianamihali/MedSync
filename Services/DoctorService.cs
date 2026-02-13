@@ -220,5 +220,35 @@ namespace MedSync.Services
             return response;
         }
 
+        public async Task<GetDoctorFeedbackResponseDto> GetDoctorFeedbackAsync(Guid institutionId, Guid doctorId)
+        {
+            var reviews = await _context.Reviews
+                .Include(r => r.Appointment)
+                    .ThenInclude(a => a.Patient)
+                        .ThenInclude(p => p.User)
+                .Where(d => d.Appointment.InstitutionId == institutionId && d.Appointment.DoctorUserId == doctorId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+            var totalReviews = reviews.Count;
+            var sumRatings = reviews.Sum(r => r.Rating);
+            var averageRating = totalReviews > 0 ? Math.Round((decimal)sumRatings / totalReviews, 1, MidpointRounding.AwayFromZero) : 0;
+
+            var response = new GetDoctorFeedbackResponseDto
+            {
+                AverageRating = averageRating,
+                TotalReviews = totalReviews,
+                Reviews = reviews.Select(r => new DoctorReviewItemDto
+                {
+                    ReviewId = r.Id,
+                    PatientName = r.Appointment.Patient != null ? r.Appointment.Patient.User.FirstName + " " + r.Appointment.Patient.User.LastName : "",
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    CreatedAt = r.CreatedAt
+                }).ToList()
+            };
+            return response;
+        }
+
+
     }
 }

@@ -103,13 +103,10 @@ CREATE TABLE Reviews (
     Rating int NOT NULL,
     Comment nvarchar(1000),
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
-    UserId uniqueidentifier NOT NULL,
-    DoctorUserId uniqueidentifier NOT NULL,
-    InstitutionId uniqueidentifier NOT NULL,
+    AppointmentId uniqueidentifier NOT NULL,
     CONSTRAINT PK_Reviews PRIMARY KEY (Id),
-    CONSTRAINT FK_Reviews_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-    CONSTRAINT FK_Reviews_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
-    CONSTRAINT FK_Reviews_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id)
+    CONSTRAINT FK_Reviews_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id),
+
 );
 GO
 

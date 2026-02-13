@@ -212,20 +212,10 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Comment).HasMaxLength(1000);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
 
-            entity.HasOne(d => d.Doctor).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.DoctorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Reviews_DoctorId");
-
-            entity.HasOne(d => d.Institution).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.InstitutionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Reviews_InstitutionId");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Reviews_UserId");
+            entity.HasOne(d => d.Appointment).WithOne(p => p.Review)
+                .HasForeignKey<Review>(d => d.AppointmentId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Reviews_AppointmentId");
         });
 
         modelBuilder.Entity<User>(entity =>
