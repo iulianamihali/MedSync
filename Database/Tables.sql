@@ -285,3 +285,25 @@ CREATE TABLE MedicalReferrals (
 	 CONSTRAINT FK_MedicalReferrals_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
 	 CONSTRAINT FK_MedicalReferrals_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id),
 )
+
+CREATE TABLE Prescriptions(
+	Id uniqueidentifier NOT NULL,
+	AppointmentId uniqueidentifier NOT NULL,
+	Diagnosis nvarchar(255) NOT NULL,
+	CONSTRAINT PK_Prescriptions PRIMARY KEY (Id),
+	CONSTRAINT FK_Prescriptions_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id)
+)
+
+
+CREATE TABLE Medications (
+	Id uniqueidentifier NOT NULL,
+	PrescriptionId uniqueidentifier NOT NULL,
+	Name nvarchar(255) NOT NULL,
+	Strength nvarchar(255) NOT NULL,
+	Dosage nvarchar(255) NOT NULL,
+	Frequency nvarchar(255) NOT NULL,
+	Duration nvarchar(255) NOT NULL,
+	CONSTRAINT PK_Medications PRIMARY KEY (Id),
+	CONSTRAINT FK_Medications_PrescriptionId FOREIGN KEY (PrescriptionId) REFERENCES Prescriptions(Id)
+
+)

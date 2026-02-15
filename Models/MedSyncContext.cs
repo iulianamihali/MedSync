@@ -48,6 +48,8 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<DoctorSpecialty> DoctorSpecialties { get; set; }
     public virtual DbSet<UnregisteredPatient> UnregisteredPatients { get; set; }
     public virtual DbSet<MedicalReferral> MedicalReferrals { get; set; }
+    public virtual DbSet<Prescription> Prescriptions { get; set; }
+    public virtual DbSet<Medication> Medications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -440,6 +442,30 @@ public partial class MedSyncContext : DbContext
                .HasForeignKey(e => e.AppointmentId)
                .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<Prescription>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Appointment)
+               .WithMany(s => s.Prescriptions)
+               .HasForeignKey(e => e.AppointmentId)
+               .OnDelete(DeleteBehavior.Cascade);
+ 
+        });
+
+        modelBuilder.Entity<Medication>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Prescription)
+               .WithMany(s => s.Medications)
+               .HasForeignKey(e => e.PrescriptionId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+        });
+
+
         OnModelCreatingPartial(modelBuilder);
     }
 

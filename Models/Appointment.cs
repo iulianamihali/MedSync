@@ -38,5 +38,6 @@ public partial class Appointment
     public virtual MedicalRecord? MedicalRecord { get; set; }
     public virtual ICollection<MedicalReferral> MedicalReferrals { get; set; }
     public virtual Review? Review { get; set; }
+    public virtual ICollection<Prescription> Prescriptions { get; set; }
 
 }
