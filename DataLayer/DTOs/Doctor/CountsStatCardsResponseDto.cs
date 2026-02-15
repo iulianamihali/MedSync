@@ -5,5 +5,6 @@
         public int TotalPatientsWithAppointments { get; set; }
         public int TotalAppointmentsByPeriod { get; set; }
         public int TotalReferralsByAppointment { get; set; }
+        public int TotalPrescriptionsByAppointment { get; set; }
     }
 }

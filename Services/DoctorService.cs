@@ -40,12 +40,19 @@ namespace MedSync.Services
                      mr.CreatedAt < toLocal.AddDays(1)
                  )
                  .CountAsync();
+            var totalPrescriptionsByAppointment = await _context.Prescriptions
+                .Where(p => p.Appointment.InstitutionId == request.InstitutionId && 
+                p.Appointment.DoctorUserId == request.DoctorId &&
+                p.Appointment.StartDateTime >= fromLocal && p.Appointment.StartDateTime < toLocal.AddDays(1)
+                )
+                .CountAsync();
 
             var response = new CountsStatCardsResponseDto
             {
                 TotalPatientsWithAppointments = totalPatientsWithAppointments,
                 TotalAppointmentsByPeriod = totalAppointmentsByPeriod,
                 TotalReferralsByAppointment = totalReferralsByAppointment,
+                TotalPrescriptionsByAppointment = totalPrescriptionsByAppointment,
             };
             return response;
                 
