@@ -35,5 +35,11 @@ namespace MedSync.Controllers
             var pdfBytes =  _pdfService.GenerateMedicalPrescription(obj);
             return File(pdfBytes, "application/pdf", "MedicalPrescription.pdf");
         }
+
+        [HttpGet("getAppointmentPrescriptions/{appointmentId}")]
+        public async Task<IActionResult> GetAppointmentPrescriptionsAsync(Guid appointmentId) { 
+            var response = await _medicalPrescriptionService.GetAppointmentPrescriptionsAsync(appointmentId);
+            return Ok(response);
+        }
     } 
 }

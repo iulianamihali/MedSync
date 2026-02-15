@@ -86,5 +86,21 @@ namespace MedSync.Services
             return medicalPrescription;
         }
 
+        public async Task<List<GetAppointmentPrescriptionsResponseDto>> GetAppointmentPrescriptionsAsync(Guid appointmentId)
+        {
+            var prescriptions = await _context.Prescriptions
+                .Where(p => p.AppointmentId == appointmentId)
+                .Select(x => new GetAppointmentPrescriptionsResponseDto { 
+                    PrescriptionId = x.Id,
+                    Diagnosis = x.Diagnosis,
+                    IssuedAt = DateTime.UtcNow,
+                    ExpirationDate = DateTime.UtcNow.AddMonths(1)
+                })
+                .OrderByDescending(x => x.IssuedAt)
+                .ToListAsync();
+
+            return prescriptions;
+        }
+
     }
 }
