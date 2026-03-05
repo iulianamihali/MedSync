@@ -93,8 +93,8 @@ namespace MedSync.Services
                 .Select(x => new GetAppointmentPrescriptionsResponseDto { 
                     PrescriptionId = x.Id,
                     Diagnosis = x.Diagnosis,
-                    IssuedAt = DateTime.UtcNow,
-                    ExpirationDate = DateTime.UtcNow.AddMonths(1)
+                    IssuedAt = x.Appointment.StartDateTime,
+                    ExpirationDate = x.Appointment.StartDateTime.AddMonths(1)
                 })
                 .OrderByDescending(x => x.IssuedAt)
                 .ToListAsync();
