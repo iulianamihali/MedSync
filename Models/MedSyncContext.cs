@@ -61,6 +61,8 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Number).HasMaxLength(20);
             entity.Property(e => e.PostalCode).HasMaxLength(20);
             entity.Property(e => e.Street).HasMaxLength(100);
+            entity.Property(e => e.Latitude).HasColumnType("decimal(9,6)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(9,6)");
         });
 
         modelBuilder.Entity<Appointment>(entity =>

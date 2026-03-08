@@ -35,6 +35,12 @@ namespace MedSync.Controllers
             var result = await _globalDataService.GetInstitutionSpecialties(codeInstitution);
             return Ok(result);
         }
+        [HttpGet("getClinicLocations")]
+        public async Task<IActionResult> GetClinicLocations()
+        {
+            var result = await _globalDataService.GetClinicLocations();
+            return Ok(result);
 
+        }
     }
 }

@@ -15,6 +15,8 @@ public partial class Address
     public string Number { get; set; } = null!;
 
     public string PostalCode { get; set; } = null!;
+    public decimal Latitude { get; set; }
+    public decimal Longitude { get; set; }
 
     public virtual ICollection<Institution> Institutions { get; set; } = new List<Institution>();
     public virtual User User { get; set; }
