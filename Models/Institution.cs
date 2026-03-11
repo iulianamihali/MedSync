@@ -19,7 +19,6 @@ public partial class Institution
     public bool Active { get; set; }
     public string TaxIdentificationNumber { get; set; }
     public virtual Address Address { get; set; } = null!;
-
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 
     public virtual ICollection<InstitutionUser> InstitutionUsers { get; set; } = new List<InstitutionUser>();

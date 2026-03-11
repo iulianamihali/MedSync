@@ -157,5 +157,12 @@ namespace MedSync.Controllers
             return Ok(response);
 
         }
+        [HttpGet("getInstitutionDetails/{institutionId}")]
+        [AuthorizeUserType(UserType.Patient)]
+        public async Task<IActionResult> GetInstitutionDetailsAsync(Guid institutionId)
+        {
+            var response = await _institutionService.GetInstitutionDetailsAsync(institutionId);
+            return Ok(response);
+        }
     }
 }

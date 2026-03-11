@@ -67,10 +67,11 @@ namespace MedSync.Services
                     FullAddress = $"{x.Address.Country} {x.Address.Number}, {x.Address.PostalCode} {x.Address.City}, {x.Address.Country}",
                     Latitude = x.Address.Latitude,
                     Longitude = x.Address.Longitude,
-                    Rating = x.Appointments
+                    Rating = Math.Round(x.Appointments
                                 .Where(a => a.Review != null)
                                 .Select(a => (double?)a.Review.Rating)
                                 .Average() ?? 0.0,
+                                2),
                     TotalRatings = x.Appointments.Count(a => a.Review != null)
                 })
                 .ToListAsync();

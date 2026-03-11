@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Core;
 using MedSync.DataLayer.DTOs;
+using MedSync.DataLayer.DTOs.Doctor;
 using MedSync.DataLayer.DTOs.GlobalData;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.User;
@@ -611,6 +612,43 @@ namespace MedSync.Services
                 .Distinct()
                 .ToListAsync();
             return services;
+        }
+
+        public async Task<InstitutionDetailsResponse> GetInstitutionDetailsAsync(Guid institutionId)
+        {
+            var response = await _context.Institutions
+                .Where(i => i.Id == institutionId)
+                .Select(x => new InstitutionDetailsResponse
+                {
+                    InstitutionId = x.Id,
+                    InstitutionName = x.Name,
+                    Rating = Math.Round(x.Appointments
+                                .Where(a => a.Review != null)
+                                .Select(a => (double?)a.Review.Rating)
+                                .Average() ?? 0.0,
+                                2),
+                    TotalReviews = x.Appointments.Count(a => a.Review != null),
+                    Address = x.Address.Country + ", " + x.Address.City + ", " + x.Address.Street + ", " + x.Address.Number,
+                    Doctors = x.InstitutionUsers
+                                .Where(iu => iu.User.Role == UserType.Doctor)
+                                .Select(d => new DoctorPreview
+                                {
+                                    Id = d.UserId,
+                                    Name = d.User.FirstName + " " + d.User.LastName,
+                                    Rating = Math.Round(d.User.Doctor.Appointments
+                                                .Where(r => r.Review != null)
+                                                .Select(r => (double?)r.Review.Rating)
+                                                .Average() ?? 0.0,
+                                                2),
+                                    Specialties = d.User.Doctor.DoctorSpecialties
+                                                .Select(ds => ds.InstitutionService.Specialty.Name)
+                                                .Distinct()
+                                                .ToList()
+
+                                }).ToList()
+                }).FirstOrDefaultAsync();
+
+            return response;
         }
         private string GenerateInstitutionCode (string institutionName)
         {
