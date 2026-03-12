@@ -382,6 +382,70 @@ namespace MedSync.Services
             return result;
         }
 
+        public async Task<List<AvailableSlotDto>> GetScheduleForDoctor(GetDoctorsWithSlotsRequestDto request, Guid doctorId, InstitutionService service)
+        {
+            var slotDuration = TimeSpan.FromMinutes(service.Duration);
+
+            if (slotDuration.TotalMinutes == 0)
+                return [];
+
+            var localDate = request.From.ToLocalTime().Date;
+            var dayOfWeek = (int)localDate.DayOfWeek;
+            var now = DateTime.Now;
+
+            var schedule = await _context.UserSchedules
+                    .FirstOrDefaultAsync(s =>
+                        s.InstitutionId == request.InstitutionId &&
+                        s.UserId == doctorId &&
+                        s.DayOfWeek == dayOfWeek);
+
+            if (schedule == null)
+                return [];
+
+            var workStart = localDate.Add(schedule.StartTime.ToTimeSpan());
+                var workEnd = localDate.Add(schedule.EndTime.ToTimeSpan());
+
+                var start = workStart;
+
+                if (localDate == now.Date)
+                {
+                    while (start + slotDuration <= workEnd && start <= now)
+                    {
+                        start = start.Add(slotDuration);
+                    }
+                }
+
+                var slots = new List<AvailableSlotDto>();
+                var appointments = await _context.Appointments
+                    .Where(a => a.DoctorUserId == doctorId &&
+                a.InstitutionId == request.InstitutionId &&
+                a.StartDateTime.Date == localDate)
+                .ToListAsync();
+
+            for (var t = start; t + slotDuration <= workEnd; t = t.Add(slotDuration))
+                {
+                    var slotEnd = t.Add(slotDuration);
+
+                var isBusy = appointments.Any(a =>
+                     a.StartDateTime < slotEnd &&
+                     a.EndDateTime > t
+                    );
+
+                if (!isBusy)
+                    {
+                        slots.Add(new AvailableSlotDto
+                        {
+                            Start = t,
+                            End = slotEnd
+                        });
+                    }
+                }
+
+            //if (!slots.Any())
+            //    continue;
+
+            return slots;
+        }
 
         public async Task<PatientSearchResultDto?> SearchPatients(SearchPatients request)
         {
@@ -649,6 +713,59 @@ namespace MedSync.Services
                 }).FirstOrDefaultAsync();
 
             return response;
+        }
+
+        public async Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(GetDoctorsWithSlotsRequestDto request)
+        {
+            var response = await _context.DoctorSpecialties
+                .Where(d => d.InstitutionService.InstitutionId == request.InstitutionId &&
+                d.InstitutionService.SpecialtyId == request.SpecialtyId &&
+                d.InstitutionService.ServiceId == request.ServiceId
+                )
+                .Select(x => new AvailabilityDoctorsResponseDto
+                {
+                    Id = x.Doctor.UserId,
+                    Name = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
+                    DoctorSpecialties = x.Doctor.DoctorSpecialties
+                                                            .Select(ds => new SpecialtyDto
+                                                            {
+                                                                Id = ds.InstitutionService.Specialty.Id,
+                                                                Name = ds.InstitutionService.Specialty.Name,
+                                                            })
+                                                            .ToList(),
+                    Rating = Math.Round(x.Doctor.Appointments
+                                        .Where(a => a.Review != null)
+                                        .Select(a => (double?)a.Review.Rating)
+                                        .Average() ?? 0.0,
+                                        2),
+                    TotalReviews = x.Doctor.Appointments.Count(a => a.Review != null),
+
+                })
+                .ToListAsync() ;
+            response = response.DistinctBy(x => x.Id).ToList();
+            foreach (var doctor in response)
+            {
+                doctor.DoctorSpecialties = doctor.DoctorSpecialties
+                    .DistinctBy(s => s.Id)
+                    .ToList();
+            }
+            var service = await _context.InstitutionServices
+                .FirstOrDefaultAsync(s =>
+                    s.InstitutionId == request.InstitutionId &&
+                    s.ServiceId == request.ServiceId);
+
+            if (service == null)
+                return [];
+
+            foreach (var item in response)
+            {
+                List<AvailableSlotDto> slots = await GetScheduleForDoctor(request, item.Id, service);
+                item.SlotsAvailable = slots;
+            }
+            List<AvailabilityDoctorsResponseDto> filteredResponse = response
+                .Where(r => r.SlotsAvailable != null && r.SlotsAvailable.Count > 0)
+                .ToList();
+            return filteredResponse;
         }
         private string GenerateInstitutionCode (string institutionName)
         {

@@ -8,7 +8,7 @@ namespace MedSync.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
+    [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor, UserType.Patient)]
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentsService _appointmentsService;

@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.DTOs;
+using MedSync.DataLayer.DTOs.Doctor;
 using MedSync.DataLayer.DTOs.GlobalData;
 using MedSync.DataLayer.DTOs.Institution;
 using MedSync.DataLayer.DTOs.User;
@@ -27,5 +28,6 @@ namespace MedSync.Services.IServices
         Task<List<SpecialtyDto>> GetSpecialtiesAsync(Guid institutionId);
         Task<List<ServiceSelectDto>> GetServicesAsync(Guid institutionId);
         Task<InstitutionDetailsResponse> GetInstitutionDetailsAsync(Guid institutionId);
+        Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(GetDoctorsWithSlotsRequestDto request);
     }
 }

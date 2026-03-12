@@ -71,7 +71,7 @@ namespace MedSync.Controllers
             return Ok(response);
         }
         [HttpGet("getSpecialtiesWithServices/{institutionId}")]
-        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor)]
+        [AuthorizeUserType(UserType.LocalAdmin, UserType.Doctor, UserType.Patient)]
         public async Task<IActionResult> GetSpecialtiesWithServicesAsync(Guid institutionId)
         {
             var response = await _institutionService.GetSpecialtiesWithServices(institutionId);
@@ -162,6 +162,13 @@ namespace MedSync.Controllers
         public async Task<IActionResult> GetInstitutionDetailsAsync(Guid institutionId)
         {
             var response = await _institutionService.GetInstitutionDetailsAsync(institutionId);
+            return Ok(response);
+        }
+        [HttpPost("getAvailableDoctors")]
+        [AuthorizeUserType(UserType.Patient)]
+        public async Task<IActionResult> GetAvailableDoctorsAsync([FromBody] GetDoctorsWithSlotsRequestDto request)
+        {
+            var response = await _institutionService.GetDoctorsAvailabilityAsync(request);
             return Ok(response);
         }
     }
