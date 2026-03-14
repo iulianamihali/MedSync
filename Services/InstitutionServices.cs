@@ -767,6 +767,34 @@ namespace MedSync.Services
                 .ToList();
             return filteredResponse;
         }
+
+        public async Task<List<DoctorInfoTabResponse>> GetDoctorsInfoTabAsync(Guid institutionId)
+        {
+            var response = await _context.DoctorSpecialties
+                .Where(d => d.InstitutionService.InstitutionId == institutionId)
+                .Select(x => new DoctorInfoTabResponse
+                {
+                    Id = x.Doctor.UserId,
+                    Name = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
+                    DoctorSpecialties = x.Doctor.DoctorSpecialties
+                                                            .Select(ds => new SpecialtyDto
+                                                            {
+                                                                Id = ds.InstitutionService.Specialty.Id,
+                                                                Name = ds.InstitutionService.Specialty.Name,
+                                                            })
+                                                            .ToList(),
+                    Rating = Math.Round(x.Doctor.Appointments
+                                        .Where(a => a.Review != null)
+                                        .Select(a => (double?)a.Review.Rating)
+                                        .Average() ?? 0.0,
+                                        2),
+                    TotalReviews = x.Doctor.Appointments.Count(a => a.Review != null),
+                })
+                .ToListAsync();
+            response = response.DistinctBy(x => x.Id).ToList();
+            return response;
+        }
+
         private string GenerateInstitutionCode (string institutionName)
         {
             var cleanName = Regex.Replace(institutionName.ToUpper(), @"[^A-Z0-9]", "");

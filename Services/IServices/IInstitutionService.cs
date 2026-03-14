@@ -29,5 +29,6 @@ namespace MedSync.Services.IServices
         Task<List<ServiceSelectDto>> GetServicesAsync(Guid institutionId);
         Task<InstitutionDetailsResponse> GetInstitutionDetailsAsync(Guid institutionId);
         Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(GetDoctorsWithSlotsRequestDto request);
+        Task<List<DoctorInfoTabResponse>> GetDoctorsInfoTabAsync(Guid institutionId);
     }
 }

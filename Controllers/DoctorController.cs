@@ -10,7 +10,7 @@ namespace MedSync.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AuthorizeUserType(UserType.Doctor)]
+    [AuthorizeUserType(UserType.Doctor, UserType.Patient)]
 
     public class DoctorController : ControllerBase
     {
@@ -60,6 +60,12 @@ namespace MedSync.Controllers
         public async Task<IActionResult> GetDoctorFeedbackAsync(Guid institutionId, Guid doctorId)
         {
             var response = await _doctorService.GetDoctorFeedbackAsync(institutionId, doctorId);
+            return Ok(response);
+        }
+        [HttpGet("getSpecialtyServicesByDoctor/{doctorId}/{institutionId}")]
+        public async Task<IActionResult> GetSpecialtyServicesByDoctor(Guid doctorId, Guid institutionId)
+        {
+            var response = await _doctorService.GetSpecialtyServicesByDoctorAsync(doctorId, institutionId);
             return Ok(response);
         }
 

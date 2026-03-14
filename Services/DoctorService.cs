@@ -257,6 +257,54 @@ namespace MedSync.Services
             return response;
         }
 
+        public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServicesByDoctorAsync(Guid doctorId, Guid institutionId)
+        {
+            var list = await _context.DoctorSpecialties
+
+               .Include(ds => ds.InstitutionService)
+                   .ThenInclude(ds => ds.Specialty)
+               .Include(ds => ds.InstitutionService)
+                   .ThenInclude(ds => ds.Service)
+               .Where(ds => ds.InstitutionService.InstitutionId == institutionId && ds.DoctorUserId == doctorId && ds.InstitutionService.IsActive == true)
+               .ToListAsync();
+
+            var groupBySpecialty = list.GroupBy(ds => new
+            {
+                ds.InstitutionService.Specialty.Id,
+                ds.InstitutionService.Specialty.Name
+            });
+
+            List<SpecialtyServicesResponseDto> response = new List<SpecialtyServicesResponseDto>();
+
+            foreach (var item in groupBySpecialty)
+            {
+                List<InstitutionServiceDto> values = new List<InstitutionServiceDto>();
+                foreach (var doctorSpecialty in item)
+                {
+                    values.Add(new InstitutionServiceDto
+                    {
+                        DoctorSpecialtyId = doctorSpecialty.Id,
+                        Id = doctorSpecialty.InstitutionService.Id,
+                        ServiceId = doctorSpecialty.InstitutionService.ServiceId,
+                        Name = doctorSpecialty.InstitutionService.Service.Name,
+                        Price = doctorSpecialty.InstitutionService.Price,
+                        Duration = doctorSpecialty.InstitutionService.Duration,
+                    });
+                }
+
+                response.Add(new SpecialtyServicesResponseDto
+                {
+                    SpecialtyId = item.Key.Id,
+                    SpecialtyName = item.Key.Name,
+                    InstitutionServices = values
+                });
+
+            }
+
+            return response;
+        }
+
+
 
     }
 }
