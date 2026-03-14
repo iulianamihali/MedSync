@@ -178,5 +178,12 @@ namespace MedSync.Controllers
             var response = await _institutionService.GetDoctorsInfoTabAsync(institutionId);
             return Ok(response);
         }
+        [HttpPost("getAvailableSlotsDoctor")]
+        [AuthorizeUserType(UserType.Patient)]
+        public async Task<IActionResult> GetAvailableSlotsDoctorAsync([FromBody] GetDoctorsWithSlotsRequestDto request)
+        {
+            var response = await _institutionService.GetAvailableSlotsByDoctorAsync(request);
+            return Ok(response);
+        }
     }
 }

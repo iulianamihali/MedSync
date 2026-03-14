@@ -795,6 +795,27 @@ namespace MedSync.Services
             return response;
         }
 
+        public async Task<AvailableSlotsDoctorResponseDto> GetAvailableSlotsByDoctorAsync(GetDoctorsWithSlotsRequestDto request)
+        {
+        
+            var service = await _context.InstitutionServices
+                .FirstOrDefaultAsync(s =>
+                    s.InstitutionId == request.InstitutionId &&
+                    s.ServiceId == request.ServiceId);
+
+            if (service == null)
+                return null;
+
+                List<AvailableSlotDto> slots = await GetScheduleForDoctor(request, request.DoctorId.Value, service);
+            var response = new AvailableSlotsDoctorResponseDto
+            {
+                DoctorId = request.DoctorId.Value,
+                SlotsAvailable = slots
+            };
+          
+            return response;
+        }
+
         private string GenerateInstitutionCode (string institutionName)
         {
             var cleanName = Regex.Replace(institutionName.ToUpper(), @"[^A-Z0-9]", "");
