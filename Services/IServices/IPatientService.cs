@@ -7,5 +7,7 @@ namespace MedSync.Services.IServices
         Task<PatientDetailsResponseDto> GetPatientDetailsAsync(Guid patientId);
         Task<List<PatientAppointmentsSummaryResponseDto>> GetPatientAppointmentsSummariesAsync(Guid institutionId, Guid doctorId, Guid patientId);
         Task<List<GetFutureAppointmentsResponseDto>> GetFutureAppointmentsAsync(Guid patientId);
+        Task<List<ActiveMedicationResponseDto>> GetActiveMedicationsAsync(Guid patientId);
+            
     }
 }

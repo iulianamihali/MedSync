@@ -791,7 +791,7 @@ namespace MedSync.Services
                     TotalReviews = x.Doctor.Appointments.Count(a => a.Review != null),
                 })
                 .ToListAsync();
-            response = response.DistinctBy(x => x.Id).ToList();
+            response = response.Select(x => new DoctorInfoTabResponse(x, x.DoctorSpecialties.DistinctBy(s => s.Id).ToList())).DistinctBy(x => x.Id).ToList();
             return response;
         }
 

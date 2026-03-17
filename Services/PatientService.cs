@@ -1,4 +1,5 @@
-﻿using MedSync.DataLayer.DTOs.Patient;
+﻿using MedSync.DataLayer.DTOs.MedicalPrescriptions;
+using MedSync.DataLayer.DTOs.Patient;
 using MedSync.Models;
 using MedSync.Services.IServices;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +99,53 @@ namespace MedSync.Services
                 .OrderBy(x => x.StartDateTimeUtc)
                 .ToListAsync();
             return result;
+        }
+
+        public async Task<List<ActiveMedicationResponseDto>> GetActiveMedicationsAsync(Guid patientId)
+        {
+            var prescriptions = await _context.Prescriptions
+                .Where(p => p.Appointment.PatientUserId == patientId)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Diagnosis,
+                    StartDate = p.Appointment.StartDateTime,
+                    DoctorName = p.Appointment.Doctor.User.FirstName + " " + p.Appointment.Doctor.User.LastName,
+                    Medications = p.Medications.Select(m => new
+                    {
+                        m.Name,
+                        m.Strength,
+                        m.Dosage,
+                        m.Frequency,
+                        m.Duration
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            var today = DateTime.Now;
+
+            var response = prescriptions
+                .Where(p => p.Medications.Any(m =>
+                    p.StartDate.AddDays(int.Parse(m.Duration)) >= today))
+                .Select(p => new ActiveMedicationResponseDto
+                {
+                    PrescriptionId = p.Id,
+                    Diagnosis = p.Diagnosis,
+                    PrescribedAt = p.StartDate,
+                    DoctorName = p.DoctorName,
+                    MedicationItems = p.Medications.Select(m => new MedicationItemDto
+                    {
+                        MedicationName = m.Name,
+                        Strength = m.Strength,
+                        Dosage = m.Dosage,
+                        Frequency = m.Frequency,
+                        Duration = m.Duration,
+                    }).ToList()
+                })
+                .ToList();
+
+            return response;
+
         }
 
 
