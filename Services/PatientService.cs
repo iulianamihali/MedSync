@@ -77,6 +77,29 @@ namespace MedSync.Services
             return appointments;
         }
 
+        public async Task<List<GetFutureAppointmentsResponseDto>> GetFutureAppointmentsAsync(Guid patientId)
+        {
+            var result = await _context.Appointments
+                .Where(a => a.PatientUserId == patientId && a.StartDateTime > DateTime.UtcNow)
+                .Select(x => new GetFutureAppointmentsResponseDto
+                {
+                    AppointmentId = x.Id,
+                    StatusAppointment = x.Status,
+                    SpecialtyName = x.InstitutionService.Specialty.Name,
+                    StartDateTimeUtc = x.StartDateTime,
+                    EndDateTimeUtc = x.EndDateTime,
+                    InstitutionName = x.Institution.Name,
+                    Address =
+                      x.Institution.Address.City + ", " +
+                      x.Institution.Address.Street + ", " +
+                      x.Institution.Address.Number,
+                    DoctorName = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName
+                })
+                .OrderBy(x => x.StartDateTimeUtc)
+                .ToListAsync();
+            return result;
+        }
+
 
     }
 }
