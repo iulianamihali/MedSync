@@ -39,5 +39,12 @@ namespace MedSync.Controllers
             var response = await _patientService.GetActiveMedicationsAsync(patientId);
             return Ok(response);
         }
+
+        [HttpGet("getAppointmentHistory/{patientId}")]
+        public async Task<IActionResult> GetAppointmentHistoryAsync(Guid patientId)
+        {
+            var response = await _patientService.GetAppointmentHistoryAsync(patientId);
+            return Ok(response);
+        }
     }
 }

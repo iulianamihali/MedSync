@@ -8,6 +8,6 @@ namespace MedSync.Services.IServices
         Task<List<PatientAppointmentsSummaryResponseDto>> GetPatientAppointmentsSummariesAsync(Guid institutionId, Guid doctorId, Guid patientId);
         Task<List<GetFutureAppointmentsResponseDto>> GetFutureAppointmentsAsync(Guid patientId);
         Task<List<ActiveMedicationResponseDto>> GetActiveMedicationsAsync(Guid patientId);
-            
+        Task<List<AppointmentHistoryResponseDto>> GetAppointmentHistoryAsync(Guid patientId);
     }
 }

@@ -148,6 +148,27 @@ namespace MedSync.Services
 
         }
 
+        public async Task<List<AppointmentHistoryResponseDto>> GetAppointmentHistoryAsync(Guid patientId)
+        {
+            var result = await _context.Appointments
+                .Where(a => a.PatientUserId == patientId && a.StartDateTime < DateTime.UtcNow)
+                .Select(a => new AppointmentHistoryResponseDto
+                {
+                    AppointmentId = a.Id,
+                    DoctorName = a.Doctor.User.FirstName + " " + a.Doctor.User.LastName,
+                    Address = a.Institution.Address.City + ", " +
+                      a.Institution.Address.Street + ", " +
+                      a.Institution.Address.Number,
+                    Specialty = a.InstitutionService.Specialty.Name,
+                    StartDateTime = a.StartDateTime,
+                    Service = a.InstitutionService.Service.Name
+
+                })
+                .OrderByDescending(a => a.StartDateTime)
+                .ToListAsync();
+            return result;
+        }
+
 
     }
 }
