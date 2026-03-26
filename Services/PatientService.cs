@@ -1,4 +1,5 @@
 ﻿using MedSync.DataLayer.DTOs.MedicalPrescriptions;
+using MedSync.DataLayer.DTOs.MedicalRecords;
 using MedSync.DataLayer.DTOs.Patient;
 using MedSync.Models;
 using MedSync.Services.IServices;
@@ -19,7 +20,7 @@ namespace MedSync.Services
                 .Include(p => p.User)
                     .ThenInclude(p => p.Address)
                 .FirstOrDefaultAsync(p => p.UserId == patientId);
-            if(patient != null)
+            if (patient != null)
             {
                 var result = new PatientDetailsResponseDto
                 {
@@ -41,7 +42,7 @@ namespace MedSync.Services
             {
                 var unregistredPatient = await _context.UnregisteredPatients
                     .FirstOrDefaultAsync(p => p.Id == patientId);
-                if(unregistredPatient != null)
+                if (unregistredPatient != null)
                 {
                     var result = new PatientDetailsResponseDto
                     {
@@ -55,7 +56,7 @@ namespace MedSync.Services
                     };
                     return result;
                 }
-              
+
             }
             return null;
         }
@@ -167,6 +168,44 @@ namespace MedSync.Services
                 .OrderByDescending(a => a.StartDateTime)
                 .ToListAsync();
             return result;
+        }
+
+
+        public async Task<AppointmentHistoryDetailsResponseDto> GetAppointmentHistoryDetailsResponseAsync(Guid appointmentId)
+        {
+            var response = await _context.Appointments
+                .Where(a => a.Id == appointmentId)  
+                .Select(x => new AppointmentHistoryDetailsResponseDto
+                {
+                    DoctorName = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
+                    SpecialtyName = x.InstitutionService.Specialty.Name,
+                    ServiceName = x.InstitutionService.Service.Name,
+                    DateTime = x.StartDateTime,
+                    Address = x.Institution.Address.City + ", " +
+                        x.Institution.Address.Street + ", " +
+                        x.Institution.Address.Number,
+                   DataMedicalRecord = new EditMedicalRecordRequestDto
+                   {
+                       AppointmentId = x.Id,
+                       Investigation = x.MedicalRecord.Investigation,
+                       InvestigationResult = x.MedicalRecord.InvestigationResult,
+                       Recommendations = x.MedicalRecord.Recommendations,
+                       Symptoms = x.MedicalRecord.Symptoms,
+                       Diagnosis = x.MedicalRecord.Diagnosis,
+                       AppointmentStatus = x.Status,
+                   }
+
+                }) 
+                .FirstOrDefaultAsync();
+            var hasRefferals = await _context.MedicalReferrals
+                .Where(m => m.AppointmentId == appointmentId)
+                .AnyAsync();
+            var hasPrescriptions = await _context.Prescriptions
+                .Where(p => p.AppointmentId == appointmentId)
+                .AnyAsync();
+            response.HasMedicalRefferals = hasRefferals;
+            response.HasMedicalPrescriptions = hasPrescriptions;
+            return response;
         }
 
 
