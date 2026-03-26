@@ -4,6 +4,7 @@ namespace MedSync.DataLayer.DTOs.Patient
 {
     public class AppointmentHistoryDetailsResponseDto
     {
+        public String? MedicalRecordId { get; set; }
         public String DoctorName { get; set; }
         public String SpecialtyName { get; set; }
         public String ServiceName { get; set; }

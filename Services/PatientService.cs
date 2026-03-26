@@ -177,6 +177,7 @@ namespace MedSync.Services
                 .Where(a => a.Id == appointmentId)  
                 .Select(x => new AppointmentHistoryDetailsResponseDto
                 {
+                    MedicalRecordId = x.MedicalRecord != null ? x.MedicalRecord.Id.ToString() : null,
                     DoctorName = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
                     SpecialtyName = x.InstitutionService.Specialty.Name,
                     ServiceName = x.InstitutionService.Service.Name,
