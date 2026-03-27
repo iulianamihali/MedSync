@@ -20,6 +20,7 @@ public partial class Patient
     public virtual ICollection<AssociatedUser> AssociatedUsers { get; set; } = new List<AssociatedUser>();
 
     public virtual ICollection<PatientAccess> PatientAccesses { get; set; } = new List<PatientAccess>();
+    public virtual ICollection<SharedLink> SharedLinks { get; set; } = new List<SharedLink>();
 
     public virtual User User { get; set; } = null!;
 }

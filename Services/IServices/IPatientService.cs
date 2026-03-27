@@ -10,5 +10,10 @@ namespace MedSync.Services.IServices
         Task<List<ActiveMedicationResponseDto>> GetActiveMedicationsAsync(Guid patientId);
         Task<List<AppointmentHistoryResponseDto>> GetAppointmentHistoryAsync(Guid patientId);
         Task<AppointmentHistoryDetailsResponseDto> GetAppointmentHistoryDetailsResponseAsync(Guid appointmentId);
+        Task<string> GenerateSharedLinkAsync(Guid patientId);
+        Task<ActiveLinkStatusResponseDto> GetLinkStatusAsync(Guid patientId);
+        Task<bool> RevokeSharedLinkAsync(Guid patientId);
+        Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid patientId);
+
     }
 }

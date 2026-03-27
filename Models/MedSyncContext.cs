@@ -50,6 +50,7 @@ public partial class MedSyncContext : DbContext
     public virtual DbSet<MedicalReferral> MedicalReferrals { get; set; }
     public virtual DbSet<Prescription> Prescriptions { get; set; }
     public virtual DbSet<Medication> Medications { get; set; }
+    public virtual DbSet<SharedLink> SharedLinks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -466,7 +467,22 @@ public partial class MedSyncContext : DbContext
                .OnDelete(DeleteBehavior.Cascade);
 
         });
+        modelBuilder.Entity<SharedLink>(entity =>
+        {
+            entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.PatientId).IsRequired();
+            entity.Property(e => e.Token).HasMaxLength(500);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.ExpiresAt).IsRequired();
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
+
+            entity.HasOne(d => d.Patient).WithMany(p => p.SharedLinks)
+                .HasForeignKey(d => d.PatientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SharedLinks_PatientId");
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }

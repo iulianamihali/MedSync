@@ -3,16 +3,21 @@ using MedSync.DataLayer.DTOs.MedicalRecords;
 using MedSync.DataLayer.DTOs.Patient;
 using MedSync.Models;
 using MedSync.Services.IServices;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MedSync.Services
 {
     public class PatientService : IPatientService
     {
         private readonly MedSyncContext _context;
-        public PatientService(MedSyncContext context) {
+        private readonly IConfiguration _configuration;
+        public PatientService(MedSyncContext context, IConfiguration configuration) {
             _context = context;
+            _configuration = configuration;
         }
         public async Task<PatientDetailsResponseDto> GetPatientDetailsAsync(Guid patientId)
         {
@@ -208,6 +213,85 @@ namespace MedSync.Services
             response.HasMedicalPrescriptions = hasPrescriptions;
             return response;
         }
+
+        public async Task<string> GenerateSharedLinkAsync(Guid patientId)
+        {
+            var secretKey = _configuration["SharedLinks:SecretKey"];
+            var keyBytes = Convert.FromBase64String(secretKey);
+
+            var message = $"{patientId}:{DateTime.UtcNow:o}";
+            var messageBytes = Encoding.UTF8.GetBytes(message);
+
+            using var hmac = new HMACSHA256(keyBytes);
+            var signatureBytes = hmac.ComputeHash(messageBytes);
+            var signature = Convert.ToBase64String(signatureBytes);
+            var token = Convert.ToBase64String(
+                    Encoding.UTF8.GetBytes($"{message}:{signature}")
+                );
+
+            var sharedLink = new SharedLink
+            {
+                Id = Guid.NewGuid(),
+                PatientId = patientId,
+                Token = token,
+                IsActive = true,
+                ExpiresAt = DateTime.UtcNow.AddHours(1),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.SharedLinks.Add(sharedLink);
+            await _context.SaveChangesAsync();
+
+            return token;
+        }
+
+        public async Task<ActiveLinkStatusResponseDto> GetLinkStatusAsync(Guid patientId)
+        {
+            var response = await _context.SharedLinks
+                .Where(s => s.PatientId == patientId && s.IsActive == true && s.ExpiresAt > DateTime.UtcNow)
+                .Select(s => new ActiveLinkStatusResponseDto
+                {
+                    Token = s.Token,
+                    RemainingSeconds = (int)(s.ExpiresAt - DateTime.UtcNow).TotalSeconds,
+                })
+                .FirstOrDefaultAsync();
+            return response;
+        }
+
+        public async Task<bool> RevokeSharedLinkAsync(Guid patientId)
+        {
+            var activeLinks = await _context.SharedLinks
+                .Where(s => s.PatientId == patientId && s.IsActive)
+                .ToListAsync();
+
+            if (activeLinks.Any())
+            {
+                foreach (var link in activeLinks)
+                    link.IsActive = false;
+
+                return await _context.SaveChangesAsync() > 0;
+            }
+
+            return false;
+        }
+
+
+
+        public async Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid patientId)
+        {
+            var response = await _context.Patients
+                .Where(p => p.UserId == patientId)
+                .Select(p => new PatientBasicInfoResponseDto
+                {
+                    Id = p.UserId,
+                    FullName = p.User.FirstName + " " + p.User.LastName,
+                    DateOfBirth = p.User.DateOfBirth
+                })
+                .FirstOrDefaultAsync();
+            return response;
+        }
+
+
 
 
     }

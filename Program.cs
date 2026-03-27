@@ -27,6 +27,7 @@ builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<PdfService>();
 builder.Services.AddScoped<IMedicalReferralService, MedicalReferralService>();
 builder.Services.AddScoped<IMedicalPrescriptionService, MedicalPrescriptionService>();
+builder.Services.AddScoped<SharedMedicalService>();
 
 // Add services to the container.
 
