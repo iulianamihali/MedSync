@@ -31,6 +31,11 @@ namespace MedSync.Services
             var json = System.Text.Json.JsonSerializer.Serialize(body);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(url, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"MailerSend error: {errorBody}");
+            }
             return response.IsSuccessStatusCode;
 
 

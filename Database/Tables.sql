@@ -141,6 +141,7 @@ CREATE TABLE Appointments (
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
     UpdatedAt datetime2,
     CanceledAt datetime2,
+    ReminderSent BIT NOT NULL DEFAULT 0,
     CONSTRAINT PK_Appointments PRIMARY KEY (Id),
     CONSTRAINT FK_Appointments_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
     CONSTRAINT FK_Appointments_PatientUserId FOREIGN KEY (PatientUserId) REFERENCES Patients(UserId),

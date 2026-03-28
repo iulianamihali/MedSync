@@ -27,7 +27,7 @@ public partial class Appointment
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? CanceledAt { get; set; }
-
+    public bool ReminderSent { get; set; }
     public virtual Doctor Doctor { get; set; } = null!;
 
     public virtual Patient? Patient { get; set; } = null!;

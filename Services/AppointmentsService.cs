@@ -5,15 +5,18 @@ using MedSync.Models;
 using MedSync.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace MedSync.Services
 {
     public class AppointmentsService : IAppointmentsService
     {
         private readonly MedSyncContext _context;
-        public AppointmentsService(MedSyncContext context)
+        private readonly MailerSendService _mailerSendService;
+        public AppointmentsService(MedSyncContext context, MailerSendService mailerSendService)
         {
             _context = context;
+            _mailerSendService = mailerSendService;
         }
         public async Task<List<CalendarAppointmentsDto>> GetCalendarAppointmentsAsync(CalendarAppointmentsRequestDto request)
         {
@@ -64,12 +67,20 @@ namespace MedSync.Services
 
         public async Task<bool> AddAppointment(AddAppointmentRequestDto request)
         {
+            var json = File.ReadAllText("EmailTemplates.json");
+            using var doc = JsonDocument.Parse(json);
             var institutionService = await _context.InstitutionServices
-                    .Where(i => i.SpecialtyId == request.SpecialtyId)
+                    .Include(i => i.Service)
+                    .Include(i => i.Specialty)
+                    .Where(i => i.SpecialtyId == request.SpecialtyId && i.ServiceId == request.ServiceId)
                     .FirstOrDefaultAsync();
             if (institutionService == null)
                 return false;
             
+            DateTime appDateTime = request.startTime;
+            string patientEmail = string.Empty;
+            string patientName = string.Empty;
+
             if (request.PatientId != null)
             {
                 var newApp = new Appointment
@@ -86,8 +97,19 @@ namespace MedSync.Services
                     ReferralCode = request.ReferralCode,
                 };
                 _context.Appointments.Add(newApp);
-                return (await _context.SaveChangesAsync()) > 0;
+
+                var patient = await _context.Users
+                    .Where(u => u.Id == request.PatientId)
+                    .Select(x => new
+                    {
+                       Email = x.Email,
+                       Name =  $"{x.FirstName} {x.LastName}"
+                    })
+                    .FirstOrDefaultAsync();
+                patientName = patient.Name;
+                patientEmail = patient.Email;
             }
+
             else if (request.UnregisteredPatientId != null)
             {
                 var newApp = new Appointment
@@ -104,7 +126,17 @@ namespace MedSync.Services
                     ReferralCode = request.ReferralCode,
                 };
                 _context.Appointments.Add(newApp);
-                return (await _context.SaveChangesAsync()) > 0;
+                var patient = await _context.UnregisteredPatients
+                  .Where(u => u.Id == request.UnregisteredPatientId)
+                  .Select(x => new
+                  {
+                      Email = x.Email,
+                      Name = $"{x.FirstName} {x.LastName}"
+                  })
+                  .FirstOrDefaultAsync();
+                patientName = patient.Name;
+                patientEmail = patient.Email;
+
             }
             else
             {
@@ -133,8 +165,45 @@ namespace MedSync.Services
                     ReferralCode = request.ReferralCode,
                 };
                 _context.Appointments.Add(newApp);
-                return (await _context.SaveChangesAsync()) > 0;
+
+                patientName = $"{newUnregPatient.FirstName} {newUnregPatient.LastName}";
+                patientEmail = newUnregPatient.Email;
+
             }
+
+            var doctor = await _context.Users
+                    .Where(u => u.Id == request.DoctorId)
+                    .Select(x => $"{x.FirstName} {x.LastName}")
+                    .FirstOrDefaultAsync();
+            var institution = await _context.Institutions
+                .Where(i => i.Id == request.InstitutionId)
+                .Select(x => new {
+                    InstitutionName = x.Name,
+                    InstitutionAddress = $"{x.Address.City} {x.Address.Street} {x.Address.Number} {x.Address.Country}"
+
+                })
+                .FirstOrDefaultAsync();
+
+            var template = doc.RootElement.GetProperty("AppointmentConfirmation");
+            var subject = template.GetProperty("subject").GetString()
+                                  .Replace("{{AppointmentDate}}", appDateTime.ToString("MMMM dd, yyyy"))
+                                  .Replace("{{AppointmentTime}}", appDateTime.ToString("hh:mm tt"));
+            ;
+            var html = template.GetProperty("html").GetString()
+                         .Replace("{{PatientName}}", patientName)
+                         .Replace("{{AppointmentDate}}", appDateTime.ToString("MMMM dd, yyyy"))
+                         .Replace("{{AppointmentTime}}", appDateTime.ToString("hh:mm tt"))
+                         .Replace("{{DoctorName}}", doctor)
+                         .Replace("{{InstitutionName}}", institution.InstitutionName)
+                         .Replace("{{InstitutionAddress}}", institution.InstitutionAddress)
+                         .Replace("{{ServiceName}}", institutionService.Service.Name)
+                         .Replace("{{SpecialtyName}}", institutionService.Specialty.Name)
+                         .Replace("{{TotalPrice}}", institutionService.Price.ToString("C"));
+
+
+            await _mailerSendService.SendEmailAsync(patientEmail, subject!, html!);
+
+            return (await _context.SaveChangesAsync()) > 0;
         }
 
         public async Task<List<UpcomingAppointmentsResponseDto>> GetUpcomingAppointmentsForDoctorAsync(Guid institutionId, Guid doctorId)

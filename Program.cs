@@ -3,12 +3,13 @@ using MedSync.Models;
 using MedSync.Services;
 using MedSync.Services.IServices;
 using MedSync.Services.pdf;
+using MedSync.Workers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using QuestPDF.Infrastructure;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetSection("Jwt");
@@ -28,6 +29,7 @@ builder.Services.AddScoped<PdfService>();
 builder.Services.AddScoped<IMedicalReferralService, MedicalReferralService>();
 builder.Services.AddScoped<IMedicalPrescriptionService, MedicalPrescriptionService>();
 builder.Services.AddScoped<SharedMedicalService>();
+builder.Services.AddHostedService<ReminderWorker>();
 
 // Add services to the container.
 

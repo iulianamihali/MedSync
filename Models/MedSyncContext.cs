@@ -75,6 +75,7 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Status).HasConversion(x => (int)x, x => (AppointmentStatusEnumType)x).IsRequired();
             entity.Property(e => e.ReferralCode)
                 .HasMaxLength(50);
+            entity.Property(e => e.ReminderSent).HasDefaultValue(false);
             entity.HasOne(d => d.Doctor).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.DoctorUserId)
                 .HasPrincipalKey(d => d.UserId)
