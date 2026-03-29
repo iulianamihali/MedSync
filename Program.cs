@@ -30,7 +30,7 @@ builder.Services.AddScoped<IMedicalReferralService, MedicalReferralService>();
 builder.Services.AddScoped<IMedicalPrescriptionService, MedicalPrescriptionService>();
 builder.Services.AddScoped<SharedMedicalService>();
 builder.Services.AddHostedService<ReminderWorker>();
-
+builder.Services.AddScoped<ICareGivingService, CareGivingService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

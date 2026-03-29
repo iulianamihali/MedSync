@@ -1,4 +1,7 @@
-﻿using MedSync.DataLayer.DTOs.Patient;
+﻿using MedSync.DataLayer.DTOs.MedicalPrescriptions;
+using MedSync.DataLayer.DTOs.MedicalReferrals;
+using MedSync.DataLayer.DTOs.Patient;
+using MedSync.DataLayer.DTOs.SharedMedical;
 using MedSync.Models;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Components.Web;
@@ -13,11 +16,15 @@ namespace MedSync.Services
         private readonly MedSyncContext _context;
         private readonly IConfiguration _configuration;
         private readonly IPatientService _patientService;
-        public SharedMedicalService(MedSyncContext context, IConfiguration configuration, IPatientService patientService) 
+        private readonly IMedicalPrescriptionService _medicalPrescriptionService;
+        private readonly IMedicalReferralService _medicalReferralService;
+        public SharedMedicalService(MedSyncContext context, IConfiguration configuration, IPatientService patientService, IMedicalPrescriptionService medicalPrescriptionService, IMedicalReferralService medicalReferralService) 
         {
             _context = context;
             _configuration = configuration;
             _patientService = patientService;
+            _medicalPrescriptionService = medicalPrescriptionService;
+            _medicalReferralService = medicalReferralService;
         }
 
         public Guid? ValidateTokenAsync(string token)
@@ -66,7 +73,7 @@ namespace MedSync.Services
             };
         }
 
-        public async Task<AppointmentHistoryDetailsResponseDto?> GetSharedAppointmentDetailsAsync(string token, Guid appointmentId)
+        public async Task<AppointmentFullDetailsResponseDto> GetSharedAppointmentDetailsAsync(string token, Guid appointmentId)
         {
             var patientId = ValidateTokenAsync(token);
 
@@ -82,12 +89,22 @@ namespace MedSync.Services
                 return null;
 
             var belongsToPatient = await _context.Appointments
-                .AnyAsync(a => a.Id == appointmentId && a.PatientUserId == patientId.Value);
+                .AnyAsync(a => a.Id == appointmentId && ((sharedLink.CareUnregisteredPatientId == null && a.PatientUserId == sharedLink.PatientId) || (sharedLink.CareUnregisteredPatientId != null && a.UnregisteredPatientId == sharedLink.CareUnregisteredPatientId)));
 
             if (!belongsToPatient)
                 return null;
 
-            return await _patientService.GetAppointmentHistoryDetailsResponseAsync(appointmentId);
+           AppointmentHistoryDetailsResponseDto app = await _patientService.GetAppointmentHistoryDetailsResponseAsync(appointmentId);
+           List<GetAppointmentPrescriptionsResponseDto> Prescriptions = await _medicalPrescriptionService.GetAppointmentPrescriptionsAsync(appointmentId);
+           List<GetAppointmentReferralsResponseDto> Referrals = await _medicalReferralService.GetAppointmentReferralsAsync(appointmentId);
+           AppointmentFullDetailsResponseDto response = new AppointmentFullDetailsResponseDto
+           {
+               AppointmentDetails = app,
+               Prescriptions = Prescriptions,
+               Refferals = Referrals
+           };
+
+           return response;
         }
     }
 }

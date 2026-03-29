@@ -6,7 +6,5 @@
         LocalAdmin = 2,
         Doctor = 3,
         Patient = 4,
-        Dependent = 5
-        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MedSync.Attributes;
+using MedSync.DataLayer.DTOs.Appointments;
 using MedSync.DataLayer.Enums;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -59,21 +60,21 @@ namespace MedSync.Controllers
         }
 
         [HttpPost("generateLink")]
-        public async Task<IActionResult> GenerateSharedLink([FromBody] Guid patientId)
+        public async Task<IActionResult> GenerateSharedLink([FromBody] GenerateLinkRequestDto request)
         {
-            var token = await _patientService.GenerateSharedLinkAsync(patientId);
+            var token = await _patientService.GenerateSharedLinkAsync(request);
             return Ok(token);
         }
-        [HttpGet("getActiveLinkStatus/{patientId}")]
-        public async Task<IActionResult> GetLinkStatusAsync(Guid patientId)
+        [HttpPost("getActiveLinkStatus")]
+        public async Task<IActionResult> GetLinkStatusAsync([FromBody] GenerateLinkRequestDto request)
         {
-            var response = await _patientService.GetLinkStatusAsync(patientId);
+            var response = await _patientService.GetActiveLinkStatusAsync(request);
             return Ok(response);
         }
-        [HttpPost("revokeSharedLink")]
-        public async Task<IActionResult> RevokeSharedLinkAsync([FromBody] Guid patientId)
+        [HttpPut("revokeSharedLink")]
+        public async Task<IActionResult> RevokeSharedLinkAsync([FromBody] GenerateLinkRequestDto request)
         {
-            var result = await _patientService.RevokeSharedLinkAsync(patientId);
+            var result = await _patientService.RevokeSharedLinkAsync(request);
             return Ok(result);
         }
         //[HttpGet("getPatientBasicInfo/{patientId}")]

@@ -17,8 +17,6 @@ public partial class Patient
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 
-    public virtual ICollection<AssociatedUser> AssociatedUsers { get; set; } = new List<AssociatedUser>();
-
     public virtual ICollection<PatientAccess> PatientAccesses { get; set; } = new List<PatientAccess>();
     public virtual ICollection<SharedLink> SharedLinks { get; set; } = new List<SharedLink>();
 

@@ -71,7 +71,7 @@ namespace MedSync.Workers
                        .Where(a => appointmentIds.Contains(a.Id))
                        .ExecuteUpdateAsync(s => s.SetProperty(a => a.ReminderSent, true));
 
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(30), stoppingToken);
 
             }
         }

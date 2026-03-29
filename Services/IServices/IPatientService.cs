@@ -1,4 +1,5 @@
-﻿using MedSync.DataLayer.DTOs.Patient;
+﻿using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.Patient;
 
 namespace MedSync.Services.IServices
 {
@@ -10,9 +11,9 @@ namespace MedSync.Services.IServices
         Task<List<ActiveMedicationResponseDto>> GetActiveMedicationsAsync(Guid patientId);
         Task<List<AppointmentHistoryResponseDto>> GetAppointmentHistoryAsync(Guid patientId);
         Task<AppointmentHistoryDetailsResponseDto> GetAppointmentHistoryDetailsResponseAsync(Guid appointmentId);
-        Task<string> GenerateSharedLinkAsync(Guid patientId);
-        Task<ActiveLinkStatusResponseDto> GetLinkStatusAsync(Guid patientId);
-        Task<bool> RevokeSharedLinkAsync(Guid patientId);
+        Task<string> GenerateSharedLinkAsync(GenerateLinkRequestDto request);
+        Task<ActiveLinkStatusResponseDto> GetActiveLinkStatusAsync(GenerateLinkRequestDto request);
+        Task<bool> RevokeSharedLinkAsync(GenerateLinkRequestDto request);
         Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid patientId);
 
     }

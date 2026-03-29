@@ -1,4 +1,5 @@
-﻿using MedSync.DataLayer.DTOs.MedicalPrescriptions;
+﻿using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.MedicalPrescriptions;
 using MedSync.DataLayer.DTOs.MedicalRecords;
 using MedSync.DataLayer.DTOs.Patient;
 using MedSync.Models;
@@ -87,7 +88,7 @@ namespace MedSync.Services
         public async Task<List<GetFutureAppointmentsResponseDto>> GetFutureAppointmentsAsync(Guid patientId)
         {
             var result = await _context.Appointments
-                .Where(a => a.PatientUserId == patientId && a.StartDateTime > DateTime.UtcNow)
+                .Where(a => (a.PatientUserId == patientId || a.UnregisteredPatientId == patientId) && a.StartDateTime > DateTime.UtcNow)
                 .Select(x => new GetFutureAppointmentsResponseDto
                 {
                     AppointmentId = x.Id,
@@ -157,7 +158,7 @@ namespace MedSync.Services
         public async Task<List<AppointmentHistoryResponseDto>> GetAppointmentHistoryAsync(Guid patientId)
         {
             var result = await _context.Appointments
-                .Where(a => a.PatientUserId == patientId && a.StartDateTime < DateTime.UtcNow)
+                .Where(a => (a.PatientUserId == patientId || a.UnregisteredPatientId == patientId) && a.StartDateTime < DateTime.UtcNow)
                 .Select(a => new AppointmentHistoryResponseDto
                 {
                     AppointmentId = a.Id,
@@ -214,12 +215,12 @@ namespace MedSync.Services
             return response;
         }
 
-        public async Task<string> GenerateSharedLinkAsync(Guid patientId)
+        public async Task<string> GenerateSharedLinkAsync(GenerateLinkRequestDto request)
         {
             var secretKey = _configuration["SharedLinks:SecretKey"];
             var keyBytes = Convert.FromBase64String(secretKey);
 
-            var message = $"{patientId}:{DateTime.UtcNow:o}";
+            var message = $"{request.CareUnregisteredPatientId ?? request.PatientId}:{DateTime.UtcNow:o}";
             var messageBytes = Encoding.UTF8.GetBytes(message);
 
             using var hmac = new HMACSHA256(keyBytes);
@@ -232,7 +233,8 @@ namespace MedSync.Services
             var sharedLink = new SharedLink
             {
                 Id = Guid.NewGuid(),
-                PatientId = patientId,
+                PatientId = request.PatientId,
+                CareUnregisteredPatientId = request.CareUnregisteredPatientId ?? null,
                 Token = token,
                 IsActive = true,
                 ExpiresAt = DateTime.UtcNow.AddHours(1),
@@ -245,10 +247,11 @@ namespace MedSync.Services
             return token;
         }
 
-        public async Task<ActiveLinkStatusResponseDto> GetLinkStatusAsync(Guid patientId)
+        public async Task<ActiveLinkStatusResponseDto> GetActiveLinkStatusAsync(GenerateLinkRequestDto request)
         {
             var response = await _context.SharedLinks
-                .Where(s => s.PatientId == patientId && s.IsActive == true && s.ExpiresAt > DateTime.UtcNow)
+                                //.Where(s => ((request.CareUnregisteredPatientId == null && s.PatientId == request.PatientId) || (request.CareUnregisteredPatientId != null && s.CareUnregisteredPatientId == request.CareUnregisteredPatientId)) && s.IsActive == true && s.ExpiresAt > DateTime.UtcNow)
+                 .Where(s => s.PatientId == request.PatientId && s.CareUnregisteredPatientId == request.CareUnregisteredPatientId && s.IsActive == true && s.ExpiresAt > DateTime.UtcNow)
                 .Select(s => new ActiveLinkStatusResponseDto
                 {
                     Token = s.Token,
@@ -258,10 +261,10 @@ namespace MedSync.Services
             return response;
         }
 
-        public async Task<bool> RevokeSharedLinkAsync(Guid patientId)
+        public async Task<bool> RevokeSharedLinkAsync(GenerateLinkRequestDto request)
         {
             var activeLinks = await _context.SharedLinks
-                .Where(s => s.PatientId == patientId && s.IsActive)
+                .Where(s => ((request.CareUnregisteredPatientId == null && s.PatientId == request.PatientId) || (request.CareUnregisteredPatientId != null && s.CareUnregisteredPatientId == request.CareUnregisteredPatientId)) && s.IsActive)
                 .ToListAsync();
 
             if (activeLinks.Any())

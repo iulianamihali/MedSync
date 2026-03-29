@@ -105,15 +105,17 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<AssociatedUser>(entity =>
         {
-            entity.HasKey(e => new { e.PrimaryUserId, e.AssociatedUserId });
+            entity.HasKey(e => new { e.PrimaryUserId, e.CareUnregisteredPatientId });
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Relationship).HasMaxLength(100);
+            entity.Property(e => e.Relationship)
+                .HasConversion(x => (short)x, x => (RelationshipType)x)
+                .IsRequired();
 
-            entity.HasOne(d => d.AssociatedUserNavigation).WithMany(p => p.AssociatedUsers)
-                .HasForeignKey(d => d.AssociatedUserId)
+            entity.HasOne(d => d.CareUnregisteredPatient).WithMany()
+                .HasForeignKey(d => d.CareUnregisteredPatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_AssociatedUsers_Associated");
+                .HasConstraintName("FK_AssociatedUsers_CareUnregisteredPatient");
 
             entity.HasOne(d => d.PrimaryUser).WithMany(p => p.AssociatedUsers)
                 .HasForeignKey(d => d.PrimaryUserId)
@@ -417,6 +419,9 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.CreatedAt)
                   .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.DateOfBirth)
+                  .HasColumnType("date");
         });
 
         modelBuilder.Entity<MedicalRecord>(entity =>
@@ -483,6 +488,10 @@ public partial class MedSyncContext : DbContext
                 .HasForeignKey(d => d.PatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SharedLinks_PatientId");
+            entity.HasOne(d => d.UnregisteredPatient).WithMany()
+               .HasForeignKey(d => d.CareUnregisteredPatientId)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_SharedLinks_CareUnregisteredPatientId");
         });
 
         OnModelCreatingPartial(modelBuilder);

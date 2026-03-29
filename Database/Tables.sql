@@ -115,12 +115,12 @@ GO
 -- 9. AssociatedUsers
 CREATE TABLE AssociatedUsers (
     PrimaryUserId uniqueidentifier NOT NULL,
-    AssociatedUserId uniqueidentifier NOT NULL,
-    Relationship nvarchar(100),
+    CareUnregisteredPatientId uniqueidentifier NOT NULL,
+    Relationship int,
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT PK_AssociatedUsers PRIMARY KEY (PrimaryUserId, AssociatedUserId),
+    CONSTRAINT PK_AssociatedUsers PRIMARY KEY (PrimaryUserId, CareUnregisteredPatientId),
     CONSTRAINT FK_AssociatedUsers_Primary FOREIGN KEY (PrimaryUserId) REFERENCES Users(Id),
-    CONSTRAINT FK_AssociatedUsers_Associated FOREIGN KEY (AssociatedUserId) REFERENCES Patients(UserId)
+    CONSTRAINT FK_AssociatedUsers_CareUnregisteredPatient FOREIGN KEY (CareUnregisteredPatientId) REFERENCES UnregisteredPatients(Id)
 );
 GO
 
@@ -271,7 +271,7 @@ CREATE TABLE UnregisteredPatients (
 	Email nvarchar(255) NULL,
 	PhoneNumber nvarchar(20) NOT NULL,
 	CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
-
+    DateOfBirth date NULL,
 	CONSTRAINT PK_UnregisteredPatients PRIMARY KEY (Id)
 );
 
@@ -314,9 +314,11 @@ CREATE TABLE Medications (
 CREATE TABLE SharedLinks (
 	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
 	PatientId UNIQUEIDENTIFIER NOT NULL,
+    CareUnregisteredPatientId UNIQUEIDENTIFIER NULL,
 	Token NVARCHAR(100) NOT NULL UNIQUE,
 	IsActive BIT NOT NULL DEFAULT 1,
 	ExpiresAt DATETIME NOT NULL,
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (PatientId) REFERENCES Patients(UserId)
+    FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+    FOREIGN KEY(CareUnregisteredPatientId) REFERENCES UnregisteredPatients(Id)
 )

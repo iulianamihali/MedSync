@@ -36,5 +36,6 @@ namespace MedSync.Controllers
                 return NotFound("Invalid or expired token.");
             return Ok(result);
         }
+       
     }
 }
