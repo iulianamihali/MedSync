@@ -264,7 +264,7 @@ namespace MedSync.Services
         public async Task<bool> RevokeSharedLinkAsync(GenerateLinkRequestDto request)
         {
             var activeLinks = await _context.SharedLinks
-                .Where(s => ((request.CareUnregisteredPatientId == null && s.PatientId == request.PatientId) || (request.CareUnregisteredPatientId != null && s.CareUnregisteredPatientId == request.CareUnregisteredPatientId)) && s.IsActive)
+                 .Where(s => s.PatientId == request.PatientId && s.CareUnregisteredPatientId == request.CareUnregisteredPatientId && s.IsActive == true)
                 .ToListAsync();
 
             if (activeLinks.Any())
