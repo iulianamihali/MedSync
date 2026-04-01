@@ -9,7 +9,7 @@ namespace MedSync.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AuthorizeUserType(UserType.Patient)]
+    [AuthorizeUserType(UserType.Patient, UserType.Doctor)]
 
     public class PatientController : ControllerBase
     {

@@ -282,16 +282,29 @@ namespace MedSync.Services
 
         public async Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid patientId)
         {
-            var response = await _context.Patients
-                .Where(p => p.UserId == patientId)
-                .Select(p => new PatientBasicInfoResponseDto
+            var patient = await _context.Patients
+                .FirstOrDefaultAsync(p => p.UserId == patientId);
+
+            if (patient != null)
+                return new PatientBasicInfoResponseDto
                 {
-                    Id = p.UserId,
-                    FullName = p.User.FirstName + " " + p.User.LastName,
-                    DateOfBirth = p.User.DateOfBirth
-                })
-                .FirstOrDefaultAsync();
-            return response;
+                    Id = patient.UserId,
+                    FullName = patient.User.FirstName + " " + patient.User.LastName,
+                    DateOfBirth = patient.User.DateOfBirth
+                };
+
+            var unregistered = await _context.UnregisteredPatients
+                .FirstOrDefaultAsync(p => p.Id == patientId);
+
+            if (unregistered != null)
+                return new PatientBasicInfoResponseDto
+                {
+                    Id = unregistered.Id,
+                    FullName = unregistered.FirstName + " " + unregistered.LastName,
+                    DateOfBirth = unregistered.DateOfBirth
+                };
+
+            return null;
         }
 
 
