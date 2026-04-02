@@ -283,6 +283,7 @@ namespace MedSync.Services
         public async Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid patientId)
         {
             var patient = await _context.Patients
+                .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.UserId == patientId);
 
             if (patient != null)
@@ -290,7 +291,7 @@ namespace MedSync.Services
                 {
                     Id = patient.UserId,
                     FullName = patient.User.FirstName + " " + patient.User.LastName,
-                    DateOfBirth = patient.User.DateOfBirth
+                    DateOfBirth = patient.User.DateOfBirth ?? null,
                 };
 
             var unregistered = await _context.UnregisteredPatients
