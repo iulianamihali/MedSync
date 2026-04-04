@@ -816,6 +816,64 @@ namespace MedSync.Services
             return response;
         }
 
+        public async Task<List<InstitutionDetailsResponse>> GetInstitutionsBySpecialtyAndServiceAsync(string? specialty, string? service, double? latitude, double? longitude, string? doctorName, string? institutionName)
+        {
+            var query = _context.InstitutionServices
+                .Where(i => i.IsActive == true && i.Institution.Active == true);
+
+            if (specialty != null)
+                query = query.Where(i => i.Specialty.Name.ToLower() == specialty.ToLower());
+
+            if (service != null)
+                query = query.Where(i => i.Service.Name.ToLower() == service.ToLower());
+
+            if (doctorName != null)
+            {
+                var parts = doctorName.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                query = query.Where(i => i.DoctorSpecialties.Any(ds =>
+                    parts.All(part =>
+                        ds.Doctor.User.FirstName.ToLower().Contains(part) ||
+                        ds.Doctor.User.LastName.ToLower().Contains(part))));
+            }
+
+            if (institutionName != null)
+                query = query.Where(i => i.Institution.Name.ToLower().Contains(institutionName.ToLower()));
+
+            var result = await query
+                .Select(i => i.Institution)
+                .Distinct()
+                .Select(x => new InstitutionDetailsResponse
+                {
+                    InstitutionId = x.Id,
+                    InstitutionName = x.Name,
+                    Rating = Math.Round(x.Appointments
+                                .Where(a => a.Review != null)
+                                .Select(a => (double?)a.Review.Rating)
+                                .Average() ?? 0.0, 2),
+                    TotalReviews = x.Appointments.Count(a => a.Review != null),
+                    Address = x.Address.Country + ", " + x.Address.City + ", " + x.Address.Street + ", " + x.Address.Number,
+                    Latitude = x.Address.Latitude == 0 && x.Address.Longitude == 0 ? null : (double?)x.Address.Latitude,
+                    Longitude = x.Address.Latitude == 0 && x.Address.Longitude == 0 ? null : (double?)x.Address.Longitude,
+                })
+                .ToListAsync();
+
+            if (latitude.HasValue && longitude.HasValue)
+            {
+                foreach (var clinic in result)
+                {
+                    if (clinic.Latitude.HasValue && clinic.Longitude.HasValue)
+                    {
+                        var dLat = (clinic.Latitude.Value - latitude.Value) * 111.0;
+                        var dLng = (clinic.Longitude.Value - longitude.Value) * 111.0 * Math.Cos(latitude.Value * Math.PI / 180);
+                        clinic.Distance = Math.Round(Math.Sqrt(dLat * dLat + dLng * dLng), 2);
+                    }
+                }
+                return result.OrderBy(x => x.Distance ?? double.MaxValue).ToList();
+            }
+
+            return result.OrderByDescending(x => x.Rating).ToList();
+        }
+
         private string GenerateInstitutionCode (string institutionName)
         {
             var cleanName = Regex.Replace(institutionName.ToUpper(), @"[^A-Z0-9]", "");

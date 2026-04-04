@@ -10,5 +10,9 @@ namespace MedSync.DataLayer.DTOs.Institution
         public int TotalReviews { get; set; }
         public string Address { get; set; }
         public List<DoctorPreview> Doctors { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public double? Distance { get; set; }
+
     }
 }

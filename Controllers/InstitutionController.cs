@@ -185,5 +185,6 @@ namespace MedSync.Controllers
             var response = await _institutionService.GetAvailableSlotsByDoctorAsync(request);
             return Ok(response);
         }
+   
     }
 }

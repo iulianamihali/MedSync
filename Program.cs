@@ -32,7 +32,7 @@ builder.Services.AddScoped<SharedMedicalService>();
 builder.Services.AddHostedService<ReminderWorker>();
 builder.Services.AddScoped<ICareGivingService, CareGivingService>();
 builder.Services.AddScoped<ISupportIssuesService, SupportIssuesService>();
-
+builder.Services.AddScoped<IGeminiService, GeminiService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

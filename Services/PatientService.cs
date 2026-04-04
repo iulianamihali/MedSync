@@ -308,7 +308,77 @@ namespace MedSync.Services
             return null;
         }
 
+        public async Task<PatientAIContextDto> GetAIContextAsync(Guid userId)
+        {
+            var user = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new
+                {
+                    u.FirstName,
+                    u.Gender,
+                    u.DateOfBirth
+                })
+                .FirstOrDefaultAsync();
 
+            var appointments = await _context.Appointments
+                .Where(a => a.PatientUserId == userId)
+                .Include(a => a.MedicalRecord)
+                .Include(a => a.Doctor).ThenInclude(d => d.User)
+                .Include(a => a.Institution)
+                .Include(a => a.Prescriptions).ThenInclude(p => p.Medications)
+                .Include(a => a.MedicalReferrals)
+                .ToListAsync();
+
+            var diagnoses = appointments
+                .Where(a => a.MedicalRecord != null && a.MedicalRecord.Diagnosis != null)
+                .Select(a => a.MedicalRecord.Diagnosis)
+                .Distinct()
+                .ToList();
+
+            var symptoms = appointments
+                .Where(a => a.MedicalRecord != null && a.MedicalRecord.Symptoms != null)
+                .Select(a => a.MedicalRecord.Symptoms)
+                .Distinct()
+                .ToList();
+
+            var recommendations = appointments
+                .Where(a => a.MedicalRecord != null && a.MedicalRecord.Recommendations != null)
+                .Select(a => a.MedicalRecord.Recommendations)
+                .Distinct()
+                .ToList();
+            var medications = appointments
+                .SelectMany(a => a.Prescriptions.Select(p => new { p, a.CreatedAt, a.Doctor, a.Institution }))
+                .SelectMany(x => x.p.Medications.Select(m => new { m, x.CreatedAt, x.Doctor, x.Institution }))
+                .Select(x => $"{x.m.Name} {x.m.Strength} - {x.m.Dosage}, {x.m.Frequency}, duration: {x.m.Duration}, prescribed on: {x.CreatedAt:yyyy-MM-dd}" +
+                    (x.Doctor?.User != null ? $", by: Dr. {x.Doctor.User.FirstName} {x.Doctor.User.LastName}" : "") +
+                    (x.Institution != null ? $", at: {x.Institution.Name}" : ""))
+                .Distinct()
+                .ToList();
+
+            var referrals = appointments
+                .SelectMany(a => a.MedicalReferrals)
+                .Select(r => r.SuspectedDiagnosis)
+                .Distinct()
+                .ToList();
+            var doctors = appointments
+                .Where(a => a.Doctor?.User != null)
+                .Select(a => $"Dr. {a.Doctor.User.FirstName} {a.Doctor.User.LastName} - {a.InstitutionService?.Specialty?.Name}")
+                .Distinct()
+                .ToList();
+
+            return new PatientAIContextDto
+            {
+                PatientName = user.FirstName,
+                Gender = user.Gender,
+                Age = DateTime.Today.Year - user.DateOfBirth.Value.Year,
+                Diagnoses = diagnoses,
+                Symptoms = symptoms,
+                Recommendations = recommendations,
+                Medications = medications,
+                Referrals = referrals,
+                Doctors = doctors
+            };
+        }
 
 
     }

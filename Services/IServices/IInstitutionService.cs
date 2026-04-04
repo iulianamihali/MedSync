@@ -31,5 +31,7 @@ namespace MedSync.Services.IServices
         Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(GetDoctorsWithSlotsRequestDto request);
         Task<List<DoctorInfoTabResponse>> GetDoctorsInfoTabAsync(Guid institutionId);
         Task<AvailableSlotsDoctorResponseDto> GetAvailableSlotsByDoctorAsync(GetDoctorsWithSlotsRequestDto request);
+        Task<List<InstitutionDetailsResponse>> GetInstitutionsBySpecialtyAndServiceAsync(string? specialty, string? service, double? latitude, double? longitude, string? doctorName, string? institutionName);
+
     }
 }
