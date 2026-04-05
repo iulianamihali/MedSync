@@ -6,6 +6,5 @@
         public DateTime To { get; set; }
         public Guid InstitutionId { get; set; }
         public Guid? DoctorId { get; set; }
-
     }
 }

@@ -6,7 +6,10 @@ namespace MedSync.Services.IServices
 {
     public interface IUserService
     {
-        Task<PaginationDto<UsersDataTableResponseDto>> GetDataTableUsersAsync(int page, UserType userType);
+        Task<PaginationDto<UsersDataTableResponseDto>> GetDataTableUsersAsync(
+            int page,
+            UserType userType
+        );
         Task<UserSettingsDataResponseDto> GetUserSettingsDataAsync(Guid id);
         Task<bool> EditInfoUsersAsync(UserSettingsDataResponseDto request);
         Task<bool> UpdateUserStatusAsync(UpdateUserStatusRequestDto request);

@@ -12,7 +12,5 @@
         public DateTime? ExpirationDate { get; set; }
         public virtual Appointment Appointment { get; set; }
         public virtual Specialty Specialty { get; set; }
-
-
     }
 }

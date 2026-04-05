@@ -2,7 +2,6 @@
 {
     public class MedicalReportPdfDto
     {
-     
         public string InstitutionName { get; set; } = string.Empty;
         public byte[]? InstitutionLogo { get; set; }
         public string DocumentTitle { get; set; } = "MEDICAL REPORT";
@@ -21,5 +20,4 @@
         public string DoctorFullName { get; set; } = string.Empty;
         public DateTime GeneratedAt { get; set; }
     }
-
 }

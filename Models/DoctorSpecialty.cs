@@ -8,6 +8,5 @@
         public virtual Doctor Doctor { get; set; }
 
         public virtual InstitutionService InstitutionService { get; set; }
-
     }
 }

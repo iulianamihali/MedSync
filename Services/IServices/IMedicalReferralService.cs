@@ -8,6 +8,8 @@ namespace MedSync.Services.IServices
     {
         Task<Guid> CreateMedicalReferralAsync(CreateMedicalReferralRequestDto request);
         Task<MedicalReferralPdfDto> GetMedicalReferralPdfDataAsync(Guid medicalReferralId);
-        Task<List<GetAppointmentReferralsResponseDto>> GetAppointmentReferralsAsync(Guid appointmentId);
+        Task<List<GetAppointmentReferralsResponseDto>> GetAppointmentReferralsAsync(
+            Guid appointmentId
+        );
     }
 }

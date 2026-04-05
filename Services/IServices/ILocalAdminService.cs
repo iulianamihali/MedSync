@@ -8,7 +8,9 @@ namespace MedSync.Services.IServices
 {
     public interface ILocalAdminService
     {
-        Task<CountsStatCardsResponseDto> GetDashboardStatCardsAsync(DashboardFilterRequestDto requestDto);
+        Task<CountsStatCardsResponseDto> GetDashboardStatCardsAsync(
+            DashboardFilterRequestDto requestDto
+        );
         Task<List<RecentAppointmentsDto>> GetDetailsRecentAppointmentsAsync(Guid institutionId);
         Task<bool> EditStatusAppointmentAsync(EditStatusAppointmentRequestDto request);
         Task<List<DoctorReqPopUpResponseDto>> GetDoctorRequestDetailsAsync(Guid institutionId);

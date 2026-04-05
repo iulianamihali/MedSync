@@ -1,5 +1,6 @@
 ﻿using MedSync.DataLayer.Enums;
 using MedSync.Models;
+
 namespace MedSync.DataLayer.DTOs.Auth
 {
     public class SignupRequestDto
@@ -14,7 +15,6 @@ namespace MedSync.DataLayer.DTOs.Auth
         public UserType Role { get; set; }
         public PatientDataDto? PatientData { get; set; }
         public DoctorDataDto? DoctorData { get; set; }
-
     }
 
     public class PatientDataDto

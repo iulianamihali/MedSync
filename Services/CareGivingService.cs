@@ -9,20 +9,20 @@ namespace MedSync.Services
     {
         private readonly MedSyncContext _context;
 
-        public CareGivingService(MedSyncContext context) {
+        public CareGivingService(MedSyncContext context)
+        {
             _context = context;
         }
 
         public async Task<bool> AddPersonAsync(AddPersonRequestDto request)
         {
-            var owner = await _context.Patients
-                .Where(p => p.UserId == request.OwnerId)
+            var owner = await _context
+                .Patients.Where(p => p.UserId == request.OwnerId)
                 .Select(x => new
                 {
                     Id = x.UserId,
                     Email = x.User.Email,
-                    PhoneNumber = x.User.PhoneNumber
-
+                    PhoneNumber = x.User.PhoneNumber,
                 })
                 .FirstOrDefaultAsync();
 
@@ -38,7 +38,7 @@ namespace MedSync.Services
                 DateOfBirth = DateOnly.Parse(request.DateOfBirth),
                 Email = owner.Email,
                 PhoneNumber = owner.PhoneNumber,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
             _context.UnregisteredPatients.Add(newPerson);
             var association = new AssociatedUser
@@ -46,7 +46,7 @@ namespace MedSync.Services
                 PrimaryUserId = owner.Id,
                 CareUnregisteredPatientId = newPerson.Id,
                 Relationship = request.Relationship,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
             _context.AssociatedUsers.Add(association);
 
@@ -55,17 +55,19 @@ namespace MedSync.Services
 
         public async Task<List<PersonsInCareResponseDto>> GetPersonsInCareAsync(Guid patientId)
         {
-            var personsInCare = await _context.AssociatedUsers
-                .Where(a => a.PrimaryUserId == patientId)
+            var personsInCare = await _context
+                .AssociatedUsers.Where(a => a.PrimaryUserId == patientId)
                 .Select(x => new PersonsInCareResponseDto
                 {
                     CareUnregisteredPatientId = x.CareUnregisteredPatientId,
-                    Name = x.CareUnregisteredPatient.FirstName + " " + x.CareUnregisteredPatient.LastName
+                    Name =
+                        x.CareUnregisteredPatient.FirstName
+                        + " "
+                        + x.CareUnregisteredPatient.LastName,
                 })
                 .ToListAsync();
 
             return personsInCare;
         }
-
     }
 }

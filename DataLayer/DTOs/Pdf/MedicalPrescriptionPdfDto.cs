@@ -18,6 +18,5 @@ namespace MedSync.DataLayer.DTOs.Pdf
         public string Diagnosis { get; set; } = string.Empty;
         public List<MedicationItemDto> Medications { get; set; } = new List<MedicationItemDto>();
         public string DoctorFullName { get; set; } = string.Empty;
-
     }
 }

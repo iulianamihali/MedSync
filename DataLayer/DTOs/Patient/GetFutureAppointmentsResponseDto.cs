@@ -11,6 +11,6 @@ namespace MedSync.DataLayer.DTOs.Patient
         public DateTime EndDateTimeUtc { get; set; }
         public String InstitutionName { get; set; }
         public String Address { get; set; }
-        public String DoctorName { get; set; }  
+        public String DoctorName { get; set; }
     }
 }

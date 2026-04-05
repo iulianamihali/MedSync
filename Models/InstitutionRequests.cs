@@ -12,6 +12,5 @@ namespace MedSync.Models
         public Guid InstitutionId { get; set; }
         public virtual User User { get; set; }
         public virtual Institution Institution { get; set; }
-
     }
 }

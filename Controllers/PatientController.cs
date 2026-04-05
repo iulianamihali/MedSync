@@ -10,10 +10,10 @@ namespace MedSync.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [AuthorizeUserType(UserType.Patient, UserType.Doctor)]
-
     public class PatientController : ControllerBase
     {
         private readonly IPatientService _patientService;
+
         public PatientController(IPatientService patientService)
         {
             _patientService = patientService;
@@ -25,10 +25,19 @@ namespace MedSync.Controllers
             var response = await _patientService.GetPatientDetailsAsync(patientId);
             return Ok(response);
         }
+
         [HttpGet("getPatientAppointmentsSummary/{institutionId}/{doctorId}/{patientId}")]
-        public async Task<IActionResult> GetPatientAppointmentsSummariesAsync(Guid institutionId, Guid doctorId, Guid patientId)
+        public async Task<IActionResult> GetPatientAppointmentsSummariesAsync(
+            Guid institutionId,
+            Guid doctorId,
+            Guid patientId
+        )
         {
-            var response = await _patientService.GetPatientAppointmentsSummariesAsync(institutionId, doctorId, patientId);
+            var response = await _patientService.GetPatientAppointmentsSummariesAsync(
+                institutionId,
+                doctorId,
+                patientId
+            );
             return Ok(response);
         }
 
@@ -52,27 +61,40 @@ namespace MedSync.Controllers
             var response = await _patientService.GetAppointmentHistoryAsync(patientId);
             return Ok(response);
         }
+
         [HttpGet("getAppointmentHistoryDetails/{appointmentId}")]
-        public async Task<IActionResult> GetAppointmentHistoryDetailsResponseAsync(Guid appointmentId)
+        public async Task<IActionResult> GetAppointmentHistoryDetailsResponseAsync(
+            Guid appointmentId
+        )
         {
-            var response = await _patientService.GetAppointmentHistoryDetailsResponseAsync(appointmentId);
+            var response = await _patientService.GetAppointmentHistoryDetailsResponseAsync(
+                appointmentId
+            );
             return Ok(response);
         }
 
         [HttpPost("generateLink")]
-        public async Task<IActionResult> GenerateSharedLink([FromBody] GenerateLinkRequestDto request)
+        public async Task<IActionResult> GenerateSharedLink(
+            [FromBody] GenerateLinkRequestDto request
+        )
         {
             var token = await _patientService.GenerateSharedLinkAsync(request);
             return Ok(token);
         }
+
         [HttpPost("getActiveLinkStatus")]
-        public async Task<IActionResult> GetLinkStatusAsync([FromBody] GenerateLinkRequestDto request)
+        public async Task<IActionResult> GetLinkStatusAsync(
+            [FromBody] GenerateLinkRequestDto request
+        )
         {
             var response = await _patientService.GetActiveLinkStatusAsync(request);
             return Ok(response);
         }
+
         [HttpPut("revokeSharedLink")]
-        public async Task<IActionResult> RevokeSharedLinkAsync([FromBody] GenerateLinkRequestDto request)
+        public async Task<IActionResult> RevokeSharedLinkAsync(
+            [FromBody] GenerateLinkRequestDto request
+        )
         {
             var result = await _patientService.RevokeSharedLinkAsync(request);
             return Ok(result);

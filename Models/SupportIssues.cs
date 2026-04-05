@@ -12,6 +12,5 @@ namespace MedSync.Models
         public bool Active { get; set; }
         public StatusSupportEnumType Status { get; set; }
         public virtual User User { get; set; }
-
     }
 }

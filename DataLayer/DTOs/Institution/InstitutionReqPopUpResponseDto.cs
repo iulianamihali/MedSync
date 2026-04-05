@@ -12,7 +12,5 @@
         public string StreetAddress { get; set; }
         public string StreetNumber { get; set; }
         public DateTime CreatedAt { get; set; }
-
     }
-
 }

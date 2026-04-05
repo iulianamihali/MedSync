@@ -2,7 +2,7 @@
 {
     public class SpecialtyWithServicesDto
     {
-        public Guid SpecialtyId{ get; set; }
+        public Guid SpecialtyId { get; set; }
         public string SpecialtyName { get; set; }
         public List<ServiceDto> Services { get; set; }
     }

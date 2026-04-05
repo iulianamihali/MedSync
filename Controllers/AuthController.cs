@@ -1,6 +1,7 @@
-﻿using MedSync.Services;
+﻿using MedSync.DataLayer.DTOs.Auth;
+using MedSync.Services;
 using Microsoft.AspNetCore.Mvc;
-using MedSync.DataLayer.DTOs.Auth;
+
 namespace MedSync.Controllers
 {
     [ApiController]
@@ -8,6 +9,7 @@ namespace MedSync.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
+
         public AuthController(AuthService authService)
         {
             _authService = authService;

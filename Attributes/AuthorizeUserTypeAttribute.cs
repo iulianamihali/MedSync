@@ -1,17 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using System.Security.Claims;
 using MedSync.DataLayer.Enums;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+
 namespace MedSync.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeUserTypeAttribute : Attribute, IAuthorizationFilter
     {
         private readonly UserType[] _allowedUserTypes;
+
         public AuthorizeUserTypeAttribute(params UserType[] allowedUserTypes)
         {
             _allowedUserTypes = allowedUserTypes;
         }
+
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             if (!context.HttpContext.User.Identity?.IsAuthenticated ?? true)
@@ -37,5 +40,4 @@ namespace MedSync.Attributes
             }
         }
     }
-
 }

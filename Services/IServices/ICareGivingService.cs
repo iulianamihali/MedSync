@@ -4,7 +4,7 @@ namespace MedSync.Services.IServices
 {
     public interface ICareGivingService
     {
-        Task<bool> AddPersonAsync (AddPersonRequestDto request);
+        Task<bool> AddPersonAsync(AddPersonRequestDto request);
         Task<List<PersonsInCareResponseDto>> GetPersonsInCareAsync(Guid patientId);
     }
 }

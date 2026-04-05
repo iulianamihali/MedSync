@@ -15,14 +15,19 @@ namespace MedSync.Controllers
         private readonly IMedicalPrescriptionService _medicalPrescriptionService;
         private readonly PdfService _pdfService;
 
-        public MedicalPrescriptionController(IMedicalPrescriptionService medicalPrescriptionService, PdfService service)
+        public MedicalPrescriptionController(
+            IMedicalPrescriptionService medicalPrescriptionService,
+            PdfService service
+        )
         {
             _medicalPrescriptionService = medicalPrescriptionService;
             _pdfService = service;
         }
 
         [HttpPost("addPrescription")]
-        public async Task<IActionResult> AddMedicalPrescriptionAsync(AddMedicalPrescriptionRequestDto request)
+        public async Task<IActionResult> AddMedicalPrescriptionAsync(
+            AddMedicalPrescriptionRequestDto request
+        )
         {
             var response = await _medicalPrescriptionService.AddMedicalPrescriptionAsync(request);
             return Ok(response);
@@ -31,15 +36,20 @@ namespace MedSync.Controllers
         [HttpGet("getMedicalPrescriptionPdf/{prescriptionId}")]
         public async Task<IActionResult> GetMedicalPrescriptionPdfAsync(Guid prescriptionId)
         {
-            var obj = await _medicalPrescriptionService.GetMedicalPrescriptionPdfDataAsync(prescriptionId);
-            var pdfBytes =  _pdfService.GenerateMedicalPrescription(obj);
+            var obj = await _medicalPrescriptionService.GetMedicalPrescriptionPdfDataAsync(
+                prescriptionId
+            );
+            var pdfBytes = _pdfService.GenerateMedicalPrescription(obj);
             return File(pdfBytes, "application/pdf", "MedicalPrescription.pdf");
         }
 
         [HttpGet("getAppointmentPrescriptions/{appointmentId}")]
-        public async Task<IActionResult> GetAppointmentPrescriptionsAsync(Guid appointmentId) { 
-            var response = await _medicalPrescriptionService.GetAppointmentPrescriptionsAsync(appointmentId);
+        public async Task<IActionResult> GetAppointmentPrescriptionsAsync(Guid appointmentId)
+        {
+            var response = await _medicalPrescriptionService.GetAppointmentPrescriptionsAsync(
+                appointmentId
+            );
             return Ok(response);
         }
-    } 
+    }
 }

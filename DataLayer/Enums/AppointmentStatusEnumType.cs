@@ -8,6 +8,5 @@
         InProgress = 3,
         Rescheduled = 4,
         Completed = 5,
-
     }
 }

@@ -11,20 +11,24 @@ namespace MedSync.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [AuthorizeUserType(UserType.Doctor, UserType.Patient)]
-
     public class MedicalReferralsController : ControllerBase
     {
         private readonly IMedicalReferralService _medicalReferralService;
         private readonly PdfService _pdfService;
 
-        public MedicalReferralsController(IMedicalReferralService medicalReferralService, PdfService pdfService)
+        public MedicalReferralsController(
+            IMedicalReferralService medicalReferralService,
+            PdfService pdfService
+        )
         {
             _medicalReferralService = medicalReferralService;
             _pdfService = pdfService;
         }
 
         [HttpPost("createMedicalReferral")]
-        public async Task<IActionResult> CreateMedicalReferralAsync([FromBody] CreateMedicalReferralRequestDto request)
+        public async Task<IActionResult> CreateMedicalReferralAsync(
+            [FromBody] CreateMedicalReferralRequestDto request
+        )
         {
             var referralId = await _medicalReferralService.CreateMedicalReferralAsync(request);
             return Ok(referralId);
@@ -41,9 +45,10 @@ namespace MedSync.Controllers
         [HttpGet("getAppointmentReferrals/{appointmentId}")]
         public async Task<IActionResult> GetAppointmentReferralsAsync(Guid appointmentId)
         {
-            var referrals = await _medicalReferralService.GetAppointmentReferralsAsync(appointmentId);
+            var referrals = await _medicalReferralService.GetAppointmentReferralsAsync(
+                appointmentId
+            );
             return Ok(referrals);
         }
     }
-
 }

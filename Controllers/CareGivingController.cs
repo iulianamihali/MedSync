@@ -12,10 +12,12 @@ namespace MedSync.Controllers
     public class CareGivingController : ControllerBase
     {
         private readonly ICareGivingService _careGivingService;
+
         public CareGivingController(ICareGivingService careGivingService)
         {
             _careGivingService = careGivingService;
         }
+
         [HttpPost("add-person")]
         public async Task<IActionResult> AddPerson([FromBody] AddPersonRequestDto request)
         {

@@ -9,6 +9,5 @@ namespace MedSync.Services.IServices
         Task<List<ServiceSelectDto>> GetServices();
         Task<List<SpecialtyDto>> GetInstitutionSpecialties(string codeInstitution);
         Task<List<ClinicLocationResponseDto>> GetClinicLocations();
-
     }
 }

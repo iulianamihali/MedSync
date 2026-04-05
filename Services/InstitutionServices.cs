@@ -1,4 +1,7 @@
-﻿using Azure;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Azure;
 using Azure.Core;
 using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Doctor;
@@ -13,9 +16,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
 using NanoidDotNet;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
 namespace MedSync.Services
 {
     public class InstitutionServices : IInstitutionService
@@ -32,8 +33,8 @@ namespace MedSync.Services
 
         public async Task<string> GetInstitutionName(Guid institutionId)
         {
-            var result = await _context.Institutions
-                .Where(i => i.Id == institutionId)
+            var result = await _context
+                .Institutions.Where(i => i.Id == institutionId)
                 .Select(i => i.Name)
                 .FirstOrDefaultAsync();
             return result;
@@ -90,7 +91,6 @@ namespace MedSync.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null,
                 Status = InstitutionRequestsStatusEnumType.Pending,
-
             };
             _context.InstitutionRequests.Add(newInstitutionRequest);
 
@@ -108,19 +108,22 @@ namespace MedSync.Services
 
         public async Task<int> CountInstitutionRequestsAsync()
         {
-            var result = await _context.InstitutionRequests
-                .Where(instReq => instReq.Status == InstitutionRequestsStatusEnumType.Pending)
+            var result = await _context
+                .InstitutionRequests.Where(instReq =>
+                    instReq.Status == InstitutionRequestsStatusEnumType.Pending
+                )
                 .CountAsync();
             return result;
         }
 
         public async Task<List<InstitutionReqPopUpResponseDto>> GetInstitutionRequestDetailsAsync()
         {
-            var result = await _context.InstitutionRequests
-                .AsNoTracking()
+            var result = await _context
+                .InstitutionRequests.AsNoTracking()
                 .Where(u => u.Status == InstitutionRequestsStatusEnumType.Pending)
                 .Include(u => u.User)
-                .Include(u => u.Institution).ThenInclude(u => u.Address)
+                .Include(u => u.Institution)
+                    .ThenInclude(u => u.Address)
                 .Select(u => new InstitutionReqPopUpResponseDto
                 {
                     Id = u.Id,
@@ -132,20 +135,21 @@ namespace MedSync.Services
                     City = u.Institution.Address.City,
                     StreetAddress = u.Institution.Address.Street,
                     StreetNumber = u.Institution.Address.Number,
-                    CreatedAt = u.CreatedAt
+                    CreatedAt = u.CreatedAt,
                 })
                 .OrderBy(u => u.CreatedAt)
                 .ToListAsync();
             return result;
-                
         }
 
-        public async Task<bool> UpdateStatusInstitutionRequestAsync(UpdateInstitutionRequestDto request)
+        public async Task<bool> UpdateStatusInstitutionRequestAsync(
+            UpdateInstitutionRequestDto request
+        )
         {
-            var result = await _context.InstitutionRequests
-                  .Include(u => u.Institution)
-                  .Where(u => u.Id == request.Id)
-                  .FirstOrDefaultAsync();
+            var result = await _context
+                .InstitutionRequests.Include(u => u.Institution)
+                .Where(u => u.Id == request.Id)
+                .FirstOrDefaultAsync();
             if (result != null)
             {
                 if (request.Value)
@@ -153,7 +157,9 @@ namespace MedSync.Services
                     result.Status = InstitutionRequestsStatusEnumType.Approved;
                     result.UpdatedAt = DateTime.UtcNow;
                     _context.InstitutionRequests.Update(result);
-                    var institution = await _context.Institutions.FirstOrDefaultAsync(x => x.Id == result.InstitutionId);
+                    var institution = await _context.Institutions.FirstOrDefaultAsync(x =>
+                        x.Id == result.InstitutionId
+                    );
                     if (institution != null)
                     {
                         institution.Active = true;
@@ -166,58 +172,61 @@ namespace MedSync.Services
                         user.IsActive = true;
                         _context.Users.Update(user);
                     }
-
-
                 }
                 else
                 {
                     result.Status = InstitutionRequestsStatusEnumType.Rejected;
                     result.UpdatedAt = DateTime.UtcNow;
                     _context.InstitutionRequests.Update(result);
-
                 }
 
                 var success = (await _context.SaveChangesAsync()) > 0;
 
-                if (success) {
+                if (success)
+                {
                     var json = File.ReadAllText("EmailTemplates.json");
                     using var doc = JsonDocument.Parse(json);
                     if (request.Value)
                     {
                         var template = doc.RootElement.GetProperty("InstitutionApproved");
                         var subject = template.GetProperty("subject").GetString();
-                        var html = template.GetProperty("html").GetString()
+                        var html = template
+                            .GetProperty("html")
+                            .GetString()
                             .Replace("{{InstitutionName}}", result.Institution.Name)
                             .Replace("{{AccessCode}}", result.Institution.Code);
                         await _mailerSendService.SendEmailAsync(
                             toEmail: "miuliana959@gmail.com",
                             subject: subject,
                             message: html
-                            );
-                        
+                        );
                     }
-                    else {
+                    else
+                    {
                         var template = doc.RootElement.GetProperty("InstitutionRejected");
                         var subject = template.GetProperty("subject").GetString();
-                        var html = template.GetProperty("html").GetString()
+                        var html = template
+                            .GetProperty("html")
+                            .GetString()
                             .Replace("{{InstitutionName}}", result.Institution.Name);
                         await _mailerSendService.SendEmailAsync(
-                           toEmail: "miuliana959@gmail.com",
-                           subject: template.GetProperty("subject").GetString(),
-                           message: html
-                           );
+                            toEmail: "miuliana959@gmail.com",
+                            subject: template.GetProperty("subject").GetString(),
+                            message: html
+                        );
                     }
                     return success;
                 }
-
             }
             return false;
-
         }
-        public async Task<PaginationDto<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync(int page)
+
+        public async Task<
+            PaginationDto<InstitutionsDataTableResponseDto>
+        > GetInstitutionsDataTableAsync(int page)
         {
-            var result = _context.InstitutionRequests
-                .Include(i => i.User)
+            var result = _context
+                .InstitutionRequests.Include(i => i.User)
                     .ThenInclude(i => i.Address)
                 .Include(i => i.Institution)
                 .Select(i => new InstitutionsDataTableResponseDto
@@ -225,7 +234,8 @@ namespace MedSync.Services
                     Id = i.Institution.Id,
                     InstitutionName = i.Institution.Name,
                     AdminName = $"{i.User.FirstName} {i.User.LastName}",
-                    Address = $"{i.Institution.Address.Country}, {i.Institution.Address.City}, {i.Institution.Address.Street}, {i.Institution.Address.Number}",
+                    Address =
+                        $"{i.Institution.Address.Country}, {i.Institution.Address.City}, {i.Institution.Address.Street}, {i.Institution.Address.Number}",
                     Country = i.Institution.Address.Country,
                     City = i.Institution.Address.City,
                     StreetAddress = i.Institution.Address.Street,
@@ -234,8 +244,7 @@ namespace MedSync.Services
                     Email = i.User.Email,
                     PhoneNumber = i.User.PhoneNumber,
                     CreatedAt = i.Institution.CreatedAt,
-                    Status = i.Institution.Active
-
+                    Status = i.Institution.Active,
                 })
                 .AsQueryable();
             var rows = await result
@@ -253,11 +262,11 @@ namespace MedSync.Services
 
         public async Task<bool> UpdateInstitutionsInfoAsync(UpdateInstitutionsInfoDto request)
         {
-            var result = await _context.Institutions
-                    .Include(i => i.Address)
-                    .Where(i => i.Id == request.Id)
+            var result = await _context
+                .Institutions.Include(i => i.Address)
+                .Where(i => i.Id == request.Id)
                 .FirstOrDefaultAsync();
-            if(result != null)
+            if (result != null)
             {
                 result.Name = request.InstitutionName;
                 result.Address.Country = request.Country;
@@ -270,34 +279,40 @@ namespace MedSync.Services
             }
             return (await _context.SaveChangesAsync()) > 0;
         }
-        public async Task<List<SpecialtyWithServicesDto>> GetSpecialtiesWithServices(Guid institutionId)
+
+        public async Task<List<SpecialtyWithServicesDto>> GetSpecialtiesWithServices(
+            Guid institutionId
+        )
         {
-            var result = await _context.InstitutionServices
-                .Where(s => s.InstitutionId == institutionId)
+            var result = await _context
+                .InstitutionServices.Where(s => s.InstitutionId == institutionId)
                 .GroupBy(s => new { s.Specialty.Id, s.Specialty.Name })
                 .Select(g => new SpecialtyWithServicesDto
                 {
                     SpecialtyId = g.Key.Id,
                     SpecialtyName = g.Key.Name,
                     Services = g.Select(x => new ServiceDto
-                    {
-                        Id = x.Service.Id,
-                        Name = x.Service.Name,
-                        Price = x.Price,
-                    }).ToList()
+                        {
+                            Id = x.Service.Id,
+                            Name = x.Service.Name,
+                            Price = x.Price,
+                        })
+                        .ToList(),
                 })
                 .ToListAsync();
 
             return result;
         }
-        public async Task<List<DoctorDto>> GetDoctorsWithSlots(GetDoctorsWithSlotsRequestDto request)
+
+        public async Task<List<DoctorDto>> GetDoctorsWithSlots(
+            GetDoctorsWithSlotsRequestDto request
+        )
         {
             var result = new List<DoctorDto>();
 
-            var service = await _context.InstitutionServices
-                .FirstOrDefaultAsync(s =>
-                    s.InstitutionId == request.InstitutionId &&
-                    s.ServiceId == request.ServiceId);
+            var service = await _context.InstitutionServices.FirstOrDefaultAsync(s =>
+                s.InstitutionId == request.InstitutionId && s.ServiceId == request.ServiceId
+            );
 
             if (service == null)
                 return result;
@@ -307,14 +322,14 @@ namespace MedSync.Services
             if (slotDuration.TotalMinutes == 0)
                 return result;
 
-            var doctors = await _context.InstitutionUsers
-                .Include(i => i.User)
+            var doctors = await _context
+                .InstitutionUsers.Include(i => i.User)
                     .ThenInclude(u => u.Doctor)
                         .ThenInclude(d => d.DoctorSpecialties)
                 .Where(i =>
-                    i.InstitutionId == request.InstitutionId &&
-                    i.User.Role == UserType.Doctor )
-                    //i.User.Doctor.DoctorSpecialties.Any(ds => ds.SpecialtyId == request.SpecialtyId))
+                    i.InstitutionId == request.InstitutionId && i.User.Role == UserType.Doctor
+                )
+                //i.User.Doctor.DoctorSpecialties.Any(ds => ds.SpecialtyId == request.SpecialtyId))
                 .ToListAsync();
 
             var localDate = request.From.ToLocalTime().Date;
@@ -323,11 +338,11 @@ namespace MedSync.Services
 
             foreach (var doctor in doctors)
             {
-                var schedule = await _context.UserSchedules
-                    .FirstOrDefaultAsync(s =>
-                        s.InstitutionId == request.InstitutionId &&
-                        s.UserId == doctor.UserId &&
-                        s.DayOfWeek == dayOfWeek);
+                var schedule = await _context.UserSchedules.FirstOrDefaultAsync(s =>
+                    s.InstitutionId == request.InstitutionId
+                    && s.UserId == doctor.UserId
+                    && s.DayOfWeek == dayOfWeek
+                );
 
                 if (schedule == null)
                     continue;
@@ -352,37 +367,39 @@ namespace MedSync.Services
                     var slotEnd = t.Add(slotDuration);
 
                     var isBusy = await _context.Appointments.AnyAsync(a =>
-                        a.DoctorUserId == doctor.UserId &&
-                        a.InstitutionId == request.InstitutionId &&
-                        a.StartDateTime < slotEnd &&
-                        a.EndDateTime > t
+                        a.DoctorUserId == doctor.UserId
+                        && a.InstitutionId == request.InstitutionId
+                        && a.StartDateTime < slotEnd
+                        && a.EndDateTime > t
                     );
 
                     if (!isBusy)
                     {
-                        slots.Add(new AvailableSlotDto
-                        {
-                            Start = t,
-                            End = slotEnd
-                        });
+                        slots.Add(new AvailableSlotDto { Start = t, End = slotEnd });
                     }
                 }
 
                 if (!slots.Any())
                     continue;
 
-                result.Add(new DoctorDto
-                {
-                    Id = doctor.UserId,
-                    Name = $"{doctor.User.FirstName} {doctor.User.LastName}",
-                    Slots = slots
-                });
+                result.Add(
+                    new DoctorDto
+                    {
+                        Id = doctor.UserId,
+                        Name = $"{doctor.User.FirstName} {doctor.User.LastName}",
+                        Slots = slots,
+                    }
+                );
             }
 
             return result;
         }
 
-        public async Task<List<AvailableSlotDto>> GetScheduleForDoctor(GetDoctorsWithSlotsRequestDto request, Guid doctorId, InstitutionService service)
+        public async Task<List<AvailableSlotDto>> GetScheduleForDoctor(
+            GetDoctorsWithSlotsRequestDto request,
+            Guid doctorId,
+            InstitutionService service
+        )
         {
             var slotDuration = TimeSpan.FromMinutes(service.Duration);
 
@@ -393,53 +410,48 @@ namespace MedSync.Services
             var dayOfWeek = (int)localDate.DayOfWeek;
             var now = DateTime.Now;
 
-            var schedule = await _context.UserSchedules
-                    .FirstOrDefaultAsync(s =>
-                        s.InstitutionId == request.InstitutionId &&
-                        s.UserId == doctorId &&
-                        s.DayOfWeek == dayOfWeek);
+            var schedule = await _context.UserSchedules.FirstOrDefaultAsync(s =>
+                s.InstitutionId == request.InstitutionId
+                && s.UserId == doctorId
+                && s.DayOfWeek == dayOfWeek
+            );
 
             if (schedule == null)
                 return [];
 
             var workStart = localDate.Add(schedule.StartTime.ToTimeSpan());
-                var workEnd = localDate.Add(schedule.EndTime.ToTimeSpan());
+            var workEnd = localDate.Add(schedule.EndTime.ToTimeSpan());
 
-                var start = workStart;
+            var start = workStart;
 
-                if (localDate == now.Date)
+            if (localDate == now.Date)
+            {
+                while (start + slotDuration <= workEnd && start <= now)
                 {
-                    while (start + slotDuration <= workEnd && start <= now)
-                    {
-                        start = start.Add(slotDuration);
-                    }
+                    start = start.Add(slotDuration);
                 }
+            }
 
-                var slots = new List<AvailableSlotDto>();
-                var appointments = await _context.Appointments
-                    .Where(a => a.DoctorUserId == doctorId &&
-                a.InstitutionId == request.InstitutionId &&
-                a.StartDateTime.Date == localDate)
+            var slots = new List<AvailableSlotDto>();
+            var appointments = await _context
+                .Appointments.Where(a =>
+                    a.DoctorUserId == doctorId
+                    && a.InstitutionId == request.InstitutionId
+                    && a.StartDateTime.Date == localDate
+                )
                 .ToListAsync();
 
             for (var t = start; t + slotDuration <= workEnd; t = t.Add(slotDuration))
-                {
-                    var slotEnd = t.Add(slotDuration);
+            {
+                var slotEnd = t.Add(slotDuration);
 
-                var isBusy = appointments.Any(a =>
-                     a.StartDateTime < slotEnd &&
-                     a.EndDateTime > t
-                    );
+                var isBusy = appointments.Any(a => a.StartDateTime < slotEnd && a.EndDateTime > t);
 
                 if (!isBusy)
-                    {
-                        slots.Add(new AvailableSlotDto
-                        {
-                            Start = t,
-                            End = slotEnd
-                        });
-                    }
+                {
+                    slots.Add(new AvailableSlotDto { Start = t, End = slotEnd });
                 }
+            }
 
             //if (!slots.Any())
             //    continue;
@@ -449,10 +461,12 @@ namespace MedSync.Services
 
         public async Task<PatientSearchResultDto?> SearchPatients(SearchPatients request)
         {
-            var result = await _context.Users
-                .Include(u => u.Patient)
-                .Where(u => u.Role == UserType.Patient && 
-                (u.PhoneNumber == request.PhoneNumber || u.Patient.Cnp == request.Cnp))
+            var result = await _context
+                .Users.Include(u => u.Patient)
+                .Where(u =>
+                    u.Role == UserType.Patient
+                    && (u.PhoneNumber == request.PhoneNumber || u.Patient.Cnp == request.Cnp)
+                )
                 .FirstOrDefaultAsync();
             if (result != null)
             {
@@ -464,10 +478,13 @@ namespace MedSync.Services
                 };
             }
 
-            var result2 = await _context.UnregisteredPatients
-                .Where(u => u.Cnp == request.Cnp || u.PhoneNumber == request.PhoneNumber)
+            var result2 = await _context
+                .UnregisteredPatients.Where(u =>
+                    u.Cnp == request.Cnp || u.PhoneNumber == request.PhoneNumber
+                )
                 .FirstOrDefaultAsync();
-            if (result2 != null) {
+            if (result2 != null)
+            {
                 return new PatientSearchResultDto
                 {
                     Id = result2.Id,
@@ -476,27 +493,37 @@ namespace MedSync.Services
                 };
             }
             return null;
-
         }
 
-        public async Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId)
+        public async Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(
+            int page,
+            Guid institutionId
+        )
         {
-            var result = _context.Appointments
-                .Where(a => a.InstitutionId == institutionId && a.Status == AppointmentStatusEnumType.Completed && a.PatientUserId.HasValue)
+            var result = _context
+                .Appointments.Where(a =>
+                    a.InstitutionId == institutionId
+                    && a.Status == AppointmentStatusEnumType.Completed
+                    && a.PatientUserId.HasValue
+                )
                 .GroupBy(a => a.PatientUserId)
                 .Select(g => new PatientsDataTableResponseDto
                 {
                     Id = g.Key.Value,
-                    PatientName = g.First().Patient.User.FirstName + " " + g.First().Patient.User.LastName,
-                    Address = g.First().Patient.User.Address.Country + ", " +
-                              g.First().Patient.User.Address.City + ", " +
-                              g.First().Patient.User.Address.Street + ", " +
-                              g.First().Patient.User.Address.Number,
+                    PatientName =
+                        g.First().Patient.User.FirstName + " " + g.First().Patient.User.LastName,
+                    Address =
+                        g.First().Patient.User.Address.Country
+                        + ", "
+                        + g.First().Patient.User.Address.City
+                        + ", "
+                        + g.First().Patient.User.Address.Street
+                        + ", "
+                        + g.First().Patient.User.Address.Number,
                     PhoneNumber = g.First().Patient.User.PhoneNumber,
                     DateOfBirth = g.First().Patient.User.DateOfBirth,
                     Visits = g.Count(),
-                    LastVisit = g.Max(a => a.StartDateTime)
-
+                    LastVisit = g.Max(a => a.StartDateTime),
                 })
                 .AsQueryable();
 
@@ -511,25 +538,30 @@ namespace MedSync.Services
                 Rows = rows,
                 TotalCount = total,
             };
-
         }
 
-        public async Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(int page, Guid institutionId)
+        public async Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(
+            int page,
+            Guid institutionId
+        )
         {
-            var result = _context.InstitutionUsers
-                .Where(d => d.InstitutionId == institutionId && d.User.Role == UserType.Doctor)
+            var result = _context
+                .InstitutionUsers.Where(d =>
+                    d.InstitutionId == institutionId && d.User.Role == UserType.Doctor
+                )
                 .Select(d => new DoctorsDataTableResponseDto
                 {
                     Id = d.UserId,
                     DoctorName = $"{d.User.FirstName} {d.User.LastName}",
                     PhoneNumber = d.User.PhoneNumber,
                     CreatedAt = d.User.CreatedAt,
-                    Specialization = d.User.Doctor.DoctorSpecialties
-                        .Select(ds => ds.InstitutionService.Specialty.Name)
+                    Specialization = d
+                        .User.Doctor.DoctorSpecialties.Select(ds =>
+                            ds.InstitutionService.Specialty.Name
+                        )
                         .FirstOrDefault(),
                     YearsOfExperience = d.User.Doctor.YearsOfExperience,
                     Status = d.User.IsActive,
-
                 });
 
             var rows = await result
@@ -543,31 +575,30 @@ namespace MedSync.Services
                 Rows = rows,
                 TotalCount = total,
             };
-
         }
 
-
-        public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId)
+        public async Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(
+            Guid institutionId
+        )
         {
-            var response = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == institutionId && i.IsActive == true)
-                .GroupBy(i => new 
-                { 
-                    i.SpecialtyId, 
-                    i.Specialty.Name 
-                })
+            var response = await _context
+                .InstitutionServices.Where(i =>
+                    i.InstitutionId == institutionId && i.IsActive == true
+                )
+                .GroupBy(i => new { i.SpecialtyId, i.Specialty.Name })
                 .Select(g => new SpecialtyServicesResponseDto
                 {
                     SpecialtyId = g.Key.SpecialtyId,
                     SpecialtyName = g.Key.Name,
                     InstitutionServices = g.Select(s => new InstitutionServiceDto
-                    {
-                        Id = s.Id,
-                        ServiceId = s.ServiceId,
-                        Name = s.Service.Name,
-                        Price = s.Price,
-                        Duration = s.Duration
-                    }).ToList()
+                        {
+                            Id = s.Id,
+                            ServiceId = s.ServiceId,
+                            Name = s.Service.Name,
+                            Price = s.Price,
+                            Duration = s.Duration,
+                        })
+                        .ToList(),
                 })
                 .ToListAsync();
             return response;
@@ -575,8 +606,10 @@ namespace MedSync.Services
 
         public async Task<bool> AddService(AddServiceRequestDto request)
         {
-            var services = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId)
+            var services = await _context
+                .InstitutionServices.Where(i =>
+                    i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId
+                )
                 .ToListAsync();
 
             foreach (Guid serviceId in request.Services)
@@ -584,10 +617,9 @@ namespace MedSync.Services
                 var existingService = services.FirstOrDefault(s => s.ServiceId == serviceId);
                 if (existingService != null)
                 {
-                   existingService.IsActive = true;
+                    existingService.IsActive = true;
                     _context.InstitutionServices.Update(existingService);
                 }
-
                 else
                 {
                     var obj = new InstitutionService
@@ -604,44 +636,43 @@ namespace MedSync.Services
 
             var result = await _context.SaveChangesAsync();
             return result > 0;
-
         }
+
         public async Task<bool> EditDataService(EditDataServiceRequestDto request)
         {
-            var response = await _context.InstitutionServices
-                .Where(i => i.Id == request.InstitutionServiceId)
+            var response = await _context
+                .InstitutionServices.Where(i => i.Id == request.InstitutionServiceId)
                 .FirstOrDefaultAsync();
 
-                response.Price = request.Price;
-                response.Duration = request.Duration;
-                _context.InstitutionServices.Update(response);
-                return (await _context.SaveChangesAsync()) > 0;
-            
+            response.Price = request.Price;
+            response.Duration = request.Duration;
+            _context.InstitutionServices.Update(response);
+            return (await _context.SaveChangesAsync()) > 0;
         }
+
         public async Task<bool> DeleteService(Guid institutionServiceId)
         {
-            var response = await _context.InstitutionServices
-                .Where(i => i.Id == institutionServiceId)
-                .FirstOrDefaultAsync ();
-            if(response != null)
+            var response = await _context
+                .InstitutionServices.Where(i => i.Id == institutionServiceId)
+                .FirstOrDefaultAsync();
+            if (response != null)
             {
                 response.IsActive = false;
                 _context.InstitutionServices.Update(response);
-              
             }
             return (await _context.SaveChangesAsync()) > 0;
-
         }
 
         public async Task<bool> DeleteSpecialty(DeleteSpecialtyRequestDto request)
         {
-           
-            var response = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId)
+            var response = await _context
+                .InstitutionServices.Where(i =>
+                    i.InstitutionId == request.InstitutionId && i.SpecialtyId == request.SpecialtyId
+                )
                 .ToListAsync();
-            if(response.Any())
+            if (response.Any())
             {
-               foreach(var item in response)
+                foreach (var item in response)
                 {
                     item.IsActive = false;
                 }
@@ -652,13 +683,11 @@ namespace MedSync.Services
 
         public async Task<List<SpecialtyDto>> GetSpecialtiesAsync(Guid institutionId)
         {
-            var specialties = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == institutionId && i.IsActive == true)
-                .Select(i => new SpecialtyDto
-                {
-                    Id = i.Specialty.Id,
-                    Name = i.Specialty.Name,
-                })
+            var specialties = await _context
+                .InstitutionServices.Where(i =>
+                    i.InstitutionId == institutionId && i.IsActive == true
+                )
+                .Select(i => new SpecialtyDto { Id = i.Specialty.Id, Name = i.Specialty.Name })
                 .Distinct()
                 .ToListAsync();
             return specialties;
@@ -666,13 +695,11 @@ namespace MedSync.Services
 
         public async Task<List<ServiceSelectDto>> GetServicesAsync(Guid institutionId)
         {
-            var services = await _context.InstitutionServices
-                .Where(i => i.InstitutionId == institutionId && i.IsActive == true)
-                .Select(i => new ServiceSelectDto
-                {
-                    Id = i.Service.Id,
-                    Name = i.Service.Name,
-                })
+            var services = await _context
+                .InstitutionServices.Where(i =>
+                    i.InstitutionId == institutionId && i.IsActive == true
+                )
+                .Select(i => new ServiceSelectDto { Id = i.Service.Id, Name = i.Service.Name })
                 .Distinct()
                 .ToListAsync();
             return services;
@@ -680,86 +707,105 @@ namespace MedSync.Services
 
         public async Task<InstitutionDetailsResponse> GetInstitutionDetailsAsync(Guid institutionId)
         {
-            var response = await _context.Institutions
-                .Where(i => i.Id == institutionId)
+            var response = await _context
+                .Institutions.Where(i => i.Id == institutionId)
                 .Select(x => new InstitutionDetailsResponse
                 {
                     InstitutionId = x.Id,
                     InstitutionName = x.Name,
-                    Rating = Math.Round(x.Appointments
-                                .Where(a => a.Review != null)
-                                .Select(a => (double?)a.Review.Rating)
-                                .Average() ?? 0.0,
-                                2),
+                    Rating = Math.Round(
+                        x.Appointments.Where(a => a.Review != null)
+                            .Select(a => (double?)a.Review.Rating)
+                            .Average()
+                            ?? 0.0,
+                        2
+                    ),
                     TotalReviews = x.Appointments.Count(a => a.Review != null),
-                    Address = x.Address.Country + ", " + x.Address.City + ", " + x.Address.Street + ", " + x.Address.Number,
-                    Doctors = x.InstitutionUsers
-                                .Where(iu => iu.User.Role == UserType.Doctor)
-                                .Select(d => new DoctorPreview
-                                {
-                                    Id = d.UserId,
-                                    Name = d.User.FirstName + " " + d.User.LastName,
-                                    Rating = Math.Round(d.User.Doctor.Appointments
-                                                .Where(r => r.Review != null)
-                                                .Select(r => (double?)r.Review.Rating)
-                                                .Average() ?? 0.0,
-                                                2),
-                                    Specialties = d.User.Doctor.DoctorSpecialties
-                                                .Select(ds => ds.InstitutionService.Specialty.Name)
-                                                .Distinct()
-                                                .ToList()
-
-                                }).ToList()
-                }).FirstOrDefaultAsync();
+                    Address =
+                        x.Address.Country
+                        + ", "
+                        + x.Address.City
+                        + ", "
+                        + x.Address.Street
+                        + ", "
+                        + x.Address.Number,
+                    Doctors = x
+                        .InstitutionUsers.Where(iu => iu.User.Role == UserType.Doctor)
+                        .Select(d => new DoctorPreview
+                        {
+                            Id = d.UserId,
+                            Name = d.User.FirstName + " " + d.User.LastName,
+                            Rating = Math.Round(
+                                d.User.Doctor.Appointments.Where(r => r.Review != null)
+                                    .Select(r => (double?)r.Review.Rating)
+                                    .Average()
+                                    ?? 0.0,
+                                2
+                            ),
+                            Specialties = d
+                                .User.Doctor.DoctorSpecialties.Select(ds =>
+                                    ds.InstitutionService.Specialty.Name
+                                )
+                                .Distinct()
+                                .ToList(),
+                        })
+                        .ToList(),
+                })
+                .FirstOrDefaultAsync();
 
             return response;
         }
 
-        public async Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(GetDoctorsWithSlotsRequestDto request)
+        public async Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(
+            GetDoctorsWithSlotsRequestDto request
+        )
         {
-            var response = await _context.DoctorSpecialties
-                .Where(d => d.InstitutionService.InstitutionId == request.InstitutionId &&
-                d.InstitutionService.SpecialtyId == request.SpecialtyId &&
-                d.InstitutionService.ServiceId == request.ServiceId
+            var response = await _context
+                .DoctorSpecialties.Where(d =>
+                    d.InstitutionService.InstitutionId == request.InstitutionId
+                    && d.InstitutionService.SpecialtyId == request.SpecialtyId
+                    && d.InstitutionService.ServiceId == request.ServiceId
                 )
                 .Select(x => new AvailabilityDoctorsResponseDto
                 {
                     Id = x.Doctor.UserId,
                     Name = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
-                    DoctorSpecialties = x.Doctor.DoctorSpecialties
-                                                            .Select(ds => new SpecialtyDto
-                                                            {
-                                                                Id = ds.InstitutionService.Specialty.Id,
-                                                                Name = ds.InstitutionService.Specialty.Name,
-                                                            })
-                                                            .ToList(),
-                    Rating = Math.Round(x.Doctor.Appointments
-                                        .Where(a => a.Review != null)
-                                        .Select(a => (double?)a.Review.Rating)
-                                        .Average() ?? 0.0,
-                                        2),
+                    DoctorSpecialties = x
+                        .Doctor.DoctorSpecialties.Select(ds => new SpecialtyDto
+                        {
+                            Id = ds.InstitutionService.Specialty.Id,
+                            Name = ds.InstitutionService.Specialty.Name,
+                        })
+                        .ToList(),
+                    Rating = Math.Round(
+                        x.Doctor.Appointments.Where(a => a.Review != null)
+                            .Select(a => (double?)a.Review.Rating)
+                            .Average()
+                            ?? 0.0,
+                        2
+                    ),
                     TotalReviews = x.Doctor.Appointments.Count(a => a.Review != null),
-
                 })
-                .ToListAsync() ;
+                .ToListAsync();
             response = response.DistinctBy(x => x.Id).ToList();
             foreach (var doctor in response)
             {
-                doctor.DoctorSpecialties = doctor.DoctorSpecialties
-                    .DistinctBy(s => s.Id)
-                    .ToList();
+                doctor.DoctorSpecialties = doctor.DoctorSpecialties.DistinctBy(s => s.Id).ToList();
             }
-            var service = await _context.InstitutionServices
-                .FirstOrDefaultAsync(s =>
-                    s.InstitutionId == request.InstitutionId &&
-                    s.ServiceId == request.ServiceId);
+            var service = await _context.InstitutionServices.FirstOrDefaultAsync(s =>
+                s.InstitutionId == request.InstitutionId && s.ServiceId == request.ServiceId
+            );
 
             if (service == null)
                 return [];
 
             foreach (var item in response)
             {
-                List<AvailableSlotDto> slots = await GetScheduleForDoctor(request, item.Id, service);
+                List<AvailableSlotDto> slots = await GetScheduleForDoctor(
+                    request,
+                    item.Id,
+                    service
+                );
                 item.SlotsAvailable = slots;
             }
             List<AvailabilityDoctorsResponseDto> filteredResponse = response
@@ -770,58 +816,80 @@ namespace MedSync.Services
 
         public async Task<List<DoctorInfoTabResponse>> GetDoctorsInfoTabAsync(Guid institutionId)
         {
-            var response = await _context.DoctorSpecialties
-                .Where(d => d.InstitutionService.InstitutionId == institutionId)
+            var response = await _context
+                .DoctorSpecialties.Where(d => d.InstitutionService.InstitutionId == institutionId)
                 .Select(x => new DoctorInfoTabResponse
                 {
                     Id = x.Doctor.UserId,
                     Name = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
-                    DoctorSpecialties = x.Doctor.DoctorSpecialties
-                                                            .Select(ds => new SpecialtyDto
-                                                            {
-                                                                Id = ds.InstitutionService.Specialty.Id,
-                                                                Name = ds.InstitutionService.Specialty.Name,
-                                                            })
-                                                            .ToList(),
-                    Rating = Math.Round(x.Doctor.Appointments
-                                        .Where(a => a.Review != null)
-                                        .Select(a => (double?)a.Review.Rating)
-                                        .Average() ?? 0.0,
-                                        2),
+                    DoctorSpecialties = x
+                        .Doctor.DoctorSpecialties.Select(ds => new SpecialtyDto
+                        {
+                            Id = ds.InstitutionService.Specialty.Id,
+                            Name = ds.InstitutionService.Specialty.Name,
+                        })
+                        .ToList(),
+                    Rating = Math.Round(
+                        x.Doctor.Appointments.Where(a => a.Review != null)
+                            .Select(a => (double?)a.Review.Rating)
+                            .Average()
+                            ?? 0.0,
+                        2
+                    ),
                     TotalReviews = x.Doctor.Appointments.Count(a => a.Review != null),
                 })
                 .ToListAsync();
-            response = response.Select(x => new DoctorInfoTabResponse(x, x.DoctorSpecialties.DistinctBy(s => s.Id).ToList())).DistinctBy(x => x.Id).ToList();
+            response = response
+                .Select(x => new DoctorInfoTabResponse(
+                    x,
+                    x.DoctorSpecialties.DistinctBy(s => s.Id).ToList()
+                ))
+                .DistinctBy(x => x.Id)
+                .ToList();
             return response;
         }
 
-        public async Task<AvailableSlotsDoctorResponseDto> GetAvailableSlotsByDoctorAsync(GetDoctorsWithSlotsRequestDto request)
+        public async Task<AvailableSlotsDoctorResponseDto> GetAvailableSlotsByDoctorAsync(
+            GetDoctorsWithSlotsRequestDto request
+        )
         {
-        
-            var service = await _context.InstitutionServices
-                .FirstOrDefaultAsync(s =>
-                    s.InstitutionId == request.InstitutionId &&
-                    s.ServiceId == request.ServiceId);
+            var service = await _context.InstitutionServices.FirstOrDefaultAsync(s =>
+                s.InstitutionId == request.InstitutionId && s.ServiceId == request.ServiceId
+            );
 
             if (service == null)
                 return null;
 
-                List<AvailableSlotDto> slots = await GetScheduleForDoctor(request, request.DoctorId.Value, service);
+            List<AvailableSlotDto> slots = await GetScheduleForDoctor(
+                request,
+                request.DoctorId.Value,
+                service
+            );
             var response = new AvailableSlotsDoctorResponseDto
             {
                 DoctorId = request.DoctorId.Value,
-                SlotsAvailable = slots
+                SlotsAvailable = slots,
             };
-          
+
             return response;
         }
 
-        public async Task<List<InstitutionDetailsResponse>> GetInstitutionsBySpecialtyAndServiceAsync(string? specialty, string? service, double? latitude, double? longitude, string? doctorName, string? institutionName)
+        public async Task<
+            List<InstitutionDetailsResponse>
+        > GetInstitutionsBySpecialtyAndServiceAsync(
+            string? specialty,
+            string? service,
+            double? latitude,
+            double? longitude,
+            string? doctorName,
+            string? institutionName
+        )
         {
-            var query = _context.InstitutionServices
-                .Where(i => i.IsActive == true && i.Institution.Active == true);
+            var query = _context.InstitutionServices.Where(i =>
+                i.IsActive == true && i.Institution.Active == true
+            );
 
-            if (specialty != null)
+            if (specialty != null && !specialty.Equals("all", StringComparison.OrdinalIgnoreCase))
                 query = query.Where(i => i.Specialty.Name.ToLower() == specialty.ToLower());
 
             if (service != null)
@@ -830,14 +898,20 @@ namespace MedSync.Services
             if (doctorName != null)
             {
                 var parts = doctorName.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                query = query.Where(i => i.DoctorSpecialties.Any(ds =>
-                    parts.All(part =>
-                        ds.Doctor.User.FirstName.ToLower().Contains(part) ||
-                        ds.Doctor.User.LastName.ToLower().Contains(part))));
+                query = query.Where(i =>
+                    i.DoctorSpecialties.Any(ds =>
+                        parts.All(part =>
+                            ds.Doctor.User.FirstName.ToLower().Contains(part)
+                            || ds.Doctor.User.LastName.ToLower().Contains(part)
+                        )
+                    )
+                );
             }
 
             if (institutionName != null)
-                query = query.Where(i => i.Institution.Name.ToLower().Contains(institutionName.ToLower()));
+                query = query.Where(i =>
+                    i.Institution.Name.ToLower().Contains(institutionName.ToLower())
+                );
 
             var result = await query
                 .Select(i => i.Institution)
@@ -846,14 +920,30 @@ namespace MedSync.Services
                 {
                     InstitutionId = x.Id,
                     InstitutionName = x.Name,
-                    Rating = Math.Round(x.Appointments
-                                .Where(a => a.Review != null)
-                                .Select(a => (double?)a.Review.Rating)
-                                .Average() ?? 0.0, 2),
+                    Rating = Math.Round(
+                        x.Appointments.Where(a => a.Review != null)
+                            .Select(a => (double?)a.Review.Rating)
+                            .Average()
+                            ?? 0.0,
+                        2
+                    ),
                     TotalReviews = x.Appointments.Count(a => a.Review != null),
-                    Address = x.Address.Country + ", " + x.Address.City + ", " + x.Address.Street + ", " + x.Address.Number,
-                    Latitude = x.Address.Latitude == 0 && x.Address.Longitude == 0 ? null : (double?)x.Address.Latitude,
-                    Longitude = x.Address.Latitude == 0 && x.Address.Longitude == 0 ? null : (double?)x.Address.Longitude,
+                    Address =
+                        x.Address.Country
+                        + ", "
+                        + x.Address.City
+                        + ", "
+                        + x.Address.Street
+                        + ", "
+                        + x.Address.Number,
+                    Latitude =
+                        x.Address.Latitude == 0 && x.Address.Longitude == 0
+                            ? null
+                            : (double?)x.Address.Latitude,
+                    Longitude =
+                        x.Address.Latitude == 0 && x.Address.Longitude == 0
+                            ? null
+                            : (double?)x.Address.Longitude,
                 })
                 .ToListAsync();
 
@@ -864,7 +954,10 @@ namespace MedSync.Services
                     if (clinic.Latitude.HasValue && clinic.Longitude.HasValue)
                     {
                         var dLat = (clinic.Latitude.Value - latitude.Value) * 111.0;
-                        var dLng = (clinic.Longitude.Value - longitude.Value) * 111.0 * Math.Cos(latitude.Value * Math.PI / 180);
+                        var dLng =
+                            (clinic.Longitude.Value - longitude.Value)
+                            * 111.0
+                            * Math.Cos(latitude.Value * Math.PI / 180);
                         clinic.Distance = Math.Round(Math.Sqrt(dLat * dLat + dLng * dLng), 2);
                     }
                 }
@@ -874,7 +967,73 @@ namespace MedSync.Services
             return result.OrderByDescending(x => x.Rating).ToList();
         }
 
-        private string GenerateInstitutionCode (string institutionName)
+        public async Task<List<PatientDoctorCandidateDto>> GetPatientDoctorCandidatesAsync(
+            string? doctorName,
+            string? institutionName,
+            double? latitude,
+            double? longitude
+        )
+        {
+            var clinics = await GetInstitutionsBySpecialtyAndServiceAsync(
+                null,
+                null,
+                latitude,
+                longitude,
+                doctorName,
+                institutionName
+            );
+
+            if (clinics.Count == 0)
+            {
+                clinics = await GetInstitutionsBySpecialtyAndServiceAsync(
+                    null,
+                    null,
+                    latitude,
+                    longitude,
+                    null,
+                    institutionName
+                );
+            }
+
+            var candidates = new List<PatientDoctorCandidateDto>();
+            foreach (var clinic in clinics)
+            {
+                var doctorsInClinic = await GetDoctorsInfoTabAsync(clinic.InstitutionId);
+                var doctorIds = doctorsInClinic.Select(d => d.Id).ToList();
+                var yearsByDoctor = await _context
+                    .Doctors.Where(d => doctorIds.Contains(d.UserId))
+                    .ToDictionaryAsync(d => d.UserId, d => d.YearsOfExperience);
+
+                foreach (var doc in doctorsInClinic)
+                {
+                    candidates.Add(new PatientDoctorCandidateDto
+                    {
+                        DoctorId = doc.Id,
+                        DoctorName = doc.Name ?? string.Empty,
+                        YearsOfExperience = yearsByDoctor.GetValueOrDefault(doc.Id, 0),
+                        InstitutionId = clinic.InstitutionId,
+                        InstitutionName = clinic.InstitutionName,
+                        Rating = doc.Rating,
+                        TotalReviews = doc.TotalReviews,
+                        Specialties =
+                            doc.DoctorSpecialties?.Select(s => s.Name)
+                                .Where(s => !string.IsNullOrWhiteSpace(s))
+                                .ToList() ?? []
+                    });
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(doctorName))
+            {
+                candidates = candidates
+                    .Where(c => c.DoctorName.Contains(doctorName, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            return candidates.DistinctBy(c => new { c.DoctorId, c.InstitutionId }).ToList();
+        }
+
+        private string GenerateInstitutionCode(string institutionName)
         {
             var cleanName = Regex.Replace(institutionName.ToUpper(), @"[^A-Z0-9]", "");
             var prefix = cleanName.Length >= 3 ? cleanName.Substring(0, 3) : cleanName;

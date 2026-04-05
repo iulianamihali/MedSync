@@ -2,7 +2,7 @@
 {
     public class Prescription
     {
-        public Guid Id {  get; set; }
+        public Guid Id { get; set; }
         public Guid AppointmentId { get; set; }
         public string Diagnosis { get; set; }
         public virtual Appointment Appointment { get; set; }

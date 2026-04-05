@@ -7,14 +7,10 @@ namespace MedSync.Models;
 
 public partial class MedSyncContext : DbContext
 {
-    public MedSyncContext()
-    {
-    }
- 
+    public MedSyncContext() { }
+
     public MedSyncContext(DbContextOptions<MedSyncContext> options)
-        : base(options)
-    {
-    }
+        : base(options) { }
 
     public virtual DbSet<Address> Addresses { get; set; }
 
@@ -68,39 +64,53 @@ public partial class MedSyncContext : DbContext
 
         modelBuilder.Entity<Appointment>(entity =>
         {
-            entity.HasIndex(e => new { e.DoctorUserId, e.StartDateTime }, "IX_Appointments_Doctor_StartDateTime").IsUnique();
+            entity
+                .HasIndex(
+                    e => new { e.DoctorUserId, e.StartDateTime },
+                    "IX_Appointments_Doctor_StartDateTime"
+                )
+                .IsUnique();
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Status).HasConversion(x => (int)x, x => (AppointmentStatusEnumType)x).IsRequired();
-            entity.Property(e => e.ReferralCode)
-                .HasMaxLength(50);
+            entity
+                .Property(e => e.Status)
+                .HasConversion(x => (int)x, x => (AppointmentStatusEnumType)x)
+                .IsRequired();
+            entity.Property(e => e.ReferralCode).HasMaxLength(50);
             entity.Property(e => e.ReminderSent).HasDefaultValue(false);
-            entity.HasOne(d => d.Doctor).WithMany(p => p.Appointments)
+            entity
+                .HasOne(d => d.Doctor)
+                .WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.DoctorUserId)
                 .HasPrincipalKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_Appointments_DoctorUserId");
-            entity.HasOne(d => d.Patient).WithMany(p => p.Appointments)
+            entity
+                .HasOne(d => d.Patient)
+                .WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.PatientUserId)
                 .HasPrincipalKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_Appointments_PatientUserId");
-            entity.HasOne(d => d.InstitutionService).WithMany(p => p.Appointments)
-               .HasForeignKey(d => d.InstitutionServiceId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("FK_Appointments_InstitutionServiceId");
-            entity.HasOne(d => d.UnregisteredPatient)
+            entity
+                .HasOne(d => d.InstitutionService)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.InstitutionServiceId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Appointments_InstitutionServiceId");
+            entity
+                .HasOne(d => d.UnregisteredPatient)
                 .WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.UnregisteredPatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_UnregisteredPatientId");
-            entity.HasOne(a => a.MedicalRecord)
+            entity
+                .HasOne(a => a.MedicalRecord)
                 .WithOne(m => m.Appointment)
                 .HasForeignKey<MedicalRecord>(m => m.AppointmentId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_MedicalRecords_AppointmentId");
-
         });
 
         modelBuilder.Entity<AssociatedUser>(entity =>
@@ -108,16 +118,21 @@ public partial class MedSyncContext : DbContext
             entity.HasKey(e => new { e.PrimaryUserId, e.CareUnregisteredPatientId });
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Relationship)
+            entity
+                .Property(e => e.Relationship)
                 .HasConversion(x => (short)x, x => (RelationshipType)x)
                 .IsRequired();
 
-            entity.HasOne(d => d.CareUnregisteredPatient).WithMany()
+            entity
+                .HasOne(d => d.CareUnregisteredPatient)
+                .WithMany()
                 .HasForeignKey(d => d.CareUnregisteredPatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AssociatedUsers_CareUnregisteredPatient");
 
-            entity.HasOne(d => d.PrimaryUser).WithMany(p => p.AssociatedUsers)
+            entity
+                .HasOne(d => d.PrimaryUser)
+                .WithMany(p => p.AssociatedUsers)
                 .HasForeignKey(d => d.PrimaryUserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AssociatedUsers_Primary");
@@ -127,13 +142,17 @@ public partial class MedSyncContext : DbContext
         {
             entity.HasKey(e => e.UserId);
 
-            entity.HasIndex(e => e.MedicalLicenseNumber, "UQ__Doctors__33143F83FC65D259").IsUnique();
+            entity
+                .HasIndex(e => e.MedicalLicenseNumber, "UQ__Doctors__33143F83FC65D259")
+                .IsUnique();
 
             entity.Property(e => e.UserId).ValueGeneratedNever();
             entity.Property(e => e.MedicalLicenseNumber).HasMaxLength(50);
             entity.Property(e => e.UniversityName).HasMaxLength(255);
 
-            entity.HasOne(d => d.User).WithOne(p => p.Doctor)
+            entity
+                .HasOne(d => d.User)
+                .WithOne(p => p.Doctor)
                 .HasForeignKey<Doctor>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Doctors_UserId");
@@ -148,7 +167,9 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
             entity.Property(e => e.TaxIdentificationNumber).HasMaxLength(25);
 
-            entity.HasOne(d => d.Address).WithMany(p => p.Institutions)
+            entity
+                .HasOne(d => d.Address)
+                .WithMany(p => p.Institutions)
                 .HasForeignKey(d => d.AddressId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Institutions_AddressId");
@@ -160,17 +181,20 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
 
-            entity.HasOne(d => d.Institution).WithMany(p => p.InstitutionUsers)
+            entity
+                .HasOne(d => d.Institution)
+                .WithMany(p => p.InstitutionUsers)
                 .HasForeignKey(d => d.InstitutionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InstitutionUsers_InstitutionId");
 
-            entity.HasOne(d => d.User).WithMany(p => p.InstitutionUsers)
+            entity
+                .HasOne(d => d.User)
+                .WithMany(p => p.InstitutionUsers)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InstitutionUsers_UserId");
         });
-
 
         modelBuilder.Entity<Patient>(entity =>
         {
@@ -179,14 +203,14 @@ public partial class MedSyncContext : DbContext
             entity.HasIndex(e => e.Cnp, "UQ__Patients__C1FF677D6D763162").IsUnique();
 
             entity.Property(e => e.UserId).ValueGeneratedNever();
-            entity.Property(e => e.Cnp)
-                .HasMaxLength(13)
-                .HasColumnName("CNP");
+            entity.Property(e => e.Cnp).HasMaxLength(13).HasColumnName("CNP");
             entity.Property(e => e.EmergencyContactName).HasMaxLength(100);
             entity.Property(e => e.EmergencyContactPhone).HasMaxLength(20);
             entity.Property(e => e.InsuranceCardNumber).HasMaxLength(50);
 
-            entity.HasOne(d => d.User).WithOne(p => p.Patient)
+            entity
+                .HasOne(d => d.User)
+                .WithOne(p => p.Patient)
                 .HasForeignKey<Patient>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Patients_UserId");
@@ -199,16 +223,18 @@ public partial class MedSyncContext : DbContext
             entity.ToTable("PatientAccess");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Scope)
-                .HasMaxLength(50)
-                .HasDefaultValue("all");
+            entity.Property(e => e.Scope).HasMaxLength(50).HasDefaultValue("all");
 
-            entity.HasOne(d => d.OwnerPatient).WithMany(p => p.PatientAccesses)
+            entity
+                .HasOne(d => d.OwnerPatient)
+                .WithMany(p => p.PatientAccesses)
                 .HasForeignKey(d => d.OwnerPatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PatientAccess_Owner");
 
-            entity.HasOne(d => d.Viewer).WithMany(p => p.PatientAccesses)
+            entity
+                .HasOne(d => d.Viewer)
+                .WithMany(p => p.PatientAccesses)
                 .HasForeignKey(d => d.ViewerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PatientAccess_Viewer");
@@ -220,7 +246,9 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Comment).HasMaxLength(1000);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
 
-            entity.HasOne(d => d.Appointment).WithOne(p => p.Review)
+            entity
+                .HasOne(d => d.Appointment)
+                .WithOne(p => p.Review)
                 .HasForeignKey<Review>(d => d.AppointmentId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Reviews_AppointmentId");
@@ -242,12 +270,12 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.AddressId).IsRequired(false);
 
-            entity.HasOne(u => u.Address)
-                  .WithOne(a => a.User)
-                  .HasForeignKey<User>(u => u.AddressId)
-                  .OnDelete(DeleteBehavior.SetNull)
-                  .HasConstraintName("FK_Users_AddressId");
-
+            entity
+                .HasOne(u => u.Address)
+                .WithOne(a => a.User)
+                .HasForeignKey<User>(u => u.AddressId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_Users_AddressId");
         });
 
         modelBuilder.Entity<UserSchedule>(entity =>
@@ -256,35 +284,49 @@ public partial class MedSyncContext : DbContext
 
             entity.Property(e => e.Id).ValueGeneratedNever();
 
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.UserScheduleCreatedByUsers)
+            entity
+                .HasOne(d => d.CreatedByUser)
+                .WithMany(p => p.UserScheduleCreatedByUsers)
                 .HasForeignKey(d => d.CreatedByUserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserSchedules_CreatedBy");
 
-            entity.HasOne(d => d.Institution).WithMany(p => p.UserSchedules)
+            entity
+                .HasOne(d => d.Institution)
+                .WithMany(p => p.UserSchedules)
                 .HasForeignKey(d => d.InstitutionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserSchedules_InstitutionId");
 
-            entity.HasOne(d => d.User).WithMany(p => p.UserScheduleUsers)
+            entity
+                .HasOne(d => d.User)
+                .WithMany(p => p.UserScheduleUsers)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserSchedules_UserId");
         });
-        
+
         modelBuilder.Entity<SupportIssues>(entity =>
         {
             entity.HasKey(e => e.Id);
-          
+
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.UserId).IsRequired();
-            entity.Property(e => e.Type).HasConversion(x => (short)x, x => (SupportIssuesEnumType)x).IsRequired();
+            entity
+                .Property(e => e.Type)
+                .HasConversion(x => (short)x, x => (SupportIssuesEnumType)x)
+                .IsRequired();
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.CreatedAt).HasColumnType("datetime2(0)").IsRequired();
             entity.Property(e => e.Active).IsRequired();
-            entity.Property(e => e.Status).HasConversion(x => (short)x, x => (StatusSupportEnumType)x).IsRequired();
+            entity
+                .Property(e => e.Status)
+                .HasConversion(x => (short)x, x => (StatusSupportEnumType)x)
+                .IsRequired();
 
-            entity.HasOne(d => d.User).WithMany(p => p.SupportIssues)
+            entity
+                .HasOne(d => d.User)
+                .WithMany(p => p.SupportIssues)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SupportIssues_UserId");
@@ -299,16 +341,23 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.InstitutionId).IsRequired();
             entity.Property(e => e.CreatedAt).HasColumnType("datetime2(0)").IsRequired();
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime2(0)");
-            entity.Property(e => e.Status).HasConversion(x => (short)x, x => (InstitutionRequestsStatusEnumType)x).IsRequired();
+            entity
+                .Property(e => e.Status)
+                .HasConversion(x => (short)x, x => (InstitutionRequestsStatusEnumType)x)
+                .IsRequired();
 
-            entity.HasOne(d => d.User).WithMany(p => p.InstitutionRequests)
+            entity
+                .HasOne(d => d.User)
+                .WithMany(p => p.InstitutionRequests)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InstitutionRequests_UserId");
-            entity.HasOne(d => d.Institution).WithMany(p => p.InstitutionRequests)
-               .HasForeignKey(d => d.InstitutionId)
-               .OnDelete(DeleteBehavior.ClientSetNull)
-               .HasConstraintName("FK_InstitutionRequests_InstitutionId");
+            entity
+                .HasOne(d => d.Institution)
+                .WithMany(p => p.InstitutionRequests)
+                .HasForeignKey(d => d.InstitutionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_InstitutionRequests_InstitutionId");
         });
         modelBuilder.Entity<DoctorRequests>(entity =>
         {
@@ -319,38 +368,39 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.InstitutionId).IsRequired();
             entity.Property(e => e.CreatedAt).HasColumnType("datetime2(0)").IsRequired();
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime2(0)");
-            entity.Property(e => e.Status).HasConversion(x => (short)x, x => (DoctorRequestsStatusEnumType)x).IsRequired();
+            entity
+                .Property(e => e.Status)
+                .HasConversion(x => (short)x, x => (DoctorRequestsStatusEnumType)x)
+                .IsRequired();
 
-            entity.HasOne(d => d.User).WithMany(p => p.DoctorRequests)
-               .HasForeignKey(d => d.UserId)
-               .OnDelete(DeleteBehavior.ClientSetNull)
-               .HasConstraintName("FK_DoctorRequests_UserId");
-            entity.HasOne(d => d.Institution).WithMany(p => p.DoctorRequests)
-               .HasForeignKey(d => d.InstitutionId)
-               .OnDelete(DeleteBehavior.ClientSetNull)
-               .HasConstraintName("FK_DoctorRequests_InstitutionId");
+            entity
+                .HasOne(d => d.User)
+                .WithMany(p => p.DoctorRequests)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DoctorRequests_UserId");
+            entity
+                .HasOne(d => d.Institution)
+                .WithMany(p => p.DoctorRequests)
+                .HasForeignKey(d => d.InstitutionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DoctorRequests_InstitutionId");
         });
         modelBuilder.Entity<Specialty>(entity =>
         {
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Name)
-                  .HasMaxLength(100)
-                  .IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Name).HasMaxLength(100);
-
         });
         modelBuilder.Entity<Service>(entity =>
         {
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Name)
-                  .HasMaxLength(100)
-                  .IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Name).HasMaxLength(100);
-
         });
         modelBuilder.Entity<InstitutionService>(entity =>
         {
@@ -362,66 +412,62 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Price).HasPrecision(10, 2);
             entity.Property(e => e.Duration).IsRequired();
             entity.Property(e => e.InstitutionId).IsRequired();
-          
 
-            entity.HasOne(d => d.Institution).WithMany(p => p.InstitutionServices)
-               .HasForeignKey(d => d.InstitutionId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("FK_InstitutionServices_InstitutionId");
-            entity.HasOne(d => d.Specialty).WithMany(p => p.InstitutionServices)
-               .HasForeignKey(d => d.SpecialtyId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("FK_InstitutionServices_SpecialtyId");
-            entity.HasOne(d => d.Service).WithMany(p => p.InstitutionServices)
-               .HasForeignKey(d => d.ServiceId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("FK_InstitutionServices_ServiceId");
-         
+            entity
+                .HasOne(d => d.Institution)
+                .WithMany(p => p.InstitutionServices)
+                .HasForeignKey(d => d.InstitutionId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_InstitutionServices_InstitutionId");
+            entity
+                .HasOne(d => d.Specialty)
+                .WithMany(p => p.InstitutionServices)
+                .HasForeignKey(d => d.SpecialtyId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_InstitutionServices_SpecialtyId");
+            entity
+                .HasOne(d => d.Service)
+                .WithMany(p => p.InstitutionServices)
+                .HasForeignKey(d => d.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_InstitutionServices_ServiceId");
         });
 
         modelBuilder.Entity<DoctorSpecialty>(entity =>
         {
             entity.HasKey(e => e.Id);
 
-            entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorSpecialties)
-               .HasForeignKey(d => d.DoctorUserId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("FK_DoctorSpecialties_DoctorId");
-            entity.HasOne(d => d.InstitutionService)
-               .WithMany(p => p.DoctorSpecialties)
-               .HasForeignKey(d => d.InstitutionServiceId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("FK_DoctorSpecialties_InstitutionServiceId");
-
+            entity
+                .HasOne(d => d.Doctor)
+                .WithMany(p => p.DoctorSpecialties)
+                .HasForeignKey(d => d.DoctorUserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_DoctorSpecialties_DoctorId");
+            entity
+                .HasOne(d => d.InstitutionService)
+                .WithMany(p => p.DoctorSpecialties)
+                .HasForeignKey(d => d.InstitutionServiceId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_DoctorSpecialties_InstitutionServiceId");
         });
 
         modelBuilder.Entity<UnregisteredPatient>(entity =>
         {
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.FirstName)
-             .IsRequired()
-             .HasMaxLength(100);
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
 
-            entity.Property(e => e.LastName)
-                  .IsRequired()
-                  .HasMaxLength(100);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
 
-            entity.Property(e => e.Cnp)
-                .HasMaxLength(13);
+            entity.Property(e => e.Cnp).HasMaxLength(13);
 
-            entity.Property(e => e.PhoneNumber)
-                  .IsRequired()
-                  .HasMaxLength(20);
+            entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(20);
 
-            entity.Property(e => e.Email)
-                  .HasMaxLength(255);
+            entity.Property(e => e.Email).HasMaxLength(255);
 
-            entity.Property(e => e.CreatedAt)
-                  .HasDefaultValueSql("GETDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
 
-            entity.Property(e => e.DateOfBirth)
-                  .HasColumnType("date");
+            entity.Property(e => e.DateOfBirth).HasColumnType("date");
         });
 
         modelBuilder.Entity<MedicalRecord>(entity =>
@@ -432,46 +478,49 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).IsRequired();
 
-            entity.HasOne(m => m.Appointment)
-               .WithOne(a => a.MedicalRecord)
-               .HasForeignKey<MedicalRecord>(m => m.AppointmentId)
-               .OnDelete(DeleteBehavior.Restrict);
+            entity
+                .HasOne(m => m.Appointment)
+                .WithOne(a => a.MedicalRecord)
+                .HasForeignKey<MedicalRecord>(m => m.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<MedicalReferral>(entity =>
         {
             entity.HasKey(e => e.Id);
 
-            entity.HasOne(e => e.Specialty) 
-               .WithMany(s => s.MedicalReferrals) 
-               .HasForeignKey(e => e.SpecialtyId) 
-               .OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(e => e.Appointment)
-               .WithMany(a => a.MedicalReferrals)
-               .HasForeignKey(e => e.AppointmentId)
-               .OnDelete(DeleteBehavior.Cascade);
+            entity
+                .HasOne(e => e.Specialty)
+                .WithMany(s => s.MedicalReferrals)
+                .HasForeignKey(e => e.SpecialtyId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity
+                .HasOne(e => e.Appointment)
+                .WithMany(a => a.MedicalReferrals)
+                .HasForeignKey(e => e.AppointmentId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Prescription>(entity =>
         {
             entity.HasKey(e => e.Id);
 
-            entity.HasOne(e => e.Appointment)
-               .WithMany(s => s.Prescriptions)
-               .HasForeignKey(e => e.AppointmentId)
-               .OnDelete(DeleteBehavior.Cascade);
- 
+            entity
+                .HasOne(e => e.Appointment)
+                .WithMany(s => s.Prescriptions)
+                .HasForeignKey(e => e.AppointmentId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Medication>(entity =>
         {
             entity.HasKey(e => e.Id);
 
-            entity.HasOne(e => e.Prescription)
-               .WithMany(s => s.Medications)
-               .HasForeignKey(e => e.PrescriptionId)
-               .OnDelete(DeleteBehavior.Cascade);
-
+            entity
+                .HasOne(e => e.Prescription)
+                .WithMany(s => s.Medications)
+                .HasForeignKey(e => e.PrescriptionId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
         modelBuilder.Entity<SharedLink>(entity =>
         {
@@ -484,14 +533,18 @@ public partial class MedSyncContext : DbContext
             entity.Property(e => e.ExpiresAt).IsRequired();
             entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.SharedLinks)
+            entity
+                .HasOne(d => d.Patient)
+                .WithMany(p => p.SharedLinks)
                 .HasForeignKey(d => d.PatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SharedLinks_PatientId");
-            entity.HasOne(d => d.UnregisteredPatient).WithMany()
-               .HasForeignKey(d => d.CareUnregisteredPatientId)
-               .OnDelete(DeleteBehavior.ClientSetNull)
-               .HasConstraintName("FK_SharedLinks_CareUnregisteredPatientId");
+            entity
+                .HasOne(d => d.UnregisteredPatient)
+                .WithMany()
+                .HasForeignKey(d => d.CareUnregisteredPatientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SharedLinks_CareUnregisteredPatientId");
         });
 
         OnModelCreatingPartial(modelBuilder);

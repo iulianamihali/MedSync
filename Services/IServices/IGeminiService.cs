@@ -6,5 +6,6 @@ namespace MedSync.Services.IServices
     public interface IGeminiService
     {
         Task<AskResponseDto> AskAsync(AskRequestDto request);
+        Task<DoctorAskResponseDto> DoctorAskAsync(DoctorAskRequestDto request);
     }
 }

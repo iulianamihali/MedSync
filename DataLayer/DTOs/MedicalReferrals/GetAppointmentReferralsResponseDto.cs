@@ -7,6 +7,5 @@
         public DateTime? IssuedAt { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public string SuspectedDiagnosis { get; set; }
-
     }
 }

@@ -8,6 +8,5 @@
         public string SuspectedDiagnosis { get; set; }
         public string RelevantClinicalInformation { get; set; }
         public int ValidityInDays { get; set; }
-
     }
 }

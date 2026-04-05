@@ -13,13 +13,21 @@ namespace MedSync.Services.IServices
         Task<int> CountInstitutionRequestsAsync();
         Task<List<InstitutionReqPopUpResponseDto>> GetInstitutionRequestDetailsAsync();
         Task<bool> UpdateStatusInstitutionRequestAsync(UpdateInstitutionRequestDto request);
-        Task<PaginationDto<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync(int page);
+        Task<PaginationDto<InstitutionsDataTableResponseDto>> GetInstitutionsDataTableAsync(
+            int page
+        );
         Task<bool> UpdateInstitutionsInfoAsync(UpdateInstitutionsInfoDto info);
         Task<List<SpecialtyWithServicesDto>> GetSpecialtiesWithServices(Guid institutionId);
         Task<List<DoctorDto>> GetDoctorsWithSlots(GetDoctorsWithSlotsRequestDto request);
         Task<PatientSearchResultDto?> SearchPatients(SearchPatients request);
-        Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(int page, Guid institutionId);
-        Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(int page, Guid institutionId);
+        Task<PaginationDto<PatientsDataTableResponseDto>> GetDataTablePatients(
+            int page,
+            Guid institutionId
+        );
+        Task<PaginationDto<DoctorsDataTableResponseDto>> GetDataTableDoctors(
+            int page,
+            Guid institutionId
+        );
         Task<List<SpecialtyServicesResponseDto>> GetSpecialtyServices(Guid institutionId);
         Task<bool> AddService(AddServiceRequestDto request);
         Task<bool> EditDataService(EditDataServiceRequestDto request);
@@ -28,10 +36,26 @@ namespace MedSync.Services.IServices
         Task<List<SpecialtyDto>> GetSpecialtiesAsync(Guid institutionId);
         Task<List<ServiceSelectDto>> GetServicesAsync(Guid institutionId);
         Task<InstitutionDetailsResponse> GetInstitutionDetailsAsync(Guid institutionId);
-        Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(GetDoctorsWithSlotsRequestDto request);
+        Task<List<AvailabilityDoctorsResponseDto>> GetDoctorsAvailabilityAsync(
+            GetDoctorsWithSlotsRequestDto request
+        );
         Task<List<DoctorInfoTabResponse>> GetDoctorsInfoTabAsync(Guid institutionId);
-        Task<AvailableSlotsDoctorResponseDto> GetAvailableSlotsByDoctorAsync(GetDoctorsWithSlotsRequestDto request);
-        Task<List<InstitutionDetailsResponse>> GetInstitutionsBySpecialtyAndServiceAsync(string? specialty, string? service, double? latitude, double? longitude, string? doctorName, string? institutionName);
-
+        Task<AvailableSlotsDoctorResponseDto> GetAvailableSlotsByDoctorAsync(
+            GetDoctorsWithSlotsRequestDto request
+        );
+        Task<List<InstitutionDetailsResponse>> GetInstitutionsBySpecialtyAndServiceAsync(
+            string? specialty,
+            string? service,
+            double? latitude,
+            double? longitude,
+            string? doctorName,
+            string? institutionName
+        );
+        Task<List<PatientDoctorCandidateDto>> GetPatientDoctorCandidatesAsync(
+            string? doctorName,
+            string? institutionName,
+            double? latitude,
+            double? longitude
+        );
     }
 }

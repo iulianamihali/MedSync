@@ -4,6 +4,7 @@ using MedSync.Services;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 namespace MedSync.Controllers
 {
     [AllowAnonymous]
@@ -12,6 +13,7 @@ namespace MedSync.Controllers
     public class GlobalDataController : ControllerBase
     {
         private readonly IGlobalDataService _globalDataService;
+
         public GlobalDataController(IGlobalDataService globalDataService)
         {
             _globalDataService = globalDataService;
@@ -23,24 +25,26 @@ namespace MedSync.Controllers
             var result = await _globalDataService.GetSpecialties();
             return Ok(result);
         }
+
         [HttpGet("getServices")]
         public async Task<IActionResult> GetServicesAsync()
         {
             var result = await _globalDataService.GetServices();
             return Ok(result);
         }
+
         [HttpGet("getInstitutionSpecialties/{codeInstitution}")]
         public async Task<IActionResult> GetInstitutionSpecialties(string codeInstitution)
         {
             var result = await _globalDataService.GetInstitutionSpecialties(codeInstitution);
             return Ok(result);
         }
+
         [HttpGet("getClinicLocations")]
         public async Task<IActionResult> GetClinicLocations()
         {
             var result = await _globalDataService.GetClinicLocations();
             return Ok(result);
-
         }
     }
 }

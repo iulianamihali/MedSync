@@ -7,8 +7,8 @@ public partial class MedicalRecord
 {
     public Guid Id { get; set; }
 
-    public Guid AppointmentId { get; set; }   
-  
+    public Guid AppointmentId { get; set; }
+
     public string? Investigation { get; set; }
     public string? InvestigationResult { get; set; }
     public string? Symptoms { get; set; }

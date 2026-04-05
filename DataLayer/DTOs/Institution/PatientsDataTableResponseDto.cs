@@ -8,6 +8,6 @@
         public string PhoneNumber { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int Visits { get; set; }
-        public DateTime LastVisit {  get; set; }
+        public DateTime LastVisit { get; set; }
     }
 }

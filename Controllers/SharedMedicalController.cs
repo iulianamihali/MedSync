@@ -12,7 +12,11 @@ namespace MedSync.Controllers
     {
         private readonly IPatientService _patientService;
         private readonly SharedMedicalService _sharedMedicalService;
-        public SharedMedicalController(IPatientService patientService, SharedMedicalService sharedMedicalService)
+
+        public SharedMedicalController(
+            IPatientService patientService,
+            SharedMedicalService sharedMedicalService
+        )
         {
             _patientService = patientService;
             _sharedMedicalService = sharedMedicalService;
@@ -25,17 +29,21 @@ namespace MedSync.Controllers
             if (history == null)
                 return NotFound("Invalid or expired token.");
             return Ok(history);
-
         }
 
         [HttpGet("getAppointmentDetails/{token}/{appointmentId}")]
-        public async Task<IActionResult> GetSharedAppointmentDetails(string token, Guid appointmentId)
+        public async Task<IActionResult> GetSharedAppointmentDetails(
+            string token,
+            Guid appointmentId
+        )
         {
-            var result = await _sharedMedicalService.GetSharedAppointmentDetailsAsync(token, appointmentId);
+            var result = await _sharedMedicalService.GetSharedAppointmentDetailsAsync(
+                token,
+                appointmentId
+            );
             if (result == null)
                 return NotFound("Invalid or expired token.");
             return Ok(result);
         }
-       
     }
 }

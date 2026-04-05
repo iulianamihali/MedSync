@@ -1,12 +1,13 @@
-﻿using MedSync.DataLayer.DTOs.Auth;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using MedSync.DataLayer.DTOs.Auth;
+using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using MedSync.DataLayer.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
 namespace MedSync.Services
 {
     public class AuthService
@@ -14,6 +15,7 @@ namespace MedSync.Services
         private readonly IConfiguration _configuration;
         private readonly MedSyncContext _context;
         private readonly PasswordHasher<User> _passwordHasher = new();
+
         public AuthService(MedSyncContext context, IConfiguration configuration)
         {
             _context = context;
@@ -27,14 +29,18 @@ namespace MedSync.Services
             {
                 return null;
             }
-           
-            var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+
+            var verificationResult = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                request.Password
+            );
             if (verificationResult == PasswordVerificationResult.Failed)
             {
                 return null;
             }
-            var insId = _context.InstitutionUsers
-                .Include(i => i.Institution)
+            var insId = _context
+                .InstitutionUsers.Include(i => i.Institution)
                 .Where(i => i.UserId == user.Id)
                 .Select(i => i.InstitutionId)
                 .FirstOrDefault();
@@ -51,17 +57,13 @@ namespace MedSync.Services
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("name", $"{user.FirstName} {user.LastName}".Trim()),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim("ins", $"{institutionId}")
-
+                new Claim("ins", $"{institutionId}"),
             };
 
             var securityKey = new SymmetricSecurityKey(
-                 Convert.FromBase64String(_configuration["Jwt:Key"]!)
+                Convert.FromBase64String(_configuration["Jwt:Key"]!)
             );
-            var credentials = new SigningCredentials(
-                securityKey,
-                SecurityAlgorithms.HmacSha256
-            );
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
@@ -70,18 +72,17 @@ namespace MedSync.Services
                 signingCredentials: credentials
             );
 
-
             return new JwtSecurityTokenHandler().WriteToken(token);
-
-
         }
 
         public string? RegisterUser(SignupRequestDto request)
         {
             Guid? institutionId = null;
-            if(request.Role == UserType.Doctor)
+            if (request.Role == UserType.Doctor)
             {
-                institutionId = _context.Institutions.FirstOrDefault(x => x.Code == request.DoctorData.InstitutionCode)?.Id;
+                institutionId = _context
+                    .Institutions.FirstOrDefault(x => x.Code == request.DoctorData.InstitutionCode)
+                    ?.Id;
                 if (institutionId == null)
                     return null;
             }
@@ -113,8 +114,8 @@ namespace MedSync.Services
                 };
                 _context.Patients.Add(patient);
             }
-            else if (request.Role == UserType.Doctor) {
-
+            else if (request.Role == UserType.Doctor)
+            {
                 var doctor = new Doctor
                 {
                     UserId = newUser.Id,
@@ -122,14 +123,16 @@ namespace MedSync.Services
                     MedicalLicenseNumber = request.DoctorData.LicenseNumber,
                     UniversityName = request.DoctorData.UniversityName,
                 };
-                
+
                 _context.Doctors.Add(doctor);
-                _context.InstitutionUsers.Add(new InstitutionUser
-                {
-                    InstitutionId = institutionId.Value,
-                    UserId = doctor.UserId,
-                    CreatedAt = DateTime.UtcNow,
-                });
+                _context.InstitutionUsers.Add(
+                    new InstitutionUser
+                    {
+                        InstitutionId = institutionId.Value,
+                        UserId = doctor.UserId,
+                        CreatedAt = DateTime.UtcNow,
+                    }
+                );
                 var newDoctorRequest = new DoctorRequests
                 {
                     Id = Guid.NewGuid(),
@@ -140,7 +143,6 @@ namespace MedSync.Services
                     Status = DoctorRequestsStatusEnumType.Pending,
                 };
                 _context.DoctorRequests.Add(newDoctorRequest);
-
             }
             _context.SaveChanges();
 
@@ -148,6 +150,4 @@ namespace MedSync.Services
             return token;
         }
     }
-
 }
-

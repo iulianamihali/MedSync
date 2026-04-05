@@ -1,6 +1,4 @@
 ﻿namespace MedSync.DataLayer.DTOs.User
 {
-    public class UpdateUserStatusDto
-    {
-    }
+    public class UpdateUserStatusDto { }
 }

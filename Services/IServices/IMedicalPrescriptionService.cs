@@ -7,6 +7,8 @@ namespace MedSync.Services.IServices
     {
         Task<Guid> AddMedicalPrescriptionAsync(AddMedicalPrescriptionRequestDto request);
         Task<MedicalPrescriptionPdfDto> GetMedicalPrescriptionPdfDataAsync(Guid prescriptionId);
-        Task<List<GetAppointmentPrescriptionsResponseDto>> GetAppointmentPrescriptionsAsync(Guid appointmentId);
+        Task<List<GetAppointmentPrescriptionsResponseDto>> GetAppointmentPrescriptionsAsync(
+            Guid appointmentId
+        );
     }
 }

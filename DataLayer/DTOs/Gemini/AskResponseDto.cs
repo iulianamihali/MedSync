@@ -6,5 +6,6 @@ namespace MedSync.DataLayer.DTOs.Gemini
     {
         public string? Message { get; set; }
         public List<InstitutionDetailsResponse>? Clinics { get; set; }
+        public List<AvailableSlotDto>? AvailableSlots { get; set; }
     }
 }

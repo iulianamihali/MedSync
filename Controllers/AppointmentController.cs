@@ -12,28 +12,41 @@ namespace MedSync.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentsService _appointmentsService;
+
         public AppointmentController(IAppointmentsService appointmentsService)
         {
             _appointmentsService = appointmentsService;
         }
+
         [HttpPost("addAppointment")]
         public async Task<IActionResult> AddAppointment(AddAppointmentRequestDto request)
         {
             var response = await _appointmentsService.AddAppointment(request);
             return Ok(response);
         }
+
         [HttpGet("getUpcomingAppointmentsForDoctor/{institutionId}/{doctorId}")]
-        public async Task<IActionResult> GetUpcomingAppointmentsForDoctorAsync(Guid institutionId, Guid doctorId)
+        public async Task<IActionResult> GetUpcomingAppointmentsForDoctorAsync(
+            Guid institutionId,
+            Guid doctorId
+        )
         {
-            var result = await _appointmentsService.GetUpcomingAppointmentsForDoctorAsync(institutionId, doctorId);
+            var result = await _appointmentsService.GetUpcomingAppointmentsForDoctorAsync(
+                institutionId,
+                doctorId
+            );
             return Ok(result);
         }
+
         [HttpPost("getCalendarAppointmentsByDoctor")]
-        public async Task<IActionResult> GetCalendarAppointmentsByDoctorAsync([FromBody] CalendarAppointmentsRequestDto request)
+        public async Task<IActionResult> GetCalendarAppointmentsByDoctorAsync(
+            [FromBody] CalendarAppointmentsRequestDto request
+        )
         {
             var result = await _appointmentsService.GetCalendarAppointmentsByDoctorAsync(request);
             return Ok(result);
         }
+
         [HttpGet("getPatientBasicInfo/{appointmentId}")]
         public async Task<IActionResult> GetPatientBasicInfoAsync(Guid appointmentId)
         {

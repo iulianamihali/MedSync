@@ -9,6 +9,5 @@ namespace MedSync.Services.IServices
         public Task<bool> AddSupportIssueAsync(AddSupportIssueRequestDto request);
         Task<PaginationDto<SupportIssueResponseDto>> GetSupportIssuesAsync(int page);
         Task<bool> UpdateSupportIssueStatusAsync(Guid id, StatusSupportEnumType status);
-
     }
 }

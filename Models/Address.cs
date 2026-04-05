@@ -20,6 +20,4 @@ public partial class Address
 
     public virtual ICollection<Institution> Institutions { get; set; } = new List<Institution>();
     public virtual User User { get; set; }
-
 }
-

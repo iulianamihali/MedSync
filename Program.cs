@@ -1,4 +1,5 @@
-﻿using MedSync.DataLayer.Enums;
+﻿using System.Text;
+using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using MedSync.Services;
 using MedSync.Services.IServices;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Infrastructure;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetSection("Jwt");
@@ -33,49 +33,54 @@ builder.Services.AddHostedService<ReminderWorker>();
 builder.Services.AddScoped<ICareGivingService, CareGivingService>();
 builder.Services.AddScoped<ISupportIssuesService, SupportIssuesService>();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<MedSyncContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MedSyncDb")));
-builder.Services
-    .AddAuthentication(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MedSyncDb"))
+);
+builder
+    .Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-     .AddJwtBearer(options =>
-     {
-         options.TokenValidationParameters = new TokenValidationParameters
-         {
-             ValidateIssuerSigningKey = true,
-             IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(key!)),
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(key!)),
 
-             ValidateIssuer = true,
-             ValidIssuer = jwt["Issuer"],
+            ValidateIssuer = true,
+            ValidIssuer = jwt["Issuer"],
 
-             ValidateAudience = true,
-             ValidAudience = jwt["Audience"],
+            ValidateAudience = true,
+            ValidAudience = jwt["Audience"],
 
-             ValidateLifetime = true
-         };
-     });
+            ValidateLifetime = true,
+        };
+    });
 
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-         policy =>
-         {
-             policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-               .AllowAnyHeader()
-               .AllowAnyMethod();
-         });
+    options.AddPolicy(
+        "AllowFrontend",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173", "https://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
 });
-
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -90,7 +95,7 @@ using (var scope = app.Services.CreateScope())
 
     var exists = await db.Users.AsNoTracking().AnyAsync(u => u.Email == adminEmail);
     if (!exists)
-    {       
+    {
         var adminPass = cfg["Admin:Password"];
         var userId = Guid.NewGuid();
         var user = new User
@@ -98,12 +103,12 @@ using (var scope = app.Services.CreateScope())
             Id = userId,
             Email = adminEmail!,
             Role = UserType.GlobalAdmin,
-            IsActive = true
+            IsActive = true,
         };
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, adminPass!);
 
-        db.Users.Add(user);       
+        db.Users.Add(user);
         await db.SaveChangesAsync();
     }
 }

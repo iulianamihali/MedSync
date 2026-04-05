@@ -11,14 +11,19 @@ namespace MedSync.Services
     public class UserService : IUserService
     {
         private readonly MedSyncContext _context;
+
         public UserService(MedSyncContext context)
         {
             _context = context;
         }
-        public async Task<PaginationDto<UsersDataTableResponseDto>> GetDataTableUsersAsync(int page, UserType userType)
+
+        public async Task<PaginationDto<UsersDataTableResponseDto>> GetDataTableUsersAsync(
+            int page,
+            UserType userType
+        )
         {
-            var result = _context.Users
-                .Where(i => i.Role == userType)
+            var result = _context
+                .Users.Where(i => i.Role == userType)
                 .Include(i => i.InstitutionUsers)
                     .ThenInclude(i => i.Institution)
                 .Select(i => new UsersDataTableResponseDto
@@ -26,11 +31,12 @@ namespace MedSync.Services
                     Id = i.Id,
                     UserName = $"{i.FirstName} {i.LastName}",
                     Role = i.Role,
-                    InstitutionName = string.Join(", ", i.InstitutionUsers
-                        .Select(x => x.Institution.Name)),
+                    InstitutionName = string.Join(
+                        ", ",
+                        i.InstitutionUsers.Select(x => x.Institution.Name)
+                    ),
                     CreatedAt = i.CreatedAt,
-                    Status = i.IsActive
-
+                    Status = i.IsActive,
                 })
                 .AsQueryable();
 
@@ -40,18 +46,13 @@ namespace MedSync.Services
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
             var total = await result.CountAsync();
-            return new PaginationDto<UsersDataTableResponseDto>
-            {
-                Rows = rows,
-                TotalCount = total,
-            };
-
+            return new PaginationDto<UsersDataTableResponseDto> { Rows = rows, TotalCount = total };
         }
 
         public async Task<UserSettingsDataResponseDto> GetUserSettingsDataAsync(Guid id)
         {
-            var result = await _context.Users
-                .Where(i => i.Id == id)
+            var result = await _context
+                .Users.Where(i => i.Id == id)
                 .Include(i => i.Address)
                 .Select(i => new UserSettingsDataResponseDto
                 {
@@ -64,7 +65,7 @@ namespace MedSync.Services
                     City = i.Address.City,
                     StreetAddress = i.Address.Street,
                     StreetNumber = i.Address.Number,
-                    PostalCode = i.Address.PostalCode
+                    PostalCode = i.Address.PostalCode,
                 })
                 .FirstOrDefaultAsync();
             return result;
@@ -72,19 +73,18 @@ namespace MedSync.Services
 
         public async Task<bool> EditInfoUsersAsync(UserSettingsDataResponseDto request)
         {
-            var result = await _context.Users
-                .Where(i => i.Id == request.Id)
+            var result = await _context
+                .Users.Where(i => i.Id == request.Id)
                 .Include(i => i.Address)
                 .FirstOrDefaultAsync();
             result.FirstName = request.FirstName;
             result.LastName = request.LastName;
             result.PhoneNumber = request.PhoneNumber;
             result.Email = request.Email;
-            if(result.Role == UserType.Patient || result.Role == UserType.Doctor)
+            if (result.Role == UserType.Patient || result.Role == UserType.Doctor)
             {
                 if (result.Address == null)
                 {
-                   
                     result.Address = new Address
                     {
                         Id = Guid.NewGuid(),
@@ -92,21 +92,19 @@ namespace MedSync.Services
                         City = request.City,
                         Street = request.StreetAddress,
                         Number = request.StreetNumber,
-                        PostalCode = request.PostalCode
+                        PostalCode = request.PostalCode,
                     };
 
                     _context.Addresses.Add(result.Address);
                 }
                 else
                 {
-                 
                     result.Address.Country = request.Country;
                     result.Address.City = request.City;
                     result.Address.Street = request.StreetAddress;
                     result.Address.Number = request.StreetNumber;
                     result.Address.PostalCode = request.PostalCode;
                 }
-
             }
             _context.Users.Update(result);
             return (await _context.SaveChangesAsync()) > 0;
@@ -114,9 +112,7 @@ namespace MedSync.Services
 
         public async Task<bool> UpdateUserStatusAsync(UpdateUserStatusRequestDto request)
         {
-            var result = await _context.Users
-                .Where(i => i.Id == request.Id)
-                .FirstOrDefaultAsync();
+            var result = await _context.Users.Where(i => i.Id == request.Id).FirstOrDefaultAsync();
             if (result != null)
             {
                 result.IsActive = request.Value;

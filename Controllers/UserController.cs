@@ -11,10 +11,12 @@ namespace MedSync.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+
         public UserController(IUserService userService)
         {
             _userService = userService;
         }
+
         [HttpGet("getDataTableUsers/{page}/{userType}")]
         [AuthorizeUserType(UserType.GlobalAdmin)]
         public async Task<IActionResult> GetDataTableUsersAsync(int page, UserType userType)
@@ -22,20 +24,33 @@ namespace MedSync.Controllers
             var result = await _userService.GetDataTableUsersAsync(page, userType);
             return Ok(result);
         }
+
         [HttpGet("getUserSettingsData/{id}")]
-        [AuthorizeUserType(UserType.GlobalAdmin, UserType.LocalAdmin, UserType.Patient, UserType.Doctor)]
+        [AuthorizeUserType(
+            UserType.GlobalAdmin,
+            UserType.LocalAdmin,
+            UserType.Patient,
+            UserType.Doctor
+        )]
         public async Task<IActionResult> GetUserSettingsDataAsync(Guid id)
         {
             var result = await _userService.GetUserSettingsDataAsync(id);
             return Ok(result);
         }
+
         [HttpPut("editInfoUsers")]
-        [AuthorizeUserType(UserType.GlobalAdmin, UserType.LocalAdmin, UserType.Patient, UserType.Doctor)]
+        [AuthorizeUserType(
+            UserType.GlobalAdmin,
+            UserType.LocalAdmin,
+            UserType.Patient,
+            UserType.Doctor
+        )]
         public async Task<IActionResult> EditInfoUsersAsync(UserSettingsDataResponseDto request)
         {
             var response = await _userService.EditInfoUsersAsync(request);
             return Ok(response);
         }
+
         [HttpPut("updateUserStatus")]
         [AuthorizeUserType(UserType.GlobalAdmin, UserType.LocalAdmin)]
         public async Task<IActionResult> UpdateUserStatusAsync(UpdateUserStatusRequestDto request)

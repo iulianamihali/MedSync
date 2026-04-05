@@ -6,6 +6,5 @@ namespace MedSync.DataLayer.DTOs.Doctor
     {
         public Guid DoctorId { get; set; }
         public List<AvailableSlotDto> SlotsAvailable { get; set; }
-
     }
 }

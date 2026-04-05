@@ -1,6 +1,6 @@
-﻿using MedSync.DataLayer.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MedSync.DataLayer.Enums;
 
 namespace MedSync.Models;
 
@@ -39,5 +39,4 @@ public partial class Appointment
     public virtual ICollection<MedicalReferral> MedicalReferrals { get; set; }
     public virtual Review? Review { get; set; }
     public virtual ICollection<Prescription> Prescriptions { get; set; }
-
 }

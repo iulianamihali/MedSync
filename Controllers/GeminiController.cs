@@ -8,10 +8,11 @@ namespace MedSync.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AuthorizeUserType(UserType.Patient)]
+    [AuthorizeUserType(UserType.Patient, UserType.Doctor)]
     public class GeminiController : ControllerBase
     {
         private readonly IGeminiService _geminiService;
+
         public GeminiController(IGeminiService geminiService)
         {
             _geminiService = geminiService;
@@ -21,6 +22,13 @@ namespace MedSync.Controllers
         public async Task<IActionResult> Ask([FromBody] AskRequestDto request)
         {
             var response = await _geminiService.AskAsync(request);
+            return Ok(response);
+        }
+
+        [HttpPost("doctor-ask")]
+        public async Task<IActionResult> DoctorAsk([FromBody] DoctorAskRequestDto request)
+        {
+            var response = await _geminiService.DoctorAskAsync(request);
             return Ok(response);
         }
     }

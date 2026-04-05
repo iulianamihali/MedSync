@@ -1,6 +1,6 @@
-﻿using MedSync.DataLayer.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MedSync.DataLayer.Enums;
 
 namespace MedSync.Models;
 

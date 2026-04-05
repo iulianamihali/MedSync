@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+
 namespace MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard
 {
     public class StatCardDto
@@ -9,15 +10,16 @@ namespace MedSync.DataLayer.DTOs.GlobalAdmin.Dashboard
         public int TrendValue { get; set; }
         public List<ChartStatPointDto> ChartData { get; set; }
     }
+
     public class StatCardsResponseDto
     {
-       public StatCardDto Patients { get; set; }
-       public StatCardDto Doctors { get; set; }
+        public StatCardDto Patients { get; set; }
+        public StatCardDto Doctors { get; set; }
 
-       [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-       public StatCardDto Institutions { get; set; }
-       [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-       public StatCardDto Appointments { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public StatCardDto Institutions { get; set; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public StatCardDto Appointments { get; set; }
     }
 }

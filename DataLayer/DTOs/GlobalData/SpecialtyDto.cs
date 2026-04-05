@@ -6,12 +6,13 @@ namespace MedSync.DataLayer.DTOs.GlobalData
     {
         public SpecialtyDto() { }
 
-        public SpecialtyDto(Specialty specialty) {
+        public SpecialtyDto(Specialty specialty)
+        {
             Id = specialty.Id;
             Name = specialty.Name;
         }
+
         public Guid Id { get; set; }
         public string Name { get; set; }
-       
     }
 }

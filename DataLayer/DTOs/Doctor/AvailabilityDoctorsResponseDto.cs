@@ -11,6 +11,5 @@ namespace MedSync.DataLayer.DTOs.Doctor
         public double Rating { get; set; }
         public int TotalReviews { get; set; }
         public List<AvailableSlotDto> SlotsAvailable { get; set; }
-
     }
 }

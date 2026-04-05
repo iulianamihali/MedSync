@@ -37,32 +37,30 @@ namespace MedSync.Services.pdf
         {
             container.Column(column =>
             {
-                column.Item().Row(row =>
-                {
-                    row.RelativeColumn(1)
-                        .AlignMiddle()
-                        .Row(left =>
-                        {
-                          
+                column
+                    .Item()
+                    .Row(row =>
+                    {
+                        row.RelativeColumn(1)
+                            .AlignMiddle()
+                            .Row(left =>
+                            {
+                                left.RelativeItem()
+                                    .AlignMiddle()
+                                    .Text(_data.InstitutionName.ToUpper())
+                                    .Bold()
+                                    .FontSize(20);
+                            });
 
-                            left.RelativeItem()
-                                .AlignMiddle()
-                                .Text(_data.InstitutionName.ToUpper())
-                                .Bold()
-                                .FontSize(20);
-                        });
+                        row.RelativeColumn(1)
+                            .AlignRight()
+                            .AlignMiddle()
+                            .Text(_data.DocumentTitle)
+                            .Bold()
+                            .FontSize(18);
+                    });
 
-                    row.RelativeColumn(1)
-                        .AlignRight()
-                        .AlignMiddle()
-                        .Text(_data.DocumentTitle)
-                        .Bold()
-                        .FontSize(18);
-                });
-
-                column.Item()
-                    .PaddingVertical(10)
-                    .LineHorizontal(1);
+                column.Item().PaddingVertical(10).LineHorizontal(1);
             });
         }
 
@@ -70,51 +68,59 @@ namespace MedSync.Services.pdf
         {
             container.Column(column =>
             {
-                column.Item()
-                    .Text("Patient information")
-                    .Bold()
-                    .FontSize(12);
+                column.Item().Text("Patient information").Bold().FontSize(12);
 
-                column.Item()
+                column
+                    .Item()
                     .PaddingTop(5)
                     .Row(row =>
                     {
-                        row.RelativeColumn().Column(left =>
-                        {
-                            left.Item().Text(text =>
+                        row.RelativeColumn()
+                            .Column(left =>
                             {
-                                text.Span("Name: ").Bold();
-                                text.Span(_data.PatientFullName);
+                                left.Item()
+                                    .Text(text =>
+                                    {
+                                        text.Span("Name: ").Bold();
+                                        text.Span(_data.PatientFullName);
+                                    });
+
+                                left.Item()
+                                    .Text(text =>
+                                    {
+                                        text.Span("Date of birth: ").Bold();
+                                        text.Span(
+                                            _data.PatientDateOfBirth.HasValue
+                                                ? _data.PatientDateOfBirth.Value.ToString(
+                                                    "dd.MM.yyyy"
+                                                )
+                                                : "-"
+                                        );
+                                    });
                             });
 
-                            left.Item().Text(text =>
+                        row.RelativeColumn()
+                            .Column(right =>
                             {
-                                text.Span("Date of birth: ").Bold();
-                                text.Span(_data.PatientDateOfBirth.HasValue
-                                    ? _data.PatientDateOfBirth.Value.ToString("dd.MM.yyyy")
-                                    : "-");
-                            });
-                        });
+                                right
+                                    .Item()
+                                    .Text(text =>
+                                    {
+                                        text.Span("CNP: ").Bold();
+                                        text.Span(_data.PatientCnp);
+                                    });
 
-                        row.RelativeColumn().Column(right =>
-                        {
-                            right.Item().Text(text =>
-                            {
-                                text.Span("CNP: ").Bold();
-                                text.Span(_data.PatientCnp);
+                                right
+                                    .Item()
+                                    .Text(text =>
+                                    {
+                                        text.Span("Consultation date: ").Bold();
+                                        text.Span(_data.ConsultationDate.ToString("dd.MM.yyyy"));
+                                    });
                             });
-
-                            right.Item().Text(text =>
-                            {
-                                text.Span("Consultation date: ").Bold();
-                                text.Span(_data.ConsultationDate.ToString("dd.MM.yyyy"));
-                            });
-                        });
                     });
 
-                column.Item()
-                    .PaddingVertical(10)
-                    .LineHorizontal(1);
+                column.Item().PaddingVertical(10).LineHorizontal(1);
 
                 AddSection(column, "Symptoms", _data.Symptoms);
                 AddSection(column, "Investigation", _data.Investigation);
@@ -126,67 +132,63 @@ namespace MedSync.Services.pdf
 
         private void AddSection(ColumnDescriptor column, string title, string? content)
         {
-            column.Item()
-                .PaddingTop(10)
-                .Text(title)
-                .Bold();
+            column.Item().PaddingTop(10).Text(title).Bold();
 
-            column.Item()
-                .PaddingLeft(10)
-                .Text(string.IsNullOrWhiteSpace(content) ? "-" : content);
+            column.Item().PaddingLeft(10).Text(string.IsNullOrWhiteSpace(content) ? "-" : content);
         }
 
         private void ComposeFooter(IContainer container)
         {
             container.Column(column =>
             {
-                column.Item()
+                column
+                    .Item()
                     .PaddingBottom(50)
                     .AlignRight()
                     .Text($"Dr. {_data.DoctorFullName.ToUpper()}")
                     .Bold()
                     .FontSize(11);
 
-                column.Item()
-                    .LineHorizontal(1);
+                column.Item().LineHorizontal(1);
 
-                column.Item()
-                .PaddingTop(6)
-                .Row(row =>
-                {
-                    row.RelativeItem()
-                        .AlignMiddle()
-                        .Column(left =>
-                        {
-                            left.Item()
-                                .Text(_data.InstitutionName)
-                                .FontSize(9)
-                                .FontColor(Colors.Grey.Darken1);
+                column
+                    .Item()
+                    .PaddingTop(6)
+                    .Row(row =>
+                    {
+                        row.RelativeItem()
+                            .AlignMiddle()
+                            .Column(left =>
+                            {
+                                left.Item()
+                                    .Text(_data.InstitutionName)
+                                    .FontSize(9)
+                                    .FontColor(Colors.Grey.Darken1);
 
-                            left.Item()
-                                .Text($"Date: {_data.GeneratedAt:dd.MM.yyyy HH:mm}")
-                                .FontSize(9)
-                                .FontColor(Colors.Grey.Darken1);
-                        });
+                                left.Item()
+                                    .Text($"Date: {_data.GeneratedAt:dd.MM.yyyy HH:mm}")
+                                    .FontSize(9)
+                                    .FontColor(Colors.Grey.Darken1);
+                            });
 
-                    row.RelativeItem()
-                        .AlignMiddle()
-                        .AlignRight()
-                        .Row(r =>
-                        {
-                            r.AutoItem()
-                                .AlignMiddle()
-                                .PaddingRight(6)
-                                .Text("Generated by")
-                                .FontSize(9)
-                                .FontColor(Colors.Grey.Darken1);
+                        row.RelativeItem()
+                            .AlignMiddle()
+                            .AlignRight()
+                            .Row(r =>
+                            {
+                                r.AutoItem()
+                                    .AlignMiddle()
+                                    .PaddingRight(6)
+                                    .Text("Generated by")
+                                    .FontSize(9)
+                                    .FontColor(Colors.Grey.Darken1);
 
-                            r.AutoItem()
-                                .AlignMiddle()
-                                .MaxHeight(50)
-                                .Image(_data.InstitutionLogo);
-                        });
-                });
+                                r.AutoItem()
+                                    .AlignMiddle()
+                                    .MaxHeight(50)
+                                    .Image(_data.InstitutionLogo);
+                            });
+                    });
             });
         }
     }

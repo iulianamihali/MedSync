@@ -25,6 +25,4 @@
 
         public string DoctorFullName { get; set; } = string.Empty;
     }
-
-
 }
