@@ -22,5 +22,6 @@ namespace MedSync.Services.IServices
         Task<bool> RevokeSharedLinkAsync(GenerateLinkRequestDto request);
         Task<PatientBasicInfoResponseDto> GetPatientBasicInfoAsync(Guid patientId);
         Task<PatientAIContextDto> GetAIContextAsync(Guid userId);
+        Task<bool> LeaveReviewAsync(LeaveReviewRequestDto request);
     }
 }

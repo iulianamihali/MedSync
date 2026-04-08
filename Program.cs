@@ -1,7 +1,11 @@
 ﻿using System.Text;
+using Google.GenAI;
 using MedSync.DataLayer.Enums;
 using MedSync.Models;
 using MedSync.Services;
+using MedSync.Services.Handlers;
+using MedSync.Services.Handlers.Doctor;
+using MedSync.Services.Handlers.Patient;
 using MedSync.Services.IServices;
 using MedSync.Services.pdf;
 using MedSync.Workers;
@@ -32,6 +36,18 @@ builder.Services.AddScoped<SharedMedicalService>();
 builder.Services.AddHostedService<ReminderWorker>();
 builder.Services.AddScoped<ICareGivingService, CareGivingService>();
 builder.Services.AddScoped<ISupportIssuesService, SupportIssuesService>();
+builder.Services.AddScoped(sp =>
+{
+    var apiKey = sp.GetRequiredService<IConfiguration>()["Gemini:ApiKey"];
+    return new Client(apiKey: apiKey);
+});
+builder.Services.AddScoped<IFunctionCallHandler, SearchClinicsHandler>();
+builder.Services.AddScoped<IFunctionCallHandler, RankDoctorsHandler>();
+builder.Services.AddScoped<IFunctionCallHandler, GetDoctorSummaryHandler>();
+builder.Services.AddScoped<IFunctionCallHandler, GetDoctorSlotsHandler>();
+builder.Services.AddScoped<IDoctorFunctionCallHandler, FutureAppointmentsHandler>();
+builder.Services.AddScoped<IDoctorFunctionCallHandler, PatientSummaryHandler>();
+builder.Services.AddScoped<IDoctorFunctionCallHandler, AvailableSlotsHandler>();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 
 // Add services to the container.

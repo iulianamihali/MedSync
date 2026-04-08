@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+﻿using MedSync.DataLayer.Enums;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace MedSync.DataLayer.DTOs.Patient
 {
@@ -10,5 +11,7 @@ namespace MedSync.DataLayer.DTOs.Patient
         public String Specialty { get; set; }
         public DateTime StartDateTime { get; set; }
         public String Service { get; set; }
+        public bool HasReview { get; set; }
+        public AppointmentStatusEnumType StatusAppointment {  get; set; }
     }
 }

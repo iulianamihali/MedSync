@@ -188,11 +188,11 @@ namespace MedSync.Services
             Guid patientId
         )
         {
-            var result = await _context
-                .Appointments.Where(a =>
+            var result = await _context.Appointments
+               .Where(a =>
                     (a.PatientUserId == patientId || a.UnregisteredPatientId == patientId)
-                    && a.StartDateTime < DateTime.UtcNow
-                )
+                    && a.StartDateTime < DateTime.UtcNow)
+               
                 .Select(a => new AppointmentHistoryResponseDto
                 {
                     AppointmentId = a.Id,
@@ -206,6 +206,8 @@ namespace MedSync.Services
                     Specialty = a.InstitutionService.Specialty.Name,
                     StartDateTime = a.StartDateTime,
                     Service = a.InstitutionService.Service.Name,
+                    HasReview = a.Review != null,
+                    StatusAppointment = a.Status,
                 })
                 .OrderByDescending(a => a.StartDateTime)
                 .ToListAsync();
@@ -492,5 +494,27 @@ namespace MedSync.Services
                 Doctors = doctors,
             };
         }
+
+        public async Task<bool> LeaveReviewAsync(LeaveReviewRequestDto request)
+        {
+            var appointment = await _context.Appointments
+                .Where(a => a.Id == request.AppointmentId && a.PatientUserId == request.PatientId && a.Status == AppointmentStatusEnumType.Completed)
+                .FirstOrDefaultAsync();
+            if (appointment == null)
+                return false;
+    
+                var resp = new Review
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = request.AppointmentId,
+                    Rating = request.Rating,
+                    Comment = request.Comment,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Reviews.Add(resp);
+                return await _context.SaveChangesAsync() > 0;
+
+        }
+
     }
 }

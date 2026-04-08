@@ -1,5 +1,6 @@
 ﻿using MedSync.Attributes;
 using MedSync.DataLayer.DTOs.Appointments;
+using MedSync.DataLayer.DTOs.Patient;
 using MedSync.DataLayer.Enums;
 using MedSync.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -105,5 +106,12 @@ namespace MedSync.Controllers
         //    var response = await _patientService.GetPatientBasicInfoAsync(patientId);
         //    return Ok(response);
         //}
+
+        [HttpPost("leaveReview")]
+        public async Task<IActionResult> LeaveReviewAsync([FromBody] LeaveReviewRequestDto request)
+        {
+            var result = await _patientService.LeaveReviewAsync(request);
+            return Ok(result);
+        }
     }
 }
