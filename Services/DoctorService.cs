@@ -351,6 +351,90 @@ namespace MedSync.Services
             return response;
         }
 
+        public async Task<List<DoctorWorkingHoursDayDto>> GetWorkingHoursAsync(
+      Guid doctorId,
+      Guid institutionId
+  )
+        {
+            var schedules = await _context.UserSchedules
+                .Where(s => s.UserId == doctorId && s.InstitutionId == institutionId)
+                .ToListAsync();
+
+            var days = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+            var result = new List<DoctorWorkingHoursDayDto>();
+
+            foreach (var dayName in days)
+            {
+                int dayNumber = (int)Enum.Parse<DayOfWeek>(dayName);
+
+                var schedule = schedules.FirstOrDefault(s => s.DayOfWeek == dayNumber);
+
+                if (schedule != null)
+                {
+                    result.Add(new DoctorWorkingHoursDayDto
+                    {
+                        Day = dayName,
+                        Enabled = true,
+                        Start = schedule.StartTime.ToString("HH:mm"),
+                        End = schedule.EndTime.ToString("HH:mm"),
+                    });
+                }
+                else
+                {
+                    result.Add(new DoctorWorkingHoursDayDto
+                    {
+                        Day = dayName,
+                        Enabled = false,
+                        Start = "09:00",
+                        End = "17:00",
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<bool> SaveWorkingHoursAsync(SaveDoctorWorkingHoursRequestDto request)
+        {
+            var dayMap = new Dictionary<string, int>
+    {
+        { "Sunday", 0 },
+        { "Monday", 1 },
+        { "Tuesday", 2 },
+        { "Wednesday", 3 },
+        { "Thursday", 4 },
+        { "Friday", 5 },
+        { "Saturday", 6 },
+    };
+
+            var existing = await _context.UserSchedules
+                .Where(s => s.UserId == request.DoctorId && s.InstitutionId == request.InstitutionId)
+                .ToListAsync();
+
+            _context.UserSchedules.RemoveRange(existing);
+
+            foreach (var day in request.WorkingHours)
+            {
+                if (!day.Enabled)
+                    continue;
+
+                _context.UserSchedules.Add(new UserSchedule
+                {
+                    Id = Guid.NewGuid(),
+                    DayOfWeek = dayMap[day.Day],
+                    StartTime = TimeOnly.Parse(day.Start),
+                    EndTime = TimeOnly.Parse(day.End),
+                    UserId = request.DoctorId,
+                    InstitutionId = request.InstitutionId,
+                    CreatedByUserId = request.DoctorId,
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<DoctorAIContextDto> GetAIContextAsync(Guid doctorId, Guid institutionId)
         {
             var doctor = await _context

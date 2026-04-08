@@ -93,5 +93,21 @@ namespace MedSync.Controllers
             );
             return Ok(response);
         }
+
+        [HttpGet("workingHours/{institutionId}/{doctorId}")]
+        public async Task<IActionResult> GetWorkingHoursAsync(Guid institutionId, Guid doctorId)
+        {
+            var response = await _doctorService.GetWorkingHoursAsync(doctorId, institutionId);
+            return Ok(response);
+        }
+
+        [HttpPost("workingHours")]
+        public async Task<IActionResult> SaveWorkingHoursAsync(
+            [FromBody] SaveDoctorWorkingHoursRequestDto request
+        )
+        {
+            var response = await _doctorService.SaveWorkingHoursAsync(request);
+            return Ok(response);
+        }
     }
 }

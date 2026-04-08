@@ -43,5 +43,7 @@ namespace MedSync.Services.IServices
             DateTime toDate,
             int slotMinutes
         );
+        Task<List<DoctorWorkingHoursDayDto>> GetWorkingHoursAsync(Guid doctorId, Guid institutionId);
+        Task<bool> SaveWorkingHoursAsync(SaveDoctorWorkingHoursRequestDto request);
     }
 }
