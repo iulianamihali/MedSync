@@ -33,5 +33,26 @@ namespace MedSync.Controllers
                 return BadRequest();
             return Ok(result);
         }
+
+        [HttpPost("request-reset-password")]
+        public async Task<IActionResult> RequestResetPassword([FromBody] string email)
+        {
+            var result = await _authService.RequestResetPasswordAsync(email);
+            return Ok(result);
+        }
+        [HttpGet("validate-token-reset")]
+        public async Task<IActionResult> ValidateResetToken([FromQuery] string token)
+        {
+            var result =  _authService.ValidateResetToken(token, out _, out _);
+            return Ok(result);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+        {
+            var result = await _authService.ResetPasswordAsync(request);
+            return Ok(result);
+        }
     }
+
 }
