@@ -124,6 +124,37 @@ CREATE TABLE AssociatedUsers (
 );
 GO
 
+Create Table Specialties(
+	Id uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+	CONSTRAINT PK_Specialties PRIMARY KEY (Id)
+);
+GO
+
+Create Table Services(
+	Id uniqueidentifier NOT NULL,
+	[Name] nvarchar(100) NOT NULL,
+	CONSTRAINT PK_Services PRIMARY KEY (Id)
+);
+GO
+
+Create Table InstitutionServices(
+	Id uniqueidentifier NOT NULL,
+    [Description] nvarchar(max),
+	Price decimal(10,2) NOT NULL,
+	Duration int NOT NULL,
+	InstitutionId uniqueidentifier NOT NULL,
+	SpecialtyId uniqueidentifier NOT NULL,
+	ServiceId uniqueidentifier NOT NULL,
+    IsActive bit NOT NULL DEFAULT 1,
+	CONSTRAINT PK_InstitutionServices PRIMARY KEY (Id),
+	CONSTRAINT FK_InstitutionServices_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
+	CONSTRAINT FK_InstitutionServices_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
+	CONSTRAINT FK_InstitutionServices_ServiceId FOREIGN KEY (ServiceId) REFERENCES Services(Id)
+
+);
+GO
+
 -- 10. Appointments
 CREATE TABLE Appointments (
     Id uniqueidentifier NOT NULL,
@@ -147,8 +178,7 @@ CREATE TABLE Appointments (
     CONSTRAINT FK_Appointments_PatientUserId FOREIGN KEY (PatientUserId) REFERENCES Patients(UserId),
     CONSTRAINT FK_Appointments_UnregisteredPatientId FOREIGN KEY (UnregisteredPatientId) REFERENCES UnregisteredPatients(Id),
     CONSTRAINT FK_Appointments_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
-    CONSTRAINT FK_Appointments_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionService(Id),
-
+    CONSTRAINT FK_Appointments_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionServices(Id)
 
 );
 GO
@@ -186,6 +216,7 @@ CREATE TABLE MedicalRecords (
     CONSTRAINT PK_MedicalRecords PRIMARY KEY (Id),
 	CONSTRAINT FK_MedicalRecords_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id)
 );
+GO
 
 
 CREATE TABLE SupportIssues (
@@ -197,8 +228,9 @@ CREATE TABLE SupportIssues (
 	Active bit NOT NULL,
 	Status smallint NOT NULL,
 	CONSTRAINT PK_SupportIssues PRIMARY KEY (Id),
-	CONSTRAINT FK_SupportIssues_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+	CONSTRAINT FK_SupportIssues_UserId FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
+GO
 
 Create table InstitutionRequests (
 	Id uniqueidentifier NOT NULL,
@@ -209,9 +241,10 @@ Create table InstitutionRequests (
 	Status smallint NOT NULL,
     CONSTRAINT PK_InstitutionRequests PRIMARY KEY (Id),
 	CONSTRAINT FK_InstitutionRequests_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-	CONSTRAINT FK_InstitutionRequests_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
+	CONSTRAINT FK_InstitutionRequests_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id)
 
 );
+GO
 
 Create table DoctorRequests (
     Id uniqueidentifier NOT NULL,
@@ -222,37 +255,10 @@ Create table DoctorRequests (
 	Status smallint NOT NULL,
     CONSTRAINT PK_DoctorRequests PRIMARY KEY (Id),
     CONSTRAINT FK_DoctorRequests_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-    CONSTRAINT FK_DoctorRequests_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
+    CONSTRAINT FK_DoctorRequests_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id)
 
 );
-
-Create Table Specialties(
-	Id uniqueidentifier NOT NULL,
-    [Name] nvarchar(100) NOT NULL,
-	CONSTRAINT PK_Specialties PRIMARY KEY (Id)
-);
-
-Create Table Services(
-	Id uniqueidentifier NOT NULL,
-	[Name] nvarchar(100) NOT NULL,
-	CONSTRAINT PK_Services PRIMARY KEY (Id)
-);
-
-Create Table InstitutionServices(
-	Id uniqueidentifier NOT NULL,
-    [Description] nvarchar(max),
-	Price decimal(10,2) NOT NULL,
-	Duration int NOT NULL,
-	InstitutionId uniqueidentifier NOT NULL,
-	SpecialtyId uniqueidentifier NOT NULL,
-	ServiceId uniqueidentifier NOT NULL,
-    IsActive bit NOT NULL DEFAULT 1,
-	CONSTRAINT PK_InstitutionServices PRIMARY KEY (Id),
-	CONSTRAINT FK_InstitutionServices_InstitutionId FOREIGN KEY (InstitutionId) REFERENCES Institutions(Id),
-	CONSTRAINT FK_InstitutionServices_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
-	CONSTRAINT FK_InstitutionServices_ServiceId FOREIGN KEY (ServiceId) REFERENCES Services(Id),
-
-);
+GO
 
 CREATE TABLE DoctorSpecialties (
 	Id uniqueIdentifier NOT NULL,
@@ -260,9 +266,10 @@ CREATE TABLE DoctorSpecialties (
 	InstitutionServiceId uniqueidentifier NOT NULL,
 	CONSTRAINT PK_DoctorSpecialties PRIMARY KEY (Id),
 	CONSTRAINT FK_DoctorSpecialties_DoctorUserId FOREIGN KEY (DoctorUserId) REFERENCES Doctors(UserId),
-	CONSTRAINT FK_DoctorSpecialties_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionServices(Id),
+	CONSTRAINT FK_DoctorSpecialties_InstitutionServiceId FOREIGN KEY (InstitutionServiceId) REFERENCES InstitutionServices(Id)
 
 );
+GO
 
 CREATE TABLE UnregisteredPatients (
 	Id uniqueidentifier NOT NULL,
@@ -274,6 +281,7 @@ CREATE TABLE UnregisteredPatients (
     DateOfBirth date NULL,
 	CONSTRAINT PK_UnregisteredPatients PRIMARY KEY (Id)
 );
+GO
 
 CREATE TABLE MedicalReferrals (
 	 Id uniqueidentifier NOT NULL,
@@ -286,8 +294,9 @@ CREATE TABLE MedicalReferrals (
 	 ExpirationDate datetime2 NULL, 
 	 CONSTRAINT PK_MedicalReferrals PRIMARY KEY (Id),
 	 CONSTRAINT FK_MedicalReferrals_SpecialtyId FOREIGN KEY (SpecialtyId) REFERENCES Specialties(Id),
-	 CONSTRAINT FK_MedicalReferrals_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id),
-)
+	 CONSTRAINT FK_MedicalReferrals_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id)
+);
+GO
 
 CREATE TABLE Prescriptions(
 	Id uniqueidentifier NOT NULL,
@@ -295,7 +304,8 @@ CREATE TABLE Prescriptions(
 	Diagnosis nvarchar(255) NOT NULL,
 	CONSTRAINT PK_Prescriptions PRIMARY KEY (Id),
 	CONSTRAINT FK_Prescriptions_AppointmentId FOREIGN KEY (AppointmentId) REFERENCES Appointments(Id)
-)
+);
+GO
 
 
 CREATE TABLE Medications (
@@ -309,7 +319,8 @@ CREATE TABLE Medications (
 	CONSTRAINT PK_Medications PRIMARY KEY (Id),
 	CONSTRAINT FK_Medications_PrescriptionId FOREIGN KEY (PrescriptionId) REFERENCES Prescriptions(Id)
 
-)
+);
+GO
 
 CREATE TABLE SharedLinks (
 	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -321,4 +332,5 @@ CREATE TABLE SharedLinks (
     CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
     FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
     FOREIGN KEY(CareUnregisteredPatientId) REFERENCES UnregisteredPatients(Id)
-)
+);
+GO
