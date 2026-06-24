@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.4.11626.88 stable
+VisualStudioVersion = 18.4.11626.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedSync", "MedSync.csproj", "{8CA5318B-CA1F-408D-A15C-36863846BE15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedSync.UnitTests", "..\MedSync.UnitTests\MedSync.UnitTests.csproj", "{D95EC3A9-0A9B-42C0-869E-5A371A799D8E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Medsync.Tests", "Medsync.Tests", "{DEB7E19E-180E-4A15-8D46-63B0FCC980C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedSync.IntegrationTests", "..\MedSync.Tests\MedSync.IntegrationTests.csproj", "{768F83DE-9828-CD35-123E-D3E479874D78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedSync.UnitTests", "..\MedSync.UnitTests\MedSync.UnitTests.csproj", "{AAECAC92-67D5-40E7-B509-85709FA76987}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,13 +21,21 @@ Global
 		{8CA5318B-CA1F-408D-A15C-36863846BE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CA5318B-CA1F-408D-A15C-36863846BE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CA5318B-CA1F-408D-A15C-36863846BE15}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D95EC3A9-0A9B-42C0-869E-5A371A799D8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D95EC3A9-0A9B-42C0-869E-5A371A799D8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D95EC3A9-0A9B-42C0-869E-5A371A799D8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D95EC3A9-0A9B-42C0-869E-5A371A799D8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{768F83DE-9828-CD35-123E-D3E479874D78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{768F83DE-9828-CD35-123E-D3E479874D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{768F83DE-9828-CD35-123E-D3E479874D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{768F83DE-9828-CD35-123E-D3E479874D78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAECAC92-67D5-40E7-B509-85709FA76987}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAECAC92-67D5-40E7-B509-85709FA76987}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAECAC92-67D5-40E7-B509-85709FA76987}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAECAC92-67D5-40E7-B509-85709FA76987}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{768F83DE-9828-CD35-123E-D3E479874D78} = {DEB7E19E-180E-4A15-8D46-63B0FCC980C6}
+		{AAECAC92-67D5-40E7-B509-85709FA76987} = {DEB7E19E-180E-4A15-8D46-63B0FCC980C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DF1DD991-C438-42A4-B220-960FFBC1A951}

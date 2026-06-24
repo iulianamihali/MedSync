@@ -49,6 +49,7 @@ builder.Services.AddScoped<IDoctorFunctionCallHandler, FutureAppointmentsHandler
 builder.Services.AddScoped<IDoctorFunctionCallHandler, PatientSummaryHandler>();
 builder.Services.AddScoped<IDoctorFunctionCallHandler, AvailableSlotsHandler>();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
+builder.Services.AddHttpClient<InstitutionServices>();
 
 // Add services to the container.
 

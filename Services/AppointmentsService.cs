@@ -75,6 +75,7 @@ namespace MedSync.Services
 
         public async Task<bool> AddAppointment(AddAppointmentRequestDto request)
         {
+                         
             var json = File.ReadAllText("EmailTemplates.json");
             using var doc = JsonDocument.Parse(json);
             var institutionService = await _context
@@ -86,7 +87,14 @@ namespace MedSync.Services
                 .FirstOrDefaultAsync();
             if (institutionService == null)
                 return false;
-
+            var duration = institutionService.Duration;
+            var conflictingAppointment = await
+               _context.Appointments
+               .Where(a => (a.PatientUserId == request.PatientId || a.UnregisteredPatientId == request.UnregisteredPatientId) &&
+               (request.startTime < a.EndDateTime && request.startTime.AddMinutes(duration) > a.StartDateTime))
+               .FirstOrDefaultAsync();
+            if (conflictingAppointment != null)
+                throw new InvalidOperationException("PATIENT_CONFLICT");
             DateTime appDateTime = request.startTime;
             string patientEmail = string.Empty;
             string patientName = string.Empty;
@@ -280,5 +288,7 @@ namespace MedSync.Services
                 .FirstOrDefaultAsync();
             return response;
         }
+
+
     }
 }

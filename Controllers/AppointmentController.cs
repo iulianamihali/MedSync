@@ -21,8 +21,16 @@ namespace MedSync.Controllers
         [HttpPost("addAppointment")]
         public async Task<IActionResult> AddAppointment(AddAppointmentRequestDto request)
         {
-            var response = await _appointmentsService.AddAppointment(request);
-            return Ok(response);
+            try
+            {
+                var response = await _appointmentsService.AddAppointment(request);
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "PATIENT_CONFLICT")
+            {
+                return BadRequest("You already have an appointment in this time slot.");
+            }
+
         }
 
         [HttpGet("getUpcomingAppointmentsForDoctor/{institutionId}/{doctorId}")]

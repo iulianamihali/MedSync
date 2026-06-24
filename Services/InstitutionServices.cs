@@ -1,7 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Azure;
+﻿using Azure;
 using Azure.Core;
 using MedSync.DataLayer.DTOs;
 using MedSync.DataLayer.DTOs.Doctor;
@@ -16,7 +13,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
 using NanoidDotNet;
-
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 namespace MedSync.Services
 {
     public class InstitutionServices : IInstitutionService
@@ -24,11 +25,14 @@ namespace MedSync.Services
         private readonly MedSyncContext _context;
         private readonly PasswordHasher<User> _passwordHasher = new();
         private readonly MailerSendService _mailerSendService;
-
-        public InstitutionServices(MedSyncContext context, MailerSendService mailerSendService)
+        private readonly IConfiguration _config;
+        private readonly HttpClient _httpClient;
+        public InstitutionServices(MedSyncContext context, MailerSendService mailerSendService, IConfiguration config, HttpClient httpClient)
         {
             _context = context;
             _mailerSendService = mailerSendService;
+            _config = config;
+            _httpClient = httpClient;
         }
 
         public async Task<string> GetInstitutionName(Guid institutionId)
@@ -40,8 +44,32 @@ namespace MedSync.Services
             return result;
         }
 
+        public async Task<(decimal lat, decimal lng)> GeocodeAddressAsync(string fullAddress)
+        {
+            var mapBoxToken = _config["MapBoxToken:AccessToken"];
+            var encoded = Uri.EscapeDataString(fullAddress);
+            var url = $"https://api.mapbox.com/search/geocode/v6/forward?q={encoded}&access_token={mapBoxToken}";
+            var response = await _httpClient.GetAsync(url);
+            if(response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var features = doc.RootElement.GetProperty("features");
+                if (features.GetArrayLength() == 0)
+                    return (0, 0);
+                var coords = features[0]
+                .GetProperty("properties")
+                .GetProperty("coordinates");
+                var lat = coords.GetProperty("latitude").GetDecimal();
+                var lng = coords.GetProperty("longitude").GetDecimal();
+                return (lat, lng);
+            }
+            return (0, 0);
+        }
         public async Task<bool> RegisterInstitutionAsync(InstitutionRequestDto requestDto)
         {
+            string fullAddress = $"{requestDto.Country},{requestDto.City},{requestDto.StreetAddress},{requestDto.StreetNumber},{requestDto.PostalCode}";
+            var coords = await GeocodeAddressAsync(fullAddress);
             var newAddress = new Address
             {
                 Id = Guid.NewGuid(),
@@ -50,6 +78,8 @@ namespace MedSync.Services
                 Street = requestDto.StreetAddress,
                 Number = requestDto.StreetNumber,
                 PostalCode = requestDto.PostalCode,
+                Latitude = coords.lat,
+                Longitude = coords.lng
             };
             _context.Addresses.Add(newAddress);
 

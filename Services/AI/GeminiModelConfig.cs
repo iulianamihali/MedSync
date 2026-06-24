@@ -2,7 +2,6 @@ namespace MedSync.Services.AI
 {
     public static class GeminiModelConfig
     {
-        //public const string Default = "gemini-2.5-flash-lite";
-        public const string Default = "gemini-3.1-flash-lite-preview";
+        public const string Default = "gemini-3.1-flash-lite";
     }
 }
