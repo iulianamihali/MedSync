@@ -82,6 +82,7 @@ namespace MedSync.Services
                 .InstitutionServices.Include(i => i.Service)
                 .Include(i => i.Specialty)
                 .Where(i =>
+                i.InstitutionId == request.InstitutionId &&
                     i.SpecialtyId == request.SpecialtyId && i.ServiceId == request.ServiceId
                 )
                 .FirstOrDefaultAsync();

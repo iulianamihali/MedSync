@@ -30,6 +30,7 @@ namespace MedSync.Services
                 .Patients.Include(p => p.User)
                     .ThenInclude(p => p.Address)
                 .FirstOrDefaultAsync(p => p.UserId == patientId);
+          
             if (patient != null)
             {
                 var result = new PatientDetailsResponseDto
@@ -64,7 +65,7 @@ namespace MedSync.Services
                         Id = unregistredPatient.Id,
                         FirstName = unregistredPatient.FirstName,
                         LastName = unregistredPatient.LastName,
-                        DateOfBirth = null,
+                        DateOfBirth = unregistredPatient.DateOfBirth,
                         Address = null,
                         PhoneNumber = unregistredPatient.PhoneNumber,
                         Email = unregistredPatient.Email,
@@ -196,6 +197,7 @@ namespace MedSync.Services
                 .Select(a => new AppointmentHistoryResponseDto
                 {
                     AppointmentId = a.Id,
+                    InstitutionName = a.Institution.Name,
                     DoctorName = a.Doctor.User.FirstName + " " + a.Doctor.User.LastName,
                     Address =
                         a.Institution.Address.City

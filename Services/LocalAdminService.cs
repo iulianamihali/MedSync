@@ -83,8 +83,8 @@ namespace MedSync.Services
                 .Include(u => u.InstitutionService)
                     .ThenInclude(u => u.Service)
                 .Where(u =>
-                    u.InstitutionService.InstitutionId == institutionId
-                    && (u.StartDateTime.Date == DateTime.UtcNow.Date)
+                    u.InstitutionId == institutionId
+                    && (u.StartDateTime.Date == DateTime.Now.Date)
                     && (
                         u.Status == AppointmentStatusEnumType.Confirmed
                         || u.Status == AppointmentStatusEnumType.InProgress

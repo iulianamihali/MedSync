@@ -29,10 +29,10 @@ namespace MedSync.Services
             {
                 from = new
                 {
-                    email = "noreply@test-ywj2lpn1x2kg7oqz.mlsender.net",
+                    email = "noreply@test-eqvygm0xdmjl0p7w.mlsender.net",
                     name = "MedSync",
                 },
-                to = new[] { new { email = toEmail } },
+                to = new[] { new { email = "iuliana.mihali02@e-uvt.ro" } },
                 subject = subject,
                 html = message,
             };

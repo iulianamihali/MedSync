@@ -884,7 +884,7 @@ namespace MedSync.Services
         )
         {
             var service = await _context.InstitutionServices.FirstOrDefaultAsync(s =>
-                s.InstitutionId == request.InstitutionId && s.ServiceId == request.ServiceId
+                s.InstitutionId == request.InstitutionId && s.SpecialtyId == request.SpecialtyId && s.ServiceId == request.ServiceId
             );
 
             if (service == null)

@@ -118,7 +118,9 @@ namespace MedSync.Services
                                 ? first.Patient.User.PhoneNumber
                                 : first.UnregisteredPatient?.PhoneNumber,
 
-                        DateOfBirth = first.Patient?.User?.DateOfBirth,
+                        DateOfBirth = first.Patient?.User != null 
+                        ? first.Patient?.User?.DateOfBirth
+                        : first.UnregisteredPatient?.DateOfBirth,
 
                         Visits = g.Count(),
 
@@ -127,8 +129,8 @@ namespace MedSync.Services
                 })
                 .AsQueryable();
 
-            var rows = result.OrderByDescending(i => i.LastVisit).Skip(page * 9).Take(9).ToList();
-            var total = result.Count();
+            var rows = result.OrderByDescending(i => i.LastVisit).Skip(page * 9).Take(9).Where(x => x.Id != Guid.Empty).ToList();
+            var total = result.Where(x => x.Id != Guid.Empty).Count();
             return new PaginationDto<PatientsDataTableResponseDto>
             {
                 Rows = rows,
