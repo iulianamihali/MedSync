@@ -20,19 +20,19 @@ MedSync oferă clinicilor un sistem integrat de administrare a activității zil
 
 ## 🏗️ Arhitectura serviciilor
 
-![Arhitectura serviciilor](public/ss_readme/arhitectura_servicii.png)
+![Arhitectura serviciilor](ClientApp/public/ss_readme/arhitectura_servicii.png)
 
 ---
 
 ## 🗃️ Arhitectura bazei de date
 
-![Arhitectura bazei de date](public/ss_readme/arhitectura_db.png)
+![Arhitectura bazei de date](ClientApp/public/ss_readme/arhitectura_db.png)
 
 ---
 
 ## 👥 Roluri și funcționalități
 
-![Roluri și funcționalități](public/ss_readme/roluri_si_functionalitati.png)
+![Roluri și funcționalități](ClientApp/public/ss_readme/roluri_si_functionalitati.png)
 
 ---
 
