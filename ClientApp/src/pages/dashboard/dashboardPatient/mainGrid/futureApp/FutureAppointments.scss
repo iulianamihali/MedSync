@@ -1,0 +1,257 @@
+.upcoming {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #1e2a3a !important;
+  }
+
+  &__view-all {
+    text-transform: none !important;
+    font-size: 0.8rem !important;
+    color: #00897b !important;
+    font-weight: 500 !important;
+    padding: 4px 8px !important;
+    border-radius: 8px !important;
+
+    .MuiSvgIcon-root {
+      font-size: 11px !important;
+    }
+
+    &:hover {
+      background-color: rgba(0, 137, 123, 0.06) !important;
+    }
+  }
+
+  &__scroll {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 8px;
+
+    &::-webkit-scrollbar {
+      height: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #b2dfdb;
+      border-radius: 4px;
+    }
+  }
+
+  &__grid {
+    display: flex;
+    gap: 16px;
+    min-width: min-content;
+  }
+
+  &__card {
+    width: 270px;
+    min-width: 270px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e0ebe7;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #00897b;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 150, 136, 0.08);
+      transform: translateY(-2px);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &--next {
+      border-color: #b2dfdb;
+
+      &::before {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &__status-chip {
+    height: 22px !important;
+    font-size: 0.65rem !important;
+    font-weight: 500 !important;
+    border-radius: 99px !important;
+
+    &--confirmed {
+      background-color: #e6f5f2 !important;
+      color: #00897b !important;
+    }
+
+    &--pending {
+      background-color: #fff3e0 !important;
+      color: #e65100 !important;
+    }
+
+    .MuiChip-label {
+      padding: 0 8px !important;
+    }
+  }
+
+  &__next-badge {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    background: #00897b;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  &__specialty {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #1a2e35 !important;
+    line-height: 1.3 !important;
+  }
+
+  &__divider {
+    width: 100%;
+    height: 1px;
+    background: #e8f0ed;
+  }
+
+  &__datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  &__date {
+    font-size: 0.78rem !important;
+    font-weight: 400 !important;
+    color: #00897b !important;
+  }
+
+  &__time {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #1a2e35 !important;
+    letter-spacing: 0.3px !important;
+  }
+
+  &__institution {
+    font-size: 0.72rem !important;
+    color: #90a4ae !important;
+    font-weight: 400 !important;
+    margin-top: 2px !important;
+  }
+
+  &__doctor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0 4px;
+  }
+
+  &__doctor-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+
+  &__doctor-name {
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    color: #1a2e35 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__doctor-title {
+    font-size: 0.69rem !important;
+    color: #90a4ae !important;
+    margin-top: 0 !important;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: auto;
+  }
+
+  &__btn-details {
+    text-transform: none !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    color: #00897b !important;
+    background: #e6f5f2 !important;
+    border-radius: 10px !important;
+    padding: 8px 16px !important;
+    box-shadow: none !important;
+
+    .MuiSvgIcon-root {
+      font-size: 1rem !important;
+    }
+
+    &:hover {
+      background: #d0eeea !important;
+    }
+  }
+
+  @media (max-width: 600px) {
+    &__card {
+      width: 240px;
+      min-width: 240px;
+      padding: 14px;
+    }
+
+    &__specialty {
+      font-size: 1rem !important;
+    }
+
+    &__time {
+      font-size: 1rem !important;
+    }
+  }
+}

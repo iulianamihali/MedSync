@@ -1,0 +1,33 @@
+.button-add-institution {
+  background: linear-gradient(90deg, #4A90E2, #7de19a);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 8px;
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+
+  &.is-final {
+    margin-top: 30px;
+  }
+
+  &:hover {
+    background: linear-gradient(90deg, #357ABD, #5DC989);
+    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+    cursor: pointer;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+    transition: all 0.1s ease;
+  }
+
+  @media (max-width: 767px) {
+    margin-top: 8px;
+    padding: 0px;
+  }
+}

@@ -1,0 +1,13 @@
+.chevron {
+  color: #5f6479;
+}
+.sidebar-button.Mui-selected
+{
+  &:hover{
+    background-color: rgba(104, 165, 229, 0.12) !important;
+  }
+  &:active{
+    background-color: rgb(234, 234, 146);
+
+  }
+}

@@ -1,0 +1,229 @@
+$ai-orange:       #E8833A;
+$ai-orange-light: #FEF0E7;
+$ai-orange-mid:   #F5C4A1;
+$ai-orange-dark:  #B85A1A;
+
+.ai-floating-root {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+.ai-floating-panel {
+  width: 380px !important;
+  height: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: 0.5px solid $ai-orange-mid !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background: white !important;
+
+  @media (max-width: 480px) {
+    width: calc(100vw - 32px) !important;
+    height: calc(100vh - 160px) !important;
+  }
+}
+
+.ai-floating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: $ai-orange-light;
+}
+
+.ai-floating-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-avatar {
+  width: 28px !important;
+  height: 28px !important;
+  background-color: $ai-orange !important;
+}
+
+.ai-floating-title {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: $ai-orange-dark !important;
+}
+
+.ai-close-btn {
+  color: $ai-orange !important;
+}
+
+.ai-divider {
+  border-color: rgba($ai-orange-mid, 0.3) !important;
+}
+
+.ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb {
+    background: $ai-orange-mid;
+    border-radius: 4px;
+  }
+}
+
+.ai-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+  opacity: 0.5;
+}
+
+.ai-empty-icon {
+  font-size: 24px !important;
+  color: $ai-orange !important;
+}
+
+.ai-empty-text {
+  font-size: 12px !important;
+  color: #666 !important;
+  text-align: center !important;
+  line-height: 1.5 !important;
+}
+
+.ai-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 8px 12px;
+}
+
+.ai-input {
+  .MuiInputBase-input {
+    font-size: 12px !important;
+    padding: 4px 0 !important;
+    &::placeholder { color: #aaa !important; }
+  }
+}
+
+.ai-send-btn {
+  color: $ai-orange !important;
+  flex-shrink: 0;
+  &.Mui-disabled { color: #ccc !important; }
+}
+
+.ai-disclaimer {
+  margin: 0 !important;
+  padding: 6px 12px 8px;
+  border-top: 1px solid rgba($ai-orange-mid, 0.35);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ai-disclaimer-icon {
+  font-size: 14px !important;
+  color: #9a9a9a !important;
+  flex-shrink: 0;
+}
+
+.ai-disclaimer-text {
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  color: #8a8a8a !important;
+  text-align: center;
+}
+
+.ai-fab {
+  background-color: $ai-orange !important;
+  color: white !important;
+  transition: transform 0.2s ease, background-color 0.2s ease !important;
+
+  &:hover {
+    background-color: $ai-orange-dark !important;
+    transform: scale(1.05);
+  }
+
+  &.ai-fab-open {
+    background-color: $ai-orange-dark !important;
+  }
+}
+
+.ai-message {
+  display: flex;
+  max-width: 85%;
+
+  &-user {
+    align-self: flex-end;
+
+    .ai-message-text {
+      background-color: #f1f1f1;
+      color: #333;
+      border-radius: 8px 8px 2px 8px;
+      padding: 6px 10px;
+    }
+  }
+
+  &-ai {
+    align-self: flex-start;
+
+    .ai-message-text {
+      background-color: $ai-orange-light;
+      color: $ai-orange-dark;
+      border-radius: 8px 8px 8px 2px;
+      padding: 6px 10px;
+    }
+  }
+}
+
+.ai-message-text {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+
+.ai-message-markdown {
+  white-space: pre-wrap;
+
+  p {
+    margin: 0 0 6px;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  ul,
+  ol {
+    margin: 6px 0 0;
+    padding-left: 16px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  li:last-child {
+    margin-bottom: 0;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}

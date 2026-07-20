@@ -1,0 +1,424 @@
+// APPOINTMENTS CALENDAR
+
+.appointments-calendar {
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  margin-top: 40px;
+  height: calc(100vh - 100px);  // 100px = header-ul paginii
+  display: flex;
+  flex-direction: column;
+
+  .fc {
+    flex: 1;
+    min-height: 0;
+
+  }
+
+  // Variabile FC
+  .fc {
+    --fc-border-color: #eee;
+    --fc-button-bg-color: rgba(109, 156, 188, 0.9);
+    --fc-button-hover-bg-color: rgba(109, 156, 188, 1);
+    --fc-button-active-bg-color: rgb(234, 234, 146);
+    --fc-today-bg-color: transparent;
+    --fc-now-indicator-color: #e74c3c;
+    --fc-small-font-size: 0.75rem;
+    font-family: inherit;
+  }
+  .fc-scrollgrid {
+    border-radius: 12px !important;
+    overflow: hidden ! important;
+  }
+  // Scrollbar
+  .fc-scroller {
+    overflow-y: auto !important;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 3px; }
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+      &:hover { background: #999; }
+    }
+  }
+
+  // Toolbar
+  .fc-toolbar {
+    margin-bottom: 16px !important;
+  }
+
+  .fc-toolbar-chunk:nth-child(2) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    text-transform: capitalize !important;
+  }
+
+  // Butoane
+  .fc-button {
+    padding: 8px 14px !important;
+    font-weight: 500 !important;
+    border-radius: 8px !important;
+  }
+
+  .fc-prev-button,
+  .fc-next-button {
+    background: transparent !important;
+    border: none !important;
+    color: #666 !important;
+    padding: 4px 8px !important;
+    font-size: 1rem !important;
+
+    &:hover { background: #f0f0f0 !important; color: #333 !important; }
+    &:focus { box-shadow: none !important; }
+  }
+
+  .fc-button-group {
+    background: #dfe9f4 !important;
+    border-radius: 10px ! important;
+    padding: 4px ! important;
+
+  }
+
+  .fc-dayGridMonth-button,
+  .fc-timeGridWeek-button,
+  .fc-timeGridDay-button {
+    background: transparent !important;
+    border: none ! important;
+    color: #666 ! important;
+    padding: 5px 7px !important;
+    border-radius: 8px ! important;
+    font-weight: 500 !important;
+    font-size: 0.9rem ! important;
+
+    &:hover { color: #b9c3e4 !important; }
+    &:focus { box-shadow: none !important; }
+
+  }
+  .fc-button-active {
+    background: rgba(109, 156, 188, 1) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(109, 156, 188, 0.3) !important;
+
+  }
+  .fc-today-button {
+    background: rgba(109, 156, 188, 1) !important;
+    border: none !important;
+    color: white !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-weight: 500 ! important;
+    font-size: 0.9rem !important;
+
+    &:hover { background: rgba(90, 140, 170, 1) !important; }
+    &:disabled { background: rgba(109, 156, 188, 1) !important; color: white !important; }
+  }
+  // Header zile
+  .fc-col-header-cell {
+    padding: 8px 0 !important;
+  }
+
+  .fc-col-header-cell-cushion {
+    color: #333 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    font-size: 0.75rem !important;
+  }
+
+  .fc-day-today .fc-col-header-cell-cushion {
+    color: #999 !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  // Celule
+  .fc-day-today {
+    background: transparent !important;
+  }
+
+  .fc-daygrid-day-number {
+    color: #333 !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    padding: 6px 10px !important;
+  }
+
+  .fc-day-other .fc-daygrid-day-number {
+    color: #ccc !important;
+  }
+
+  // Carduri Month view
+  .fc-daygrid-event {
+    border-radius: 4px !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left-width: 4px !important;
+    border-left-style: solid !important;
+    padding: 3px 6px !important;
+    margin: 1px 2px !important;
+
+    .fc-daygrid-event-dot { display: none !important; }
+    .fc-event-time { font-size: 0.65rem !important; font-weight: 700 !important; color: #333 !important; }
+    .fc-event-title { font-size: 0.7rem !important; font-weight: 500 !important; color: #444 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  }
+
+  // Carduri Week/Day view
+  .fc-timegrid-event {
+    border-radius: 6px !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left-width: 4px !important;
+    border-left-style: solid !important;
+
+    .fc-event-main { padding: 6px 8px !important; }
+    .fc-event-time { font-size: 0.7rem !important; font-weight: 700 !important; color: #333 !important; }
+    .fc-event-title { font-size: 0.75rem !important; font-weight: 600 !important; color: #333 !important; }
+  }
+  .fc-timegrid-col.fc-day-today {
+    background: rgba(109, 156, 188, 0.05) !important;
+  }
+  .fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    cursor: pointer;
+  }
+
+  // Time grid
+  .fc-timegrid-slot { height: 50px !important; }
+  .fc-timegrid-slot-label-cushion { font-size: 0.75rem !important; color: #666 !important; }
+  .fc-timegrid-axis-cushion { font-size: 0.7rem !important; }
+
+  // Now indicator
+  .fc-timegrid-now-indicator-line {
+    border-color: #e74c3c !important;
+    border-width: 2px !important;
+  }
+
+  // Modal
+
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+
+      h3 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+      button {
+        width: 32px; height: 32px;
+        border: none; background: #f5f5f5;
+        border-radius: 50%; font-size: 18px; cursor: pointer;
+        &:hover { background: rgba(109, 156, 188, 1); color: white; }
+      }
+    }
+
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      input {
+        padding: 12px 14px;
+        border: 2px solid #eee;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        &:focus { outline: none; border-color: rgba(109, 156, 188, 1); }
+      }
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+
+      button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: none;
+        background: #f5f5f5;
+
+        &.save {
+          background: rgba(109, 156, 188, 1);
+          color: white;
+          &:hover { background: rgba(90, 140, 170, 1); }
+        }
+      }
+      button.delete {
+        background: #fee2e2;
+        color: #dc2626;
+        margin-right: auto;
+
+        &:hover {
+          background: #dc2626;
+          color: white;
+        }
+      }
+    }
+  }
+}
+.fab-new-appointment{
+  background: #4caf50;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+
+  &:hover {
+    background: #43a047;
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+  }
+}
+
+// Mobile
+@media (max-width: 768px) {
+  .appointments-calendar {
+    padding: 12px;
+    margin-top: 46px;
+    height: calc(100vh - 80px);
+
+    .fc-toolbar {
+      flex-direction: column ! important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      margin-bottom: 12px !important;
+      .fc-toolbar-chunk { display: flex; justify-content: center; }
+    }
+
+    .fc-toolbar-chunk:nth-child(2) {
+      display: flex ! important;
+      align-items: center ! important;
+      justify-content: center ! important;
+      gap: 8px !important;
+      order: 0 !important;
+    }
+
+    // Butonul Today
+    .fc-toolbar-chunk:first-child {
+      order: 1 ! important;
+    }
+
+    // Butoanele Month/Week/Day
+    .fc-toolbar-chunk:last-child {
+      order: 2 !important;
+    }
+
+    .fc-toolbar-title {
+      font-size: 1.1rem !important;
+      margin: 0 4px !important;
+    }
+
+    .fc-button { padding: 6px 12px !important; font-size: 0.8rem !important; }
+    .fc-col-header-cell { padding: 4px 0 !important; }
+    .fc-col-header-cell-cushion { font-size: 0.65rem !important; padding: 2px !important; }
+    .fc-day-today .fc-col-header-cell-cushion { padding: 3px 6px !important; font-size: 0.6rem !important; }
+    .fc-timegrid-slot { height: 40px !important; }
+    .fc-timegrid-slot-label-cushion { font-size: 0.6rem !important; padding: 0 4px !important; }
+    .fc-timegrid-axis { width: 35px !important; }
+
+    .fc-timegrid-event {
+      border-left-width: 2px !important;
+      border-radius: 4px !important;
+      .fc-event-main { padding: 3px 5px !important; }
+      .fc-event-time { font-size: 0.55rem !important; }
+      .fc-event-title { font-size: 0.6rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    }
+
+    .fc-daygrid-day-number { font-size: 0.75rem !important; padding: 4px !important; }
+    .fc-daygrid-day-frame { min-height: 60px !important; }
+    .fc-daygrid-event {
+      padding: 2px 4px !important;
+      margin: 1px !important;
+      border-left-width: 2px !important;
+      .fc-event-time { font-size: 0.55rem !important; }
+      .fc-event-title { font-size: 0.6rem !important; }
+    }
+
+    .modal-content {
+      margin: 16px;
+      border-radius: 12px;
+      .modal-header { padding: 14px 16px; h3 { font-size: 1rem; } }
+      .modal-body { padding: 16px; gap: 10px; input { padding: 10px 12px; font-size: 0.9rem; } }
+      .modal-footer { padding: 12px 16px; button { padding: 8px 16px; font-size: 0.85rem; } }
+    }
+  }
+  .fab-new-appointment {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+}
+
+// Floating Action Button
+.fab-new-appointment {
+  position: fixed;
+  bottom: 96px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9ed8d2 0%, #7ecec6 100%);
+  color: white;
+  border: none;
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: linear-gradient(135deg, #8ed0c9 0%, #6ec4bb 100%);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+// Telefoane mici
+@media (max-width: 380px) {
+  .appointments-calendar {
+    padding: 8px;
+    height: calc(100vh - 60px);
+
+    .fc-toolbar-title { font-size: 1rem !important; }
+    .fc-button { padding: 5px 10px !important; font-size: 0.75rem !important; }
+    .fc-timegrid-slot { height: 35px !important; }
+    .fc-timegrid-event {
+      .fc-event-time { display: none !important; }
+      .fc-event-title { font-size: 0.55rem !important; }
+    }
+  }
+  .fab-new-appointment {
+    bottom: 16px;
+    right: 16px;
+    width: 46px;
+    height: 46px;
+    font-size: 22px;
+
+  }
+}

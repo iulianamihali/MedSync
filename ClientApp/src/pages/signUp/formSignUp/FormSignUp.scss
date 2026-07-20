@@ -1,0 +1,101 @@
+.form-signup-container {
+  background:  #f8fafc;
+  box-shadow: 0 4px 20px rgba(74,144,226,0.15);  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 500px;
+  margin-right: 550px;
+  border: 1px solid #e2e8f0;
+
+  .login-link {
+    color: #4A90E2;
+    font-weight: 800;
+  }
+
+  .form-fields {
+    .MuiOutlinedInput-root {
+      border-radius: 12px;
+    }
+    .MuiInputLabel-root {
+      background: #f8fafc;
+      padding: 0 4px;
+    }
+    .MuiFormLabel-asterisk {
+      color: red;
+    }
+
+  }
+
+  .button-signup {
+    background: linear-gradient(90deg, #4A90E2, #7de19a);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    padding: 8px;
+    &.is-final {
+      margin-top: 30px
+    }
+    &:hover {
+      background: linear-gradient(90deg, #357ABD, #5DC989);
+      box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+      cursor: pointer;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 767px) {
+      margin-top: 8px;
+      padding: 0px;
+    }
+  }
+
+  .button-back {
+    height: 74%;
+    margin-bottom: 4px;
+    background: transparent;
+    color: #4A90E2;
+    font-weight: 400;
+    border-color: #357ABD;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(74, 144, 226, 0.1);
+      cursor: pointer;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+    }
+
+    @media (max-width: 767px) {
+      width: 74px;
+    }
+  }
+
+  @media (max-width: 1024px) and (min-width: 768px) {
+    margin: 50px auto;
+    width: 65%;
+    margin-left: 5%;
+    margin-bottom: 176px;
+  }
+
+  @media (max-width: 767px) {
+    margin: 0 auto;
+    width: 79%;
+    &.is-final {height: 44%;}
+    &.is-initial {height: 61%;}
+    height: 61%;
+    margin-bottom: 15px;
+    justify-content: center;
+
+    .MuiInputBase-input {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+    }
+    .MuiInputLabel-root {
+      font-size: 1rem;
+    }
+  }
+}

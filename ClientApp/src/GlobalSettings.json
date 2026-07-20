@@ -1,0 +1,19 @@
+{
+  "apiUrl": "https://localhost:7146/api",
+  "globalAdminRoute": "/GlobalAdmin",
+  "institutionRoute": "/institution",
+  "userRoute": "/user",
+  "localAdminRoute": "/LocalAdmin",
+  "globalDataRoute": "/GlobalData",
+  "appointmentRoute": "/Appointment",
+  "doctorRoute": "/Doctor",
+  "medicalRecords": "/MedicalRecords",
+  "patientRoute": "/Patient",
+  "medicalReferrals": "/MedicalReferrals",
+  "medicalPrescription": "/MedicalPrescription",
+  "sharedMedical": "/SharedMedical",
+  "careGiving": "/CareGiving",
+  "supportIssues": "/SupportIssues",
+  "gemini": "/Gemini",
+  "auth" : "/Auth"
+}

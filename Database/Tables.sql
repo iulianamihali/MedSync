@@ -7,7 +7,7 @@ CREATE TABLE Addresses (
     Number nvarchar(20) NOT NULL,
     PostalCode nvarchar(20) NOT NULL,
     Latitude DECIMAL(9,6) NOT NULL DEFAULT 0,
-    Longitude DECIMAL(9,6) NOT NULL DEFAULT 0
+    Longitude DECIMAL(9,6) NOT NULL DEFAULT 0,
     CONSTRAINT PK_Addresses PRIMARY KEY (Id)
 );
 GO

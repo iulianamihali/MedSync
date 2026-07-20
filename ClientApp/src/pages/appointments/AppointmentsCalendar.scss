@@ -1,0 +1,54 @@
+.fc-v-event {
+  background: #f9f8f9 !important;
+}
+.fc-h-event {
+  background: none !important;
+}
+.fc-more-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.08);
+
+  border-radius: 999px;
+  padding: 2px 6px;
+
+  cursor: pointer;
+  &:hover{
+    background: rgba(15, 23, 42, 0.12);
+  }
+}
+
+.calendar-event {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  padding: 4px 6px;
+  box-sizing: border-box;
+
+  color: #676464;
+  overflow: hidden;
+
+  .service {
+    color: #0e0d0d;
+    font-weight: bold;
+  }
+  .status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 7px;
+
+    .icon-status {
+      margin-top: 5px;
+      margin-right: 5px;
+    }
+  }
+
+}

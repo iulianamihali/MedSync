@@ -1,0 +1,49 @@
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+}
+
+.appointment-card {
+  display: flex;
+  align-items: center;
+  .col-info {
+    flex: 2;
+    min-width: 0;
+  }
+  .col-type {
+    flex: 1;
+    text-align: center;
+  }
+  .col-status {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .col-info, .col-type, .col-status {
+      width: 100%;
+      flex: auto;
+      text-align: left;
+      justify-content: flex-start;
+    }
+    .col-status {
+      transform: translateX(-4px);
+    }
+
+  }
+}
+.list {
+  max-height: 345px;
+  overflow-y: auto;
+}
