@@ -32,7 +32,7 @@ MedSync provides clinics with an integrated system for managing daily operations
 
 ## 👥 Roles and Features
 
-![Roles and Features](ClientApp/public/ss_readme/roluri_si_functionalitati.png)
+![Roles and Features](ClientApp/public/ss_readme/roles_features.png)
 
 ---
 
