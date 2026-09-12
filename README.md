@@ -1,42 +1,42 @@
 # 🏥 MedSync
 
-> Platformă web pentru gestionarea centralizată a mai multor clinici medicale
+> A web platform for centralized management of multiple medical clinics
 
-MedSync oferă clinicilor un sistem integrat de administrare a activității zilnice și pacienților un istoric medical unificat, accesibil și ușor de partajat între instituții.
+MedSync provides clinics with an integrated system for managing daily operations and gives patients a unified medical history that is easy to access and share across institutions.
 
 ---
 
-## 🛠️ Tehnologii utilizate
+## 🛠️ Technologies Used
 
-| Strat | Tehnologie |
+| Layer | Technology |
 |---|---|
 | Frontend | React, TypeScript |
 | Backend | C#, .NET 8 (Web API + Worker Service) |
-| Bază de date | Microsoft SQL Server |
+| Database | Microsoft SQL Server |
 | Email | MailerSend |
 | Asistent AI | Google Gemini |
 
 ---
 
-## 🏗️ Arhitectura serviciilor
+## 🏗️ Service Architecture
 
-![Arhitectura serviciilor](ClientApp/public/ss_readme/arhitectura_servicii.png)
-
----
-
-## 🗃️ Arhitectura bazei de date
-
-![Arhitectura bazei de date](ClientApp/public/ss_readme/arhitectura_db.png)
+![Service Architecture](ClientApp/public/ss_readme/arhitectura_servicii.png)
 
 ---
 
-## 👥 Roluri și funcționalități
+## 🗃️ Database Architecture
 
-![Roluri și funcționalități](ClientApp/public/ss_readme/roluri_si_functionalitati.png)
+![Database Architecture](ClientApp/public/ss_readme/arhitectura_db.png)
 
 ---
 
-## ⚙️ Cerințe preliminare
+## 👥 Roles and Features
+
+![Roles and Features](ClientApp/public/ss_readme/roluri_si_functionalitati.png)
+
+---
+
+## ⚙️ Prerequisities
 
 - [Node.js](https://nodejs.org/) v18+
 - [.NET SDK](https://dotnet.microsoft.com/download) v8+
@@ -44,11 +44,11 @@ MedSync oferă clinicilor un sistem integrat de administrare a activității zil
 
 ---
 
-## 🚀 Rulare locală
+## 🚀 Running Locally
 
 ### Backend
 
-Configurează `appsettings.Development.json` în folderul `MedSync/`:
+Configure `appsettings.Development.json` in the  `MedSync/` folder:
 
 ```json
 {
@@ -75,7 +75,7 @@ dotnet run
 
 ### Frontend
 
-Configurează `.env` în rădăcina proiectului:
+Configure the `.env` file in the project root:
 
 ```env
 VITE_MAPBOX_TOKEN=your_mapbox_token_here
